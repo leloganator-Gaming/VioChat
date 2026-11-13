@@ -1,0 +1,25 @@
+VIOCHAT — PREMIÈRE VERSION
+
+Fichiers :
+- index.html : page d'accueil, inscription et connexion
+- style.css : design noir et violet responsive
+- config.js : identifiants publics du projet Supabase
+- app.js : logique d'inscription, connexion et déconnexion
+- schema.sql : table des profils et règles de sécurité
+
+INSTALLATION
+
+1. Crée un projet sur https://supabase.com/
+2. Dans Supabase, ouvre Project Settings > API.
+3. Copie l'URL du projet et la clé publishable (ou anon si ton projet l'affiche).
+4. Colle-les dans config.js à la place des deux textes COLLE_ICI.
+5. Dans Supabase, ouvre SQL Editor > New query.
+6. Copie tout le contenu de schema.sql, puis clique sur Run.
+7. Dans Authentication > URL Configuration, ajoute l'adresse de ton site GitHub Pages dans Site URL et Redirect URLs.
+   Exemple : https://TON-PSEUDO.github.io/TON-REPO/
+8. Envoie les fichiers à la racine de ton dépôt GitHub et active GitHub Pages.
+
+À SAVOIR
+- Si la confirmation par e-mail est activée, le membre doit confirmer son adresse avant de se connecter.
+- La messagerie, les amis, les stories et les notifications ne sont pas encore activés dans cette première étape.
+- Ne partage jamais une clé service_role. La clé publishable/anon est prévue pour le navigateur, avec les règles RLS activées.

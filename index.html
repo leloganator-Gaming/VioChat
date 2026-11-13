@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#100b18">
+  <title>VioChat — Discutez librement</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="ambient ambient-one"></div><div class="ambient ambient-two"></div>
+  <main class="shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="VioChat accueil"><span class="brand-mark">V</span><span>Vio<span>Chat</span></span></a>
+      <span class="top-note"><i></i> Votre espace de discussion</span>
+    </header>
+
+    <section id="auth-view" class="auth-layout">
+      <div class="intro">
+        <div class="eyebrow"><span class="sparkle">✦</span> CONNECTÉS, TOUT SIMPLEMENT</div>
+        <h1>Les conversations<br>prennent <span>vie.</span></h1>
+        <p>Retrouvez vos amis, échangez vos idées et créez de nouvelles conversations dans votre espace VioChat.</p>
+        <div class="feature-pills"><span>✦ Messages privés</span><span>✦ Communautés</span><span>✦ Profils personnalisés</span></div>
+        <div class="orb-art" aria-hidden="true"><div class="orb orb-a"></div><div class="orb orb-b"></div><div class="orb orb-c"></div><div class="orbit-line"></div></div>
+      </div>
+
+      <div class="auth-card">
+        <div class="card-heading">
+          <div class="mini-mark">V</div>
+          <div><p class="eyebrow">BIENVENUE SUR VIOCHAT</p><h2 id="form-title">Créer un compte</h2></div>
+        </div>
+        <p class="muted" id="form-subtitle">Rejoignez la communauté, c'est gratuit.</p>
+
+        <div class="tabs" role="tablist" aria-label="Type de formulaire">
+          <button class="tab active" id="signup-tab" type="button">Inscription</button>
+          <button class="tab" id="login-tab" type="button">Connexion</button>
+        </div>
+
+        <form id="auth-form">
+          <div class="field" id="username-field">
+            <label for="username">Pseudo</label>
+            <input id="username" type="text" autocomplete="nickname" minlength="3" maxlength="20" placeholder="Ex. AlexViolet">
+            <small>3 à 20 caractères. Lettres, chiffres et _ uniquement.</small>
+          </div>
+          <div class="field">
+            <label for="email">Adresse e-mail</label>
+            <input id="email" type="email" autocomplete="email" placeholder="toi@exemple.fr" required>
+          </div>
+          <div class="field">
+            <label for="password">Mot de passe</label>
+            <input id="password" type="password" autocomplete="new-password" minlength="8" placeholder="8 caractères minimum" required>
+          </div>
+          <button class="primary-btn" id="submit-btn" type="submit"><span>Créer mon compte</span><b>→</b></button>
+        </form>
+        <div id="feedback" class="feedback" role="status" aria-live="polite"></div>
+        <p class="terms">En continuant, tu acceptes d'utiliser VioChat de manière respectueuse.</p>
+      </div>
+    </section>
+
+    <section id="app-view" class="app-view hidden">
+      <aside class="sidebar">
+        <a class="brand side-brand" href="#"><span class="brand-mark">V</span><span>Vio<span>Chat</span></span></a>
+        <p class="side-label">ESPACE PERSONNEL</p>
+        <button class="side-link selected" type="button"><span>◈</span> Discussions <em>À venir</em></button>
+        <button class="side-link" type="button"><span>♧</span> Amis <em>À venir</em></button>
+        <button class="side-link" type="button"><span>◉</span> Stories <em>À venir</em></button>
+        <div class="sidebar-bottom">
+          <div class="user-chip"><div class="avatar" id="avatar-letter">V</div><div><strong id="user-pseudo">Membre</strong><small id="user-email"></small></div></div>
+          <button id="logout-btn" class="logout-btn" type="button">↪ Déconnexion</button>
+        </div>
+      </aside>
+      <div class="welcome-panel">
+        <div class="welcome-icon">✦</div>
+        <p class="eyebrow">TON ESPACE VIOCHAT</p>
+        <h1>Bienvenue,<br><span id="welcome-name">membre</span> !</h1>
+        <p class="muted">Ton compte est prêt. La messagerie et les amis seront ajoutés dans la prochaine étape.</p>
+        <div class="coming-grid"><div><b>01</b><strong>Messages privés</strong><small>Discuter en temps réel</small></div><div><b>02</b><strong>Amis</strong><small>Retrouver la communauté</small></div><div><b>03</b><strong>Stories</strong><small>Partager des moments</small></div></div>
+      </div>
+    </section>
+
+    <footer><span>© 2026 VioChat</span><span>Fait pour garder le lien <b>✦</b></span></footer>
+  </main>
+</body>
+</html>
