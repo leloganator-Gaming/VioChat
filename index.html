@@ -7,6 +7,7 @@
   <title>VioChat — Discutez librement</title>
   <link rel="stylesheet" href="style.css?v=2">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
   <script src="config.js?v=2"></script>
   <script src="app.js?v=2" defer></script>
 </head>
@@ -64,23 +65,45 @@
       <aside class="sidebar">
         <a class="brand side-brand" href="#"><span class="brand-mark">V</span><span>Vio<span>Chat</span></span></a>
         <p class="side-label">ESPACE PERSONNEL</p>
-        <button class="side-link selected" type="button"><span>◈</span> Discussions <em>À venir</em></button>
-        <button class="side-link" type="button"><span>♧</span> Amis <em>À venir</em></button>
-        <button class="side-link" type="button"><span>◉</span> Stories <em>À venir</em></button>
-        <div class="sidebar-bottom">
-          <div class="user-chip"><div class="avatar" id="avatar-letter">V</div><div><strong id="user-pseudo">Membre</strong><small id="user-email"></small></div></div>
-          <button id="logout-btn" class="logout-btn" type="button">↪ Déconnexion</button>
-        </div>
+        <div class="user-chip"><div class="avatar" id="avatar-letter">V</div><div><strong id="user-pseudo">Membre</strong><small id="user-email"></small></div></div>
+        <button id="logout-btn" class="logout-btn" type="button">↪ Déconnexion</button>
       </aside>
-      <div class="welcome-panel">
-        <div class="welcome-icon">✦</div>
-        <p class="eyebrow">TON ESPACE VIOCHAT</p>
-        <h1>Bienvenue,<br><span id="welcome-name">membre</span> !</h1>
-        <p class="muted">Ton compte est prêt. La messagerie et les amis seront ajoutés dans la prochaine étape.</p>
-        <div class="coming-grid"><div><b>01</b><strong>Messages privés</strong><small>Discuter en temps réel</small></div><div><b>02</b><strong>Amis</strong><small>Retrouver la communauté</small></div><div><b>03</b><strong>Stories</strong><small>Partager des moments</small></div></div>
+      <div class="member-area">
+        <div class="member-heading"><div><p class="eyebrow">TON ESPACE VIOCHAT</p><h1>Salut, <span id="welcome-name">membre</span> !</h1></div><span class="online-pill">● En ligne</span></div>
+        <div class="member-grid">
+          <section class="panel avatar-panel">
+            <div class="panel-heading"><div><p class="eyebrow">TON PERSONNAGE</p><h2>Mon avatar 3D</h2></div><span class="panel-icon">✦</span></div>
+            <div id="avatar-canvas" class="avatar-canvas" aria-label="Aperçu 3D de ton avatar"></div>
+            <p class="avatar-hint">Fais glisser le personnage pour le faire tourner.</p>
+            <div class="avatar-controls">
+              <label>Teint <input id="skin-color" type="color" value="#d99a70"></label>
+              <label>Cheveux <input id="hair-color" type="color" value="#51302a"></label>
+              <label>Vêtement <input id="shirt-color" type="color" value="#8d45df"></label>
+              <label>Coiffure <select id="hair-style"><option value="short">Courte</option><option value="long">Longue</option><option value="curly">Bouclée</option></select></label>
+            </div>
+            <button id="save-avatar" class="primary-btn" type="button"><span>Enregistrer mon avatar</span><b>✓</b></button>
+            <p id="avatar-save-status" class="status-line"></p>
+          </section>
+          <section class="panel messages-panel">
+            <div class="panel-heading"><div><p class="eyebrow">RESTE EN CONTACT</p><h2>Messages privés</h2></div><span class="panel-icon">◈</span></div>
+            <form id="find-user" class="find-user"><input id="find-username" placeholder="Rechercher un pseudo…" required><button type="submit">Trouver</button></form>
+            <p id="find-status" class="status-line"></p>
+            <div class="messenger">
+              <div class="chat-list-wrap"><p class="side-label">CONVERSATIONS</p><div id="chat-list" class="chat-list"><p class="muted">Chargement…</p></div></div>
+              <div class="chat-main">
+                <div id="chat-empty" class="chat-empty"><span>✦</span><strong>Ta messagerie</strong><small>Recherche un pseudo pour commencer à discuter.</small></div>
+                <div id="chat-room" class="chat-room hidden">
+                  <div class="chat-title"><strong id="active-chat-name">Conversation</strong><span>● En ligne</span></div>
+                  <div id="messages" class="messages"></div>
+                  <form id="send-message" class="send-message"><input id="message-input" maxlength="2000" placeholder="Écris un message…" required><button type="submit" aria-label="Envoyer">➤</button></form>
+                  <p id="chat-status" class="status-line"></p>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
       </div>
     </section>
-
     <footer><span>© 2026 VioChat</span><span>Fait pour garder le lien <b>✦</b></span></footer>
   </main>
 </body>
