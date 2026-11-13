@@ -197,7 +197,13 @@ create policy "Users can read own notifications" on public.notifications
 for select to authenticated using (auth.uid()=user_id);
 drop policy if exists "Users can receive notifications" on public.notifications;
 create policy "Users can receive notifications" on public.notifications
-for insert to authenticated with check (auth.uid()=actor_id);
+for insert to authenticated with check (
+  auth.uid()=actor_id and user_id<>auth.uid() and exists (
+    select 1 from public.friend_requests fr
+    where (fr.sender_id=auth.uid() and fr.receiver_id=notifications.user_id)
+       or (fr.receiver_id=auth.uid() and fr.sender_id=notifications.user_id)
+  )
+);
 drop policy if exists "Users can update own notifications" on public.notifications;
 create policy "Users can update own notifications" on public.notifications
 for update to authenticated using (auth.uid()=user_id) with check (auth.uid()=user_id);
