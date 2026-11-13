@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#100b18">
   <title>VioChat — Discutez librement</title>
-  <link rel="stylesheet" href="style.css?v=4">
+  <link rel="stylesheet" href="style.css?v=5">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
   <script src="config.js?v=2"></script>
-  <script src="app.js?v=4" defer></script>
+  <script src="app.js?v=5" defer></script>
 </head>
 <body>
   <div class="ambient ambient-one"></div><div class="ambient ambient-two"></div>
@@ -75,11 +75,41 @@
             <div class="panel-heading"><div><p class="eyebrow">TON PERSONNAGE</p><h2>Mon avatar 3D</h2></div><span class="panel-icon">✦</span></div>
             <div id="avatar-canvas" class="avatar-canvas" aria-label="Aperçu 3D de ton avatar"></div>
             <p class="avatar-hint">Fais glisser le personnage pour le faire tourner.</p>
-            <div class="avatar-controls">
-              <label>Teint <input id="skin-color" type="color" value="#d99a70"></label>
-              <label>Cheveux <input id="hair-color" type="color" value="#51302a"></label>
-              <label>Vêtement <input id="shirt-color" type="color" value="#8d45df"></label>
-              <label>Coiffure <select id="hair-style"><option value="short">Courte</option><option value="long">Longue</option><option value="curly">Bouclée</option></select></label>
+            <div class="avatar-editor">
+              <div class="avatar-editor-title"><strong>Personnalise ton personnage</strong><span>Modifie chaque détail</span></div>
+              <div class="avatar-tabs">
+                <button type="button" class="avatar-tab active" data-avatar-tab="face">Visage</button>
+                <button type="button" class="avatar-tab" data-avatar-tab="hair">Cheveux</button>
+                <button type="button" class="avatar-tab" data-avatar-tab="style">Tenue</button>
+                <button type="button" class="avatar-tab" data-avatar-tab="extras">Accessoires</button>
+              </div>
+              <div class="avatar-options active" data-avatar-panel="face">
+                <label>Couleur de peau <input id="skin-color" type="color" value="#d99a70"></label>
+                <label>Forme du visage <select id="face-shape"><option value="oval">Ovale</option><option value="round">Rond</option><option value="square">Carré</option><option value="long">Allongé</option></select></label>
+                <label>Yeux <select id="eye-style"><option value="round">Ronds</option><option value="soft">Doux</option><option value="wide">Grands</option><option value="narrow">Fins</option></select></label>
+                <label>Couleur des yeux <input id="eye-color" type="color" value="#38251f"></label>
+                <label>Sourcils <select id="brow-style"><option value="natural">Naturels</option><option value="thick">Épais</option><option value="thin">Fins</option></select></label>
+                <label>Nez <select id="nose-style"><option value="small">Petit</option><option value="round">Arrondi</option><option value="long">Allongé</option></select></label>
+                <label>Bouche <select id="mouth-style"><option value="smile">Sourire</option><option value="small">Discrète</option><option value="wide">Large</option></select></label>
+              </div>
+              <div class="avatar-options" data-avatar-panel="hair">
+                <label>Coiffure <select id="hair-style"><option value="short">Courte</option><option value="long">Longue</option><option value="curly">Bouclée</option><option value="afro">Volume afro</option><option value="bob">Carré</option><option value="ponytail">Queue-de-cheval</option><option value="spiky">Ébouriffée</option><option value="bun">Chignon</option></select></label>
+                <label>Couleur des cheveux <input id="hair-color" type="color" value="#51302a"></label>
+              </div>
+              <div class="avatar-options" data-avatar-panel="style">
+                <label>Haut <select id="outfit-style"><option value="hoodie">Sweat à capuche</option><option value="tee">T-shirt</option><option value="jacket">Veste</option><option value="shirt">Chemise</option></select></label>
+                <label>Couleur du haut <input id="shirt-color" type="color" value="#8d45df"></label>
+                <label>Bas <select id="pants-style"><option value="jeans">Jean</option><option value="shorts">Short</option><option value="skirt">Jupe</option></select></label>
+                <label>Couleur du bas <input id="pants-color" type="color" value="#292b52"></label>
+                <label>Chaussures <select id="shoe-style"><option value="sneakers">Baskets</option><option value="boots">Bottines</option><option value="high">Chaussures montantes</option></select></label>
+                <label>Couleur des chaussures <input id="shoe-color" type="color" value="#f2edf8"></label>
+              </div>
+              <div class="avatar-options" data-avatar-panel="extras">
+                <label>Lunettes <select id="glasses-style"><option value="none">Aucune</option><option value="round">Rondes</option><option value="square">Carrées</option><option value="sunglasses">Soleil</option></select></label>
+                <label>Chapeau <select id="hat-style"><option value="none">Aucun</option><option value="cap">Casquette</option><option value="beanie">Bonnet</option><option value="crown">Couronne</option></select></label>
+                <label>Accessoire <select id="accessory-style"><option value="none">Aucun</option><option value="earrings">Boucles d'oreilles</option><option value="chain">Chaîne</option><option value="headphones">Casque audio</option></select></label>
+                <label>Couleur accessoire <input id="accessory-color" type="color" value="#f4c95d"></label>
+              </div>
             </div>
             <button id="save-avatar" class="primary-btn" type="button"><span>Enregistrer mon avatar</span><b>✓</b></button>
             <p id="avatar-save-status" class="status-line"></p>
