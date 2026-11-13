@@ -27,3 +27,18 @@
 .message-row .bubble{max-width:min(82%,420px)}
 .chat-title .chat-person strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 @media(max-width:560px){.message-avatar{width:26px;height:26px}.chat-avatar{width:36px;height:36px}}
+
+/* Éditeur d'avatar 3D à catégories */
+.avatar-editor{margin-top:14px;padding:13px;border:1px solid #382747;border-radius:13px;background:#100c16}
+.avatar-editor-title{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:12px}
+.avatar-editor-title strong{font:600 13px 'Space Grotesk'}
+.avatar-editor-title span{font-size:9px;color:var(--muted)}
+.avatar-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:13px}
+.avatar-tab{border:1px solid #382b46;background:#191321;color:#b9a9ca;border-radius:8px;padding:9px 3px;font-size:10px;cursor:pointer}
+.avatar-tab.active{background:#56317b;border-color:#9864c4;color:#fff}
+.avatar-options{display:none;grid-template-columns:1fr 1fr;gap:11px}
+.avatar-options.active{display:grid}
+.avatar-options label{display:flex;flex-direction:column;gap:6px;font-size:10px;color:#d8cce5}
+.avatar-options input[type=color],.avatar-options select{width:100%;height:35px;border:1px solid #382b46;border-radius:8px;background:#191321;color:#f7f2ff;padding:4px}
+.avatar-options input[type=color]{padding:3px}
+@media(max-width:560px){.avatar-tabs{grid-template-columns:repeat(2,1fr)}.avatar-editor-title{align-items:flex-start;flex-direction:column}}
