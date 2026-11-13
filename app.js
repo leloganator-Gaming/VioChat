@@ -13,6 +13,7 @@
   const submitBtn = document.getElementById("submit-btn");
   let mode = "signup", supabase = null, currentUser = null, activeChat = null, messageChannel = null;
   let avatarConfig = { skin:"#d99a70", hair:"#51302a", shirt:"#8d45df", style:"short" };
+  const profileAvatars = {};
 
   const $ = id => document.getElementById(id);
   function message(text, type="") { feedback.textContent=text; feedback.className="feedback "+type; }
@@ -62,6 +63,7 @@
   async function loadProfile(){
     const {data}=await supabase.from("profiles").select("username,avatar_config").eq("id",currentUser.id).maybeSingle();
     if(data?.avatar_config){avatarConfig={...avatarConfig,...data.avatar_config};}
+    profileAvatars[currentUser.id] = avatarConfig;
     $("avatar-name").textContent=data?.username||currentUser.user_metadata?.username||"Membre";
     syncAvatarControls(); drawAvatar();
     await loadChats();
@@ -123,19 +125,49 @@
     $("avatar-save-status").textContent=error?("Erreur : "+error.message):"Avatar enregistré !";
   });
 
+  // Petit rendu 3D du même avatar, utilisé dans les conversations et près des messages.
+  function drawMiniAvatar(host, config){
+    if(!host || !window.THREE) return;
+    const T=window.THREE, c={skin:"#d99a70",hair:"#51302a",shirt:"#8d45df",style:"short",...(config||{})};
+    host.innerHTML="";
+    const scene=new T.Scene();
+    const camera=new T.PerspectiveCamera(35,1,.1,30);camera.position.set(0,0,4.2);
+    const renderer=new T.WebGLRenderer({antialias:true,alpha:true});
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+    renderer.setSize(48,48,false);host.appendChild(renderer.domElement);
+    scene.add(new T.HemisphereLight(0xffffff,0x554066,2));
+    const light=new T.DirectionalLight(0xffffff,2);light.position.set(-2,3,4);scene.add(light);
+    const root=new T.Group();scene.add(root);
+    const mat=color=>new T.MeshStandardMaterial({color,roughness:.78});
+    const head=new T.Mesh(new T.SphereGeometry(.78,24,18),mat(c.skin));head.position.y=.25;root.add(head);
+    const hair=new T.Mesh(new T.SphereGeometry(.8,24,18),mat(c.hair));hair.scale.set(1,.48,.9);hair.position.set(0,.78,-.02);root.add(hair);
+    if(c.style==="long"){
+      for(const x of [-.58,.58]){const side=new T.Mesh(new T.SphereGeometry(.22,16,12),mat(c.hair));side.scale.set(1,2.1,1);side.position.set(x,-.05,-.08);root.add(side);}
+    }else if(c.style==="curly"){
+      for(let i=0;i<7;i++){const a=i*Math.PI*2/7;const curl=new T.Mesh(new T.SphereGeometry(.24,14,10),mat(c.hair));curl.position.set(Math.cos(a)*.53,.88+Math.sin(a)*.1,0);root.add(curl);}
+    }
+    const shirt=new T.Mesh(new T.CylinderGeometry(.62,.8,.72,24),mat(c.shirt));shirt.position.y=-.95;root.add(shirt);
+    const eyeMat=mat("#241927");
+    for(const x of [-.25,.25]){const eye=new T.Mesh(new T.SphereGeometry(.055,12,10),eyeMat);eye.position.set(x,.28,.69);root.add(eye);}
+    renderer.render(scene,camera);
+    host._avatarRenderer=renderer;
+  }
+
   async function loadChats(){
     const list=$("chat-list"); list.innerHTML="<p class='muted'>Chargement des conversations…</p>";
     const {data:chats,error}=await supabase.from("direct_chats").select("id,user_a,user_b").or("user_a.eq."+currentUser.id+",user_b.eq."+currentUser.id).order("created_at",{ascending:false});
     if(error){list.innerHTML="<p class='muted'>La messagerie doit être activée avec le script SQL indiqué dans le dépôt.</p>";return;}
     if(!chats?.length){list.innerHTML="<p class='muted'>Aucune conversation. Recherche un pseudo pour commencer.</p>";return;}
     const otherIds=chats.map(c=>c.user_a===currentUser.id?c.user_b:c.user_a);
-    const {data:profiles}=await supabase.from("profiles").select("id,username").in("id",otherIds);
+    const {data:profiles}=await supabase.from("profiles").select("id,username,avatar_config").in("id",otherIds);
     list.innerHTML="";
     chats.forEach(chat=>{
       const otherId=chat.user_a===currentUser.id?chat.user_b:chat.user_a;
       const profile=profiles?.find(p=>p.id===otherId);
-      const btn=document.createElement("button");btn.className="chat-item";btn.textContent=profile?.username||"Membre";
-      btn.addEventListener("click",()=>openChat(chat,profile));list.appendChild(btn);
+      const btn=document.createElement("button");btn.className="chat-item";
+      const face=document.createElement("span");face.className="mini-avatar list-avatar";drawMiniAvatar(face,profile?.avatar_config);
+      const name=document.createElement("span");name.className="chat-item-name";name.textContent=profile?.username||"Membre";
+      btn.append(face,name);btn.addEventListener("click",()=>openChat(chat,profile));list.appendChild(btn);
     });
   }
   $("find-user")?.addEventListener("submit",async e=>{
@@ -152,7 +184,13 @@
   });
 
   async function openChat(chat,profile){
-    activeChat=chat;$("active-chat-name").textContent=profile?.username||"Conversation";
+    activeChat=chat;
+    const otherId=chat.user_a===currentUser.id?chat.user_b:chat.user_a;
+    const {data:members}=await supabase.from("profiles").select("id,username,avatar_config").in("id",[currentUser.id,otherId]);
+    (members||[]).forEach(member=>{profileAvatars[member.id]=member.avatar_config||{skin:"#d99a70",hair:"#51302a",shirt:"#8d45df",style:"short"};});
+    const otherProfile=members?.find(member=>member.id===otherId)||profile;
+    $("active-chat-name").textContent=otherProfile?.username||"Conversation";
+    drawMiniAvatar($("chat-avatar"),otherProfile?.avatar_config);
     $("chat-empty").classList.add("hidden");$("chat-room").classList.remove("hidden");
     if(messageChannel) await supabase.removeChannel(messageChannel);
     await loadMessages();
@@ -161,8 +199,14 @@
     }).subscribe();
   }
   function appendMessage(msg){
-    const el=document.createElement("div");el.className="bubble "+(msg.sender_id===currentUser.id?"mine":"theirs");
-    el.textContent=msg.content;$("messages").appendChild(el);$("messages").scrollTop=$("messages").scrollHeight;
+    const mine=msg.sender_id===currentUser.id;
+    const row=document.createElement("div");row.className="message-row "+(mine?"mine":"theirs");
+    const face=document.createElement("div");face.className="mini-avatar message-avatar";
+    drawMiniAvatar(face,profileAvatars[msg.sender_id]);
+    const bubble=document.createElement("div");bubble.className="bubble "+(mine?"mine":"theirs");
+    bubble.textContent=msg.content;
+    if(mine) row.append(bubble,face); else row.append(face,bubble);
+    $("messages").appendChild(row);$("messages").scrollTop=$("messages").scrollHeight;
   }
   async function loadMessages(){
     $("messages").innerHTML="";
