@@ -321,7 +321,7 @@
   async function respondFriend(row,username){
     const {error}=await supabase.from("friend_requests").update({status:"accepted"}).eq("id",row.id);
     if(error){$("friend-search-status").textContent=error.message;return;}
-    await supabase.from("notifications").insert({user_id:row.sender_id,actor_id:currentUser.id,kind:"friend_accepted",content=(username||"Un membre")+" a accepté ta demande d'ami."});
+    await supabase.from("notifications").insert({user_id:row.sender_id,actor_id:currentUser.id,kind:"friend_accepted",content:(username||"Un membre")+" a accepté ta demande d'ami."});
     loadFriends();loadNotifications();
   }
   $("friend-search")?.addEventListener("submit",async e=>{
@@ -335,7 +335,7 @@
     if(existing?.some(r=>r.status==="pending")){status.textContent="Une demande existe déjà entre vous.";return;}
     const {error:insertError}=await supabase.from("friend_requests").insert({sender_id:currentUser.id,receiver_id:p.id});
     if(insertError){status.textContent=insertError.message;return;}
-    await supabase.from("notifications").insert({user_id:p.id,actor_id:currentUser.id,kind:"friend_request",content=(currentUser.user_metadata?.username||"Un membre")+" t'a envoyé une demande d'ami."});
+    await supabase.from("notifications").insert({user_id:p.id,actor_id:currentUser.id,kind:"friend_request",content:(currentUser.user_metadata?.username||"Un membre")+" t'a envoyé une demande d'ami."});
     status.textContent="Demande envoyée à "+p.username+" !";$("friend-username").value="";loadFriends();
   });
   $("story-form")?.addEventListener("submit",async e=>{
