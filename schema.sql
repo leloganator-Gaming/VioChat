@@ -117,3 +117,12 @@ exception when duplicate_object then
 when undefined_object then
   raise notice 'Publication supabase_realtime indisponible : active-la dans Supabase > Database > Publications.';
 end $$;
+
+
+-- Crée aussi un profil pour les comptes qui existaient avant l'installation du déclencheur.
+insert into public.profiles (id, username)
+select u.id,
+       coalesce(nullif(u.raw_user_meta_data ->> 'username',''),
+                'Membre_' || substr(u.id::text,1,8))
+from auth.users u
+on conflict (id) do nothing;
