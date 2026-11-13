@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#100b18">
   <title>VioChat — Discutez librement</title>
-  <link rel="stylesheet" href="style.css?v=3">
+  <link rel="stylesheet" href="style.css?v=4">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
   <script src="config.js?v=2"></script>
-  <script src="app.js?v=3" defer></script>
+  <script src="app.js?v=4" defer></script>
 </head>
 <body>
   <div class="ambient ambient-one"></div><div class="ambient ambient-two"></div>
@@ -93,7 +93,7 @@
               <div class="chat-main">
                 <div id="chat-empty" class="chat-empty"><span>✦</span><strong>Ta messagerie</strong><small>Recherche un pseudo pour commencer à discuter.</small></div>
                 <div id="chat-room" class="chat-room hidden">
-                  <div class="chat-title"><strong id="active-chat-name">Conversation</strong><span>● En ligne</span></div>
+                  <div class="chat-title"><div class="chat-person"><div id="chat-avatar" class="mini-avatar chat-avatar" aria-label="Avatar 3D du correspondant"></div><strong id="active-chat-name">Conversation</strong></div><span>● En ligne</span></div>
                   <div id="messages" class="messages"></div>
                   <form id="send-message" class="send-message"><input id="message-input" maxlength="2000" placeholder="Écris un message…" required><button type="submit" aria-label="Envoyer">➤</button></form>
                   <p id="chat-status" class="status-line"></p>
