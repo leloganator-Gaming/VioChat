@@ -42,3 +42,41 @@
 .avatar-options input[type=color],.avatar-options select{width:100%;height:35px;border:1px solid #382b46;border-radius:8px;background:#191321;color:#f7f2ff;padding:4px}
 .avatar-options input[type=color]{padding:3px}
 @media(max-width:560px){.avatar-tabs{grid-template-columns:repeat(2,1fr)}.avatar-editor-title{align-items:flex-start;flex-direction:column}}
+
+
+/* Navigation et espaces sociaux VioChat */
+.social-nav{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 18px;padding:7px;border:1px solid var(--line);border-radius:14px;background:#120d1b}
+.social-nav-btn{position:relative;border:0;border-radius:10px;background:transparent;color:#b9a9ca;padding:11px 16px;font:600 12px 'DM Sans';cursor:pointer}
+.social-nav-btn:hover,.social-nav-btn.active{background:#39224f;color:#fff}
+.notification-count{display:inline-grid;place-items:center;min-width:18px;height:18px;margin-left:5px;border-radius:20px;background:#c14d9b;color:#fff;font-size:10px}
+.social-section{animation:vioFade .2s ease}
+@keyframes vioFade{from{opacity:.5;transform:translateY(5px)}to{opacity:1;transform:none}}
+.social-section-heading{display:flex;align-items:center;justify-content:space-between;gap:15px;margin:12px 0 20px}
+.social-section-heading h2{font:700 28px 'Space Grotesk';margin:4px 0}
+.social-section .panel{margin-top:12px}
+.social-section h3{font:600 16px 'Space Grotesk';margin:0 0 14px}
+.social-form{display:flex;gap:9px;margin-bottom:8px}
+.social-form input,.story-create input:not([type=file]){flex:1;min-width:0;border:1px solid var(--line);border-radius:10px;background:#100c16;color:var(--text);padding:12px;font:13px 'DM Sans'}
+.social-form button,.secondary-btn,.social-action{border:1px solid #7546a0;border-radius:10px;background:#39224f;color:#fff;padding:10px 16px;font:600 12px 'DM Sans';cursor:pointer}
+.social-columns{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+.social-list{display:flex;flex-direction:column;gap:10px}
+.social-person,.notification-item{display:flex;align-items:center;gap:10px;padding:11px;border:1px solid var(--line);border-radius:11px;background:#120d1b}
+.social-person-main{flex:1;min-width:0}
+.social-person strong,.social-person small{display:block;overflow:hidden;text-overflow:ellipsis}
+.social-person strong{font-size:12px}.social-person small{font-size:10px;color:var(--muted);margin-top:3px}
+.social-person-actions{display:flex;gap:6px;flex-wrap:wrap}
+.social-action{padding:7px 10px;font-size:10px}
+.social-action.accept{background:#254b37;border-color:#397653}
+.story-create{max-width:560px;display:flex;flex-direction:column;gap:9px}
+.story-create label{font-size:11px;color:#d8cce5}
+.story-create input[type=file]{font-size:11px;color:var(--muted);padding:10px;border:1px dashed #60427b;border-radius:9px}
+.story-create .primary-btn{margin-top:5px}
+.story-feed{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-top:20px}
+.story-card{position:relative;min-height:250px;border:1px solid #49335d;border-radius:16px;overflow:hidden;background:#171020}
+.story-card img,.story-card video{width:100%;height:250px;object-fit:cover;display:block}
+.story-card-caption{position:absolute;left:0;right:0;bottom:0;padding:28px 12px 12px;background:linear-gradient(transparent,#09060ddd);font-size:11px;color:#fff}
+.story-card-caption strong{display:block;margin-bottom:4px}
+.notification-item.unread{border-color:#8e55bd;background:#21152f}
+.notification-item p{margin:0;font-size:12px;line-height:1.5;flex:1}
+.notification-item small{color:var(--muted);font-size:9px}
+@media(max-width:600px){.social-nav{display:grid;grid-template-columns:repeat(2,1fr)}.social-nav-btn{padding:12px 6px}.social-columns{grid-template-columns:1fr}.social-section-heading{align-items:flex-start;flex-direction:column}.social-form{flex-direction:column}.social-form button{min-height:42px}.story-feed{grid-template-columns:repeat(2,minmax(0,1fr))}.story-card,.story-card img,.story-card video{min-height:210px;height:210px}}
