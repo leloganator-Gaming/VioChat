@@ -52,6 +52,11 @@
     try{
       const email=emailInput.value.trim(), password=passwordInput.value;
       if(mode==="signup"){
+        // Une inscription doit toujours repartir sans session précédente.
+        // Sinon Supabase peut conserver le compte déjà connecté dans ce navigateur.
+        const {error:signOutError}=await supabase.auth.signOut({scope:"local"});
+        if(signOutError) throw signOutError;
+        currentUser=null; activeChat=null;
         const username=usernameInput.value.trim();
         if(!/^[A-Za-z0-9_]{3,20}$/.test(username)) throw new Error("Le pseudo doit contenir 3 à 20 lettres, chiffres ou _.");
         const {data,error}=await supabase.auth.signUp({email,password,options:{data:{username},emailRedirectTo:location.origin+location.pathname}});
