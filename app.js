@@ -76,6 +76,7 @@
     
     syncAvatarControls(); drawAvatar();
     await loadChats();
+    await loadNotifications();
   }
 
   // Créateur d'avatar 3D original : visage, cheveux, tenue et accessoires.
@@ -277,6 +278,113 @@
     if(error){$("chat-status").textContent="Erreur : "+error.message;input.value=content;return;}
     appendMessage(data);$("chat-status").textContent="";
   });
+
+  // VIOCHAT_SOCIAL_FEATURES — amis, stories 24 h et notifications.
+  function switchSocialSection(section){
+    ["home","friends","stories","notifications"].forEach(name=>{
+      $("section-"+name)?.classList.toggle("hidden",name!==section);
+      document.querySelector('[data-section="'+name+'"]')?.classList.toggle("active",name===section);
+    });
+    if(section==="friends") loadFriends();
+    if(section==="stories") loadStories();
+    if(section==="notifications") loadNotifications();
+  }
+  document.querySelectorAll("[data-section]").forEach(btn=>btn.addEventListener("click",()=>switchSocialSection(btn.dataset.section)));
+  async function loadFriends(){
+    const reqBox=$("friend-requests"), friendsBox=$("friends-list"); if(!reqBox||!friendsBox||!currentUser)return;
+    reqBox.innerHTML="<p class='muted'>Chargement…</p>";friendsBox.innerHTML="<p class='muted'>Chargement…</p>";
+    const {data:rows,error}=await supabase.from("friend_requests").select("*").or("sender_id.eq."+currentUser.id+",receiver_id.eq."+currentUser.id).order("created_at",{ascending:false});
+    if(error){reqBox.textContent="Active les nouvelles tables avec schema.sql dans Supabase.";friendsBox.innerHTML="";return;}
+    const pending=(rows||[]).filter(r=>r.status==="pending"&&r.receiver_id===currentUser.id);
+    const accepted=(rows||[]).filter(r=>r.status==="accepted");
+    const ids=[...new Set([...pending.map(r=>r.sender_id),...accepted.map(r=>r.sender_id===currentUser.id?r.receiver_id:r.sender_id)])];
+    const {data:profiles}=ids.length?await supabase.from("profiles").select("id,username,avatar_config").in("id",ids):{data:[]};
+    const profile=id=>(profiles||[]).find(p=>p.id===id);
+    reqBox.innerHTML="";
+    if(!pending.length)reqBox.innerHTML="<p class='muted'>Aucune demande en attente.</p>";
+    pending.forEach(r=>{
+      const p=profile(r.sender_id),item=document.createElement("div");item.className="social-person";
+      const main=document.createElement("div");main.className="social-person-main";main.innerHTML="<strong></strong><small>Souhaite devenir ton ami</small>";main.querySelector("strong").textContent=p?.username||"Membre";
+      const actions=document.createElement("div");actions.className="social-person-actions";
+      const accept=document.createElement("button");accept.className="social-action accept";accept.textContent="Accepter";accept.onclick=()=>respondFriend(r,p?.username||"Un membre");
+      const decline=document.createElement("button");decline.className="social-action";decline.textContent="Refuser";decline.onclick=async()=>{await supabase.from("friend_requests").delete().eq("id",r.id);loadFriends();};
+      actions.append(accept,decline);item.append(main,actions);reqBox.append(item);
+    });
+    friendsBox.innerHTML="";
+    if(!accepted.length)friendsBox.innerHTML="<p class='muted'>Tu n'as pas encore d'amis. Envoie une demande avec leur pseudo.</p>";
+    accepted.forEach(r=>{
+      const id=r.sender_id===currentUser.id?r.receiver_id:r.sender_id,p=profile(id),item=document.createElement("div");item.className="social-person";
+      const main=document.createElement("div");main.className="social-person-main";main.innerHTML="<strong></strong><small>Ton ami VioChat</small>";main.querySelector("strong").textContent=p?.username||"Membre";
+      item.append(main);friendsBox.append(item);
+    });
+  }
+  async function respondFriend(row,username){
+    const {error}=await supabase.from("friend_requests").update({status:"accepted"}).eq("id",row.id);
+    if(error){$("friend-search-status").textContent=error.message;return;}
+    await supabase.from("notifications").insert({user_id:row.sender_id,actor_id:currentUser.id,kind:"friend_accepted",content=(username||"Un membre")+" a accepté ta demande d'ami."});
+    loadFriends();loadNotifications();
+  }
+  $("friend-search")?.addEventListener("submit",async e=>{
+    e.preventDefault();const status=$("friend-search-status");status.textContent="Recherche…";
+    const name=$("friend-username").value.trim();
+    const {data:p,error}=await supabase.from("profiles").select("id,username").ilike("username",name).maybeSingle();
+    if(error||!p){status.textContent="Pseudo introuvable.";return;}
+    if(p.id===currentUser.id){status.textContent="Tu ne peux pas t'ajouter toi-même.";return;}
+    const {data:existing}=await supabase.from("friend_requests").select("id,status,sender_id,receiver_id").or("and(sender_id.eq."+currentUser.id+",receiver_id.eq."+p.id+"),and(sender_id.eq."+p.id+",receiver_id.eq."+currentUser.id+")");
+    if(existing?.some(r=>r.status==="accepted")){status.textContent="Vous êtes déjà amis.";return;}
+    if(existing?.some(r=>r.status==="pending")){status.textContent="Une demande existe déjà entre vous.";return;}
+    const {error:insertError}=await supabase.from("friend_requests").insert({sender_id:currentUser.id,receiver_id:p.id});
+    if(insertError){status.textContent=insertError.message;return;}
+    await supabase.from("notifications").insert({user_id:p.id,actor_id:currentUser.id,kind:"friend_request",content=(currentUser.user_metadata?.username||"Un membre")+" t'a envoyé une demande d'ami."});
+    status.textContent="Demande envoyée à "+p.username+" !";$("friend-username").value="";loadFriends();
+  });
+  $("story-form")?.addEventListener("submit",async e=>{
+    e.preventDefault();const file=$("story-file").files[0],status=$("story-status");if(!file)return;
+    if(file.size>50*1024*1024){status.textContent="Le fichier doit faire 50 Mo maximum.";return;}
+    if(!file.type.startsWith("image/")&&!file.type.startsWith("video/")){status.textContent="Choisis une photo ou une vidéo.";return;}
+    status.textContent="Publication…";
+    const safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,"_"),path=currentUser.id+"/"+Date.now()+"-"+safeName;
+    const {error:uploadError}=await supabase.storage.from("viochat-stories").upload(path,file,{contentType:file.type,upsert:false});
+    if(uploadError){status.textContent="Erreur de stockage : "+uploadError.message+" (vérifie que le script SQL a été exécuté).";return;}
+    const {error}=await supabase.from("stories").insert({user_id:currentUser.id,storage_path:path,caption:$("story-caption").value.trim()});
+    if(error){await supabase.storage.from("viochat-stories").remove([path]);status.textContent="Erreur : "+error.message;return;}
+    $("story-file").value="";$("story-caption").value="";status.textContent="Story publiée pour 24 heures !";loadStories();
+  });
+  async function loadStories(){
+    const box=$("story-feed");if(!box||!currentUser)return;box.innerHTML="<p class='muted'>Chargement…</p>";
+    const {data,error}=await supabase.from("stories").select("*").gt("expires_at",new Date().toISOString()).order("created_at",{ascending:false}).limit(60);
+    if(error){box.textContent="Active les tables Stories et le stockage via schema.sql.";return;}
+    box.innerHTML="";
+    for(const story of (data||[])){
+      const {data:urlData,error:urlError}=await supabase.storage.from("viochat-stories").createSignedUrl(story.storage_path,3600);
+      if(urlError||!urlData?.signedUrl)continue;
+      const {data:profile}=await supabase.from("profiles").select("username").eq("id",story.user_id).maybeSingle();
+      const card=document.createElement("article");card.className="story-card";
+      const media=document.createElement(story.storage_path.match(/\.(mp4|webm|mov)$/i)?"video":"img");
+      media.src=urlData.signedUrl;if(media.tagName==="VIDEO"){media.controls=true;media.playsInline=true;}else media.alt="Story de "+(profile?.username||"Membre");
+      const caption=document.createElement("div");caption.className="story-card-caption";const name=document.createElement("strong");name.textContent=profile?.username||"Membre";caption.append(name,document.createTextNode(story.caption||""));
+      card.append(media,caption);box.append(card);
+    }
+    if(!box.children.length)box.innerHTML="<p class='muted'>Aucune story pour le moment. Publie la première !</p>";
+  }
+  async function loadNotifications(){
+    const box=$("notifications-list");if(!box||!currentUser)return;
+    const {data,error}=await supabase.from("notifications").select("*").order("created_at",{ascending:false}).limit(50);
+    if(error){box.textContent="Active les notifications avec schema.sql.";return;}
+    box.innerHTML="";const unread=(data||[]).filter(n=>!n.is_read).length;
+    $("notification-count")?.classList.toggle("hidden",!unread);if($("notification-count"))$("notification-count").textContent=String(unread);
+    (data||[]).forEach(n=>{
+      const item=document.createElement("div");item.className="notification-item"+(n.is_read?"":" unread");
+      const p=document.createElement("p");p.textContent=n.content;const date=document.createElement("small");date.textContent=new Date(n.created_at).toLocaleString("fr-FR");
+      item.append(p,date);box.append(item);
+    });
+    if(!data?.length)box.innerHTML="<p class='muted'>Aucune notification pour le moment.</p>";
+  }
+  $("mark-notifications-read")?.addEventListener("click",async()=>{
+    const {error}=await supabase.from("notifications").update({is_read:true}).eq("user_id",currentUser.id).eq("is_read",false);
+    if(error){$("notifications-list").textContent=error.message;return;}loadNotifications();
+  });
+
   $("logout-btn").addEventListener("click",async()=>{if(messageChannel)await supabase.removeChannel(messageChannel);await supabase.auth.signOut();currentUser=null;activeChat=null;showAuth();authMode("login");});
   supabase.auth.getSession().then(({data})=>{if(data.session?.user)showApp(data.session.user);});
   supabase.auth.onAuthStateChange((_event,session)=>{if(session?.user)showApp(session.user);else{currentUser=null;showAuth();}});
