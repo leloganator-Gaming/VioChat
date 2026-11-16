@@ -237,3 +237,104 @@ button.danger{flex:0 0 auto;padding:9px 12px;border:1px solid #a94c68;border-rad
 .wx-form select{background:#120f19;color:#fff;border:1px solid #ffffff24;border-radius:10px;padding:12px 14px;font:inherit;min-width:0}
 .wx-report-form{align-items:stretch;flex-direction:column}
 .wx-report-form textarea{width:100%;min-height:90px}
+
+
+/* Refonte visuelle du village et du hub — interface originale Wolfanator */
+:root{--bg:#0d0b13;--panel:#171421;--panel2:#201a2c;--line:#342b43;--purple:#9d79e8;--gold:#e9c779;--muted:#a99eb8}
+body{background:radial-gradient(ellipse at 50% -18%,#46305e 0,transparent 43%),radial-gradient(ellipse at 100% 70%,#24162f 0,transparent 35%),#0d0b13}
+.topbar{max-width:1440px;padding:18px 34px;border-bottom-color:#ffffff12}
+.brand{font-size:18px;letter-spacing:2.5px}.brand .logo{width:42px!important;height:42px!important;max-width:42px!important;max-height:42px!important;object-fit:cover}
+.status{padding:8px 12px;border:1px solid #ffffff15;border-radius:99px;background:#ffffff07}
+.lobby{max-width:1440px;padding:28px 34px 70px;margin:0 auto}
+.section-head{padding:10px 0 20px;border-bottom:1px solid #ffffff13;margin-bottom:24px}
+.section-head h2{font-size:clamp(28px,4vw,40px);letter-spacing:-1.4px}
+.lobby-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.lobby-grid .panel{min-height:225px;padding:23px;background:linear-gradient(150deg,#211a2d,#15121d);border-color:#ffffff17;border-radius:16px;box-shadow:0 12px 35px #0002}
+.lobby-grid .featured{background:linear-gradient(140deg,#44305c,#211a2d 72%);border-color:#a77aff55}
+.panel-icon{width:46px;height:46px;display:grid;place-items:center;border:1px solid #ffffff18;border-radius:13px;background:#ffffff0b;font-size:23px}
+.lobby-grid .panel h3{font-size:19px;letter-spacing:-.3px}
+.lobby-grid .panel p{min-height:43px;font-size:12px}
+.primary,.secondary,.ghost{border-radius:10px;padding:12px 16px;font-size:13px}
+.primary{background:linear-gradient(120deg,#a887e9,#7653b8);box-shadow:0 8px 22px #8e5ec733}
+.primary:disabled{opacity:.35;filter:grayscale(1);cursor:not-allowed;transform:none}
+.panel,.room-panel,.profile-panel,.premium-panel,.admin-panel{border-radius:16px}
+.room-panel{background:linear-gradient(145deg,#1a1623,#14111b);border-color:#ffffff17}
+.room-card{background:#211b2b;border-color:#ffffff18;border-radius:12px;padding:15px}
+.room-card strong{font-size:13px}.room-card small{font-size:10px}
+.field-grid input,.field-grid select,.hub-editor input,.hub-editor select{background:#100d16;border-color:#413550;border-radius:9px}
+.composition-editor{background:#171321;border-color:#40334f}
+.composition-fields label{padding:10px;border:1px solid #ffffff12;border-radius:10px;background:#ffffff05;font-size:11px}
+.composition-fields input{padding:9px;background:#0d0b13;border-color:#40334f}
+#wolf-comp-total{background:#a77aff12}
+.wolf-hub{grid-template-columns:minmax(0,1.18fr) minmax(320px,.82fr);gap:14px;margin-top:16px}
+.hub-scene{padding:0;overflow:hidden;min-height:620px;border:1px solid #ffffff18;border-radius:17px;background:#15121c;box-shadow:0 18px 55px #0004}
+.hub-panel{min-height:620px;border:1px solid #ffffff18;border-radius:17px;background:#15121c}
+.hub-chat{min-height:620px;padding:15px}
+.hub-tabs{background:#0d0b13;border:1px solid #ffffff0d}
+.hub-tab{font-size:11px;padding:11px 6px}
+.hub-tab.active{background:#48335f}
+.hub-tab-content .chat-messages{background:#0d0b13;border:1px solid #ffffff0c;border-radius:12px}
+.chat-form input{background:#0d0b13;border-color:#3e334c}
+.chat-message{background:#211b2b;border-color:#ffffff12}
+.chat-message.mine{background:#38284c;border-color:#8e6acb55}
+.wolf-waiting-room{padding:22px;min-height:620px;background:radial-gradient(ellipse at 50% 0%,#3a2b4c66,transparent 48%),#15121c}
+.wolf-room-banner{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:8px 0 22px;border-bottom:1px solid #ffffff15}
+.wolf-room-banner h2{font:700 clamp(23px,3vw,32px) 'Space Grotesk';letter-spacing:-1px;margin:7px 0 3px}
+.wolf-room-banner p{margin:0;color:#aaa0b8;font-size:12px}
+.wolf-room-kicker{font-size:9px;letter-spacing:1.8px;color:#c6a6ef;font-weight:800}
+.wolf-live-dot{display:inline-block;width:7px;height:7px;margin-right:7px;border-radius:50%;background:#8cdda6;box-shadow:0 0 12px #8cdda6}
+.wolf-room-codebox{min-width:145px;padding:12px 14px;border:1px solid #a77aff3d;border-radius:12px;background:#a77aff0c;text-align:center}
+.wolf-room-codebox small,.wolf-room-codebox strong{display:block}
+.wolf-room-codebox small{font-size:8px;letter-spacing:1.3px;color:#b9a9c9}
+.wolf-room-codebox strong{font:700 21px 'Space Grotesk';letter-spacing:3px;color:#f0d28b;margin:4px 0}
+.wolf-room-codebox button{border:0;background:transparent;color:#cbb3f1;font-size:10px;font-weight:700;cursor:pointer}
+.wolf-waiting-columns{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(180px,.65fr);gap:13px;padding-top:18px}
+.wolf-roster-card,.wolf-side-card{padding:16px;border:1px solid #ffffff14;border-radius:13px;background:#1b1725}
+.wolf-card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+.wolf-card-head .eyebrow{margin:0 0 4px;font-size:8px}
+.wolf-card-head h3,.wolf-side-card h3{margin:0;font:700 17px 'Space Grotesk'}
+.wolf-player-count{font:700 20px 'Space Grotesk';color:#f0d28b}
+.wolf-player-count i{font-style:normal;color:#95899f;font-size:13px}
+.wolf-seat-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.wolf-seat{position:relative;display:flex;align-items:center;gap:9px;min-width:0;padding:10px;border:1px solid #ffffff14;border-radius:11px;background:#ffffff06}
+.wolf-seat-avatar{flex:0 0 34px;width:34px;height:34px;display:grid;place-items:center;border-radius:50%;background:linear-gradient(145deg,#594271,#2b2138);border:1px solid #b18ce455;color:#f4eaff;font:700 11px 'Space Grotesk'}
+.wolf-seat-meta{min-width:0;display:grid;gap:3px}
+.wolf-seat-meta strong{font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wolf-seat-meta small{font-size:9px;color:#a99eb8}
+.wolf-seat-tag{margin-left:auto;padding:4px 6px;border-radius:5px;background:#e9c77918;color:#e9c779;font-size:7px;font-weight:800;letter-spacing:.7px}
+.wolf-seat-dot{margin-left:auto;color:#8ee0a9;font-size:12px}
+.wolf-seat-dot.waiting{color:#b39bcf}
+.wolf-seat-empty{border-style:dashed;background:#ffffff02;opacity:.62}
+.wolf-seat-empty .wolf-seat-avatar{background:#ffffff08;border-style:dashed;color:#9d91a9}
+.wolf-seat-empty strong{font-size:10px;color:#c3b9ce}
+.wolf-seat-empty small{font-size:9px;color:#887d93}
+.wolf-ready-progress{margin-top:17px}
+.wolf-ready-progress>div:first-child{display:flex;justify-content:space-between;gap:8px;color:#a99eb8;font-size:10px}
+.wolf-ready-progress strong{color:#e9d8ff}
+.wolf-progress-track{height:5px;margin-top:8px;border-radius:9px;background:#0d0b13;overflow:hidden}
+.wolf-progress-track i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,#8d69c7,#c4a2f2);transition:width .25s}
+.wolf-start-message{margin-top:13px;padding:10px 11px;border:1px solid #e9c77933;border-radius:9px;background:#e9c7790b;color:#e7d5ae;font-size:10px;line-height:1.5}
+.wolf-start-message.is-valid{border-color:#7dc99a44;background:#7dc99a0b;color:#a9e5bc}
+.wolf-lobby-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:13px}
+.wolf-lobby-actions button{font-size:11px;padding:10px 12px}
+.wolf-lobby-actions #wolf-start{margin-left:auto}
+.wolf-lobby-side{display:grid;align-content:start;gap:10px}
+.wolf-side-card{padding:14px;text-align:center}
+.wolf-side-card>.eyebrow{text-align:left;font-size:8px;margin:0 0 10px}
+.wolf-campfire{display:grid;place-items:center;width:68px;height:68px;margin:4px auto 9px;border-radius:50%;background:radial-gradient(circle,#f0a45b24,#a77aff09 70%);font-size:37px}
+.wolf-side-card h3{font-size:14px}
+.wolf-side-card p{font-size:10px;line-height:1.6;color:#a99eb8;margin:7px 0 0}
+.wolf-role-pills{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-top:12px}
+.wolf-role-pill{padding:6px 8px;border:1px solid #ffffff14;border-radius:99px;background:#ffffff07;color:#e4d8ef;font-size:9px}
+.wolf-role-pill b{color:#f0d28b}
+.wolf-side-hint{display:block;margin-top:12px;color:#8e8399;font-size:9px;line-height:1.5}
+.wolf-lobby-footer{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:16px;padding-top:12px;border-top:1px solid #ffffff12;color:#93889f;font-size:9px}
+.game-status{padding:10px 12px;border:1px solid #ffffff13;border-radius:10px;background:#ffffff05}
+.phase-chip{background:#9d79e81a;border-color:#9d79e855}
+.player-chip{background:#211b2b;border-color:#ffffff18}
+.role-card{border-radius:13px}
+.action-area{border-radius:13px}
+.wx-shell{max-width:1370px;border-radius:17px;background:#171421;border-color:#ffffff16}
+.wx-nav{border-bottom-color:#ffffff14}
+@media(max-width:980px){.wolf-waiting-columns{grid-template-columns:1fr}.wolf-lobby-side{grid-template-columns:repeat(2,minmax(0,1fr))}.wolf-hub{grid-template-columns:1fr}.hub-scene,.hub-panel,.hub-chat{min-height:0}}
+@media(max-width:620px){.lobby{padding:20px 14px 45px}.topbar{padding:14px 16px}.lobby-grid{grid-template-columns:1fr}.wolf-waiting-room{padding:14px}.wolf-room-banner{align-items:flex-start;flex-direction:column}.wolf-room-codebox{width:100%;display:grid;grid-template-columns:1fr auto;align-items:center;text-align:left}.wolf-room-codebox small{grid-column:1}.wolf-room-codebox strong{grid-column:1;grid-row:2}.wolf-room-codebox button{grid-column:2;grid-row:1/3}.wolf-seat-grid{grid-template-columns:1fr}.wolf-lobby-side{grid-template-columns:1fr}.wolf-lobby-actions #wolf-start{margin-left:0}.section-head{align-items:flex-start;gap:12px;flex-direction:column}.section-head .button-row{margin-top:0}}
