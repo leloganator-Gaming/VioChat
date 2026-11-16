@@ -148,7 +148,7 @@
       ids.length?sb.from('game_rooms').select('id,room_code,name,status,max_players,created_at,room_players(count)').in('id',ids).eq('status','playing').order('created_at',{ascending:false}):Promise.resolve({data:[],error:null})
     ]);
     if(waiting.error||playing.error){$('wolf-rooms').textContent=(waiting.error||playing.error).message;return;}
-    const open=(waiting.data||[]).filter(x=>x.settings?.visibility!=='private'&&(x.room_players?.[0]?.count||0)<x.max_players);
+    const open=(waiting.data||[]).filter(x=>(x.settings?.visibility!=='private'||ids.includes(x.id))&&(x.room_players?.[0]?.count||0)<x.max_players);
     const active=playing.data||[];
     const cards=[...active,...open].map(x=>{const count=x.room_players?.[0]?.count||0,when=new Date(x.created_at).toLocaleString('fr-FR',{dateStyle:'short',timeStyle:'short'});return '<div class="room-card"><span><strong>'+esc(x.name)+'</strong><small>'+(x.status==='playing'?'🎮 Partie en cours · réservée aux participants':'🏰 Salon ouvert · '+(x.max_players-count)+' place(s) disponible(s)')+' · '+count+'/'+x.max_players+' joueurs · Créé le '+when+'</small><small>Code : '+esc(x.room_code)+'</small></span>'+(x.status==='playing'?'<button class="secondary" data-resume="'+x.id+'" data-code="'+esc(x.room_code)+'">Reprendre</button>':'<button class="secondary" data-enter="'+esc(x.room_code)+'">Rejoindre</button>')+'</div>';}).join('');
     $('wolf-rooms').innerHTML=cards||'<div class="empty-rooms"><strong>Aucune partie à afficher</strong><small>Les salons ouverts apparaîtront ici. Créez-en un pour commencer ou rejoignez un ami avec son code.</small></div>';
