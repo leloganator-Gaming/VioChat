@@ -33,7 +33,7 @@
     if(!sb)return;const r=await sb.auth.getSession(),session=r.data.session;
     $('wolf-logout').hidden=!session;$('wolf-login').hidden=!!session;$('wolf-signup').hidden=!!session;$('wolf-pseudo').hidden=!!session;
     profile.hidden=!session;panel.hidden=!session;
-    if(session){status('Connecté : '+(session.user.email||'joueur'));await loadProfile(session.user);await loadRooms();}
+    if(session){$('auth-screen').classList.add('hidden');$('lobby').classList.remove('hidden');status('Connecté : '+(session.user.email||'joueur'));await loadProfile(session.user);await loadRooms();}
     else{profileName='';status('Non connecté.');$('wolf-rooms').innerHTML='<small>Connectez-vous pour afficher les salons.</small>';}
   }
   async function loadStats(){
