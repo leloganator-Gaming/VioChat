@@ -152,3 +152,6 @@
 .kick-player{display:inline-flex;margin-top:7px;padding:5px 8px;border:1px solid #8b5366;border-radius:7px;background:#8b263b22;color:#f2a9b8;font-size:10px;cursor:pointer}
 .room-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 .room-heading .button-row{margin:0}
+
+.lobby-start-state{margin:14px 0;padding:11px 13px;border:1px solid #79648f66;border-radius:10px;background:#a77aff12;color:#e6d8f3;font-size:12px;line-height:1.5}
+#wolf-start:disabled{opacity:.38;cursor:not-allowed;filter:grayscale(1)}
