@@ -126,16 +126,36 @@
     box.innerHTML=(r.data||[]).map(m=>'<div class="chat-message '+(m.user_id===currentUserId?'mine':'')+'"><div><strong>'+esc(m.display_name)+'</strong><small>'+new Date(m.created_at).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})+'</small></div><p>'+esc(m.body)+'</p></div>').join('')||'<small>La conversation est vide. Envoyez le premier message.</small>';
     box.scrollTop=box.scrollHeight;
   }
-  function attachChat(box){
+  function attachChat(box,context={}){
     const wrap=document.createElement('section');wrap.className='hub-chat';
-    wrap.innerHTML='<div class="chat-heading"><div><p class="eyebrow">LE HUB DU VILLAGE</p><h3>💬 Discussion du salon</h3></div><small>Messages visibles par les membres du salon</small></div><div class="chat-messages" id="wolf-chat-messages" aria-live="polite"><small>Chargement de la discussion…</small></div><form class="chat-form" id="wolf-chat-form"><input id="wolf-chat-input" maxlength="500" autocomplete="off" placeholder="Écrire un message…" aria-label="Votre message" required><button class="primary" type="submit">Envoyer</button></form>';
-    box.appendChild(wrap);loadChat();
-    $('wolf-chat-form').addEventListener('submit',async e=>{
-      e.preventDefault();const input=$('wolf-chat-input'),body=input.value.trim();if(!body||!currentRoom)return;
+    wrap.innerHTML='<div class="hub-tabs"><button class="hub-tab active" data-hub-tab="discussion">💬 Discussion</button><button class="hub-tab" data-hub-tab="composition">📜 Composition</button><button class="hub-tab" data-hub-tab="rules">❔ Règles</button></div><div class="hub-tab-content" id="wolf-hub-tab-content"></div>';
+    box.appendChild(wrap);
+    const content=$('wolf-hub-tab-content'),tabs=wrap.querySelectorAll('[data-hub-tab]');
+    const showTab=key=>{
+      tabs.forEach(t=>t.classList.toggle('active',t.dataset.hubTab===key));
+      if(key==='discussion'){
+        content.innerHTML='<div class="chat-heading"><div><p class="eyebrow">VILLAGE EN DIRECT</p><h3>Discussion de la partie</h3></div><small>Messages du salon</small></div><div class="chat-messages" id="wolf-chat-messages" aria-live="polite"><small>Chargement…</small></div><form class="chat-form" id="wolf-chat-form"><input id="wolf-chat-input" maxlength="500" autocomplete="off" placeholder="Écrire un message…" aria-label="Votre message" required><button class="primary" type="submit">Envoyer</button></form>';
+        loadChat();$('wolf-chat-form').addEventListener('submit',sendChat);
+      }else if(key==='composition'){
+        if(context.waiting){
+          content.innerHTML='<p class="eyebrow">COMPOSITION DU SALON</p><h3>Préparation de la partie</h3><div class="hub-info-row"><span>Joueurs présents</span><strong>'+context.players.length+'/'+context.room.max_players+'</strong></div><div class="hub-info-row"><span>Salon</span><strong>'+esc(context.room.name)+'</strong></div><div class="hub-info-row"><span>Accès</span><strong>Avec code d’invitation</strong></div><p class="muted-note">La partie démarre lorsque l’hôte lance le salon et que les conditions sont remplies.</p>';
+        }else{
+          const s=context.state||{},ps=s.players||[],alive=ps.filter(p=>p.is_alive).length;
+          content.innerHTML='<p class="eyebrow">COMPOSITION DE LA PARTIE</p><h3>État du village</h3><div class="hub-info-row"><span>Manche</span><strong>'+Number(s.round||1)+'</strong></div><div class="hub-info-row"><span>Phase</span><strong>'+(s.phase==='night'?'Nuit':'Jour')+'</strong></div><div class="hub-info-row"><span>Joueurs en vie</span><strong>'+alive+'/'+ps.length+'</strong></div><div class="hub-role-line">🐺 Loup-garou <span>Camp des loups</span></div><div class="hub-role-line">🔮 Voyante <span>Camp du village</span></div><div class="hub-role-line">🛡️ Protecteur <span>Camp du village</span></div><div class="hub-role-line">🏡 Villageois <span>Camp du village</span></div><p class="muted-note">Les rôles secrets des autres joueurs restent masqués jusqu’à leur élimination ou à la fin de la partie.</p>';
+        }
+      }else{
+        const s=context.state||{},role=s.my_role;
+        content.innerHTML='<p class="eyebrow">AIDE DE PARTIE</p><h3>'+(context.waiting?'Comment jouer':'Votre rôle : '+esc(roles[role]||'Inconnu'))+'</h3><p class="hub-rule">🌙 <strong>La nuit</strong><br>Les rôles qui possèdent un pouvoir agissent secrètement.</p><p class="hub-rule">☀️ <strong>Le jour</strong><br>Les joueurs discutent puis votent pour tenter d’éliminer un loup.</p><p class="hub-rule">🏆 <strong>Victoire</strong><br>Le village gagne lorsque tous les loups sont éliminés. Les loups gagnent lorsqu’ils sont au moins aussi nombreux que les autres joueurs vivants.</p>'+(role?'<div class="hub-own-role"><strong>Votre rôle secret</strong><p>'+esc(descriptions[role]||'')+'</p></div>':'');
+      }
+    };
+    const sendChat=async e=>{
+      e.preventDefault();const input=$('wolf-chat-input'),body=input?.value.trim();if(!body||!currentRoom)return;
       const roomId=currentRoom;input.disabled=true;
       const r=await sb.from('room_messages').insert({room_id:roomId,user_id:currentUserId,display_name:(profileName||'Joueur').slice(0,24),body});
       input.disabled=false;if(r.error){toast(r.error.message);return;}input.value='';await loadChat();input.focus();
-    });
+    };
+    tabs.forEach(t=>t.addEventListener('click',()=>showTab(t.dataset.hubTab)));
+    showTab('discussion');
   }
   async function refreshRoom(){
     if(!currentRoom||!sb||refreshing)return;refreshing=true;const id=currentRoom;
@@ -146,13 +166,13 @@
       if(values[0].error||values[1].error){box.textContent=(values[0].error||values[1].error).message;return;}
       currentUserId=u.id;
       if(room.status==='waiting'){
-        box.innerHTML=waitingHTML(room,players,u);attachChat(box);
+        box.innerHTML='<div class="wolf-hub"><section class="hub-scene">'+waitingHTML(room,players,u)+'</section><aside class="hub-panel" id="wolf-hub-panel"></aside></div>';attachChat($('wolf-hub-panel'),{waiting:true,room,players});
         $('wolf-ready')?.addEventListener('click',async()=>{const me=players.find(p=>p.user_id===u.id);const r=await sb.rpc('set_room_ready',{p_room_id:id,p_ready:!me?.is_ready});if(r.error)toast(r.error.message);else await refreshRoom();});
         $('wolf-start')?.addEventListener('click',async()=>{const r=await sb.rpc('start_game_room',{p_room_id:id});if(r.error)toast(r.error.message);else{toast('La partie commence. Les rôles ont été distribués.');await refreshRoom();}});
         $('wolf-leave')?.addEventListener('click',async()=>{const r=await sb.rpc('leave_game_room',{p_room_id:id});if(r.error)toast(r.error.message);else closeRoom();});
       }else{
         const r=await sb.rpc('get_my_game_state',{p_room_id:id});if(r.error){box.textContent=r.error.message;return;}
-        box.innerHTML=gameHTML(r.data);attachChat(box);
+        box.innerHTML='<div class="wolf-hub"><section class="hub-scene">'+gameHTML(r.data)+'</section><aside class="hub-panel" id="wolf-hub-panel"></aside></div>';attachChat($('wolf-hub-panel'),{waiting:false,state:r.data});
         box.querySelectorAll('[data-target]').forEach(b=>b.addEventListener('click',async()=>{b.disabled=true;const a=await sb.rpc('submit_game_action',{p_room_id:id,p_target_id:b.dataset.target});if(a.error)toast(a.error.message);else{toast('Choix enregistré.');await refreshRoom();}}));
         $('wolf-resolve')?.addEventListener('click',async()=>{const b=$('wolf-resolve');b.disabled=true;const a=await sb.rpc('resolve_game_phase',{p_room_id:id});if(a.error){toast(a.error.message);b.disabled=false;}else{toast(a.data?.message||'Phase terminée.');await refreshRoom();}});
         $('wolf-finish-close')?.addEventListener('click',closeRoom);
