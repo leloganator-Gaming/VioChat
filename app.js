@@ -160,7 +160,7 @@
   function gameHTML(s){
     const players=s.players||[],alive=players.filter(p=>p.is_alive),role=s.my_role,night=s.phase==='night',day=s.phase==='day',done=s.status==='finished'||s.phase==='finished';
     let desc=night?({wolf:'Choisissez une cible avec les autres loups.',seer:'Choisissez un joueur à examiner.',healer:'Choisissez une personne à protéger.',villager:'Vous êtes à l’abri cette nuit. Attendez le matin.'}[role]):'Le village débat. Votez pour la personne que vous pensez être un loup.';
-    const canAct=!done&&s.my_alive&&(night&&['wolf','seer','healer'].includes(role)||day);
+    const canAct=!done&&s.my_alive&&(night&&['wolf','seer','healer'].includes(role)||day),witchTurn=!done&&s.my_alive&&night&&role==='witch'&&(s.witch_state?.heal_available||s.witch_state?.poison_available);
     const targets=alive.filter(p=>p.user_id!==(day||role==='seer'||role==='wolf'?currentUserId:''));
     const label=night?({wolf:'Désigner la cible',seer:'Examiner ce joueur',healer:'Protéger ce joueur'}[role]||''):'Voter contre ce joueur';
     const targetHTML=canAct?'<div class="target-grid">'+targets.map(p=>'<button class="target-button" data-target="'+p.user_id+'"><strong>'+esc(p.display_name)+'</strong><small>'+(p.is_host?'👑 Hôte':'Joueur')+' · '+label+'</small></button>').join('')+'</div>':'';
@@ -174,6 +174,8 @@
     if(done)html+='<div class="winner-card"><h3>'+winner+'</h3><p>Les rôles de tous les joueurs sont révélés.</p>'+(personalWin?'<strong class="win">🌙 Vous gagnez 1 Lune !</strong>':'<small>Pas de Lune cette fois. Une victoire vous rapporte 1 Lune.</small>')+'</div>';
     else{html+='<div class="action-area"><h3>'+(night?'Actions de la nuit':'Vote du village')+'</h3><p>'+esc(desc)+'</p>';
       if(canAct)html+='<p class="action-state">'+(s.my_action_submitted?'Votre choix est enregistré. Vous pouvez le modifier avant la fin de la phase.':'Vous n’avez pas encore envoyé votre choix.')+'</p>'+targetHTML;
+      if(witchTurn){html+='<div class="witch-actions"><h4>🧪 Vos potions</h4>'+(s.witch_state.heal_available?'<button class="secondary" data-witch-action="heal">🧪 Utiliser la potion de vie (sauver la cible des loups)</button>':'<small>🧪 Potion de vie déjà utilisée</small>')+(s.witch_state.poison_available?'<p>☠️ Choisissez une cible pour la potion de mort :</p><div class="target-grid">'+targets.map(p=>'<button class="target-button" data-witch-poison="'+p.user_id+'">☠️ Empoisonner '+esc(p.display_name)+'</button>').join('')+'</div>':'<small>☠️ Potion de mort déjà utilisée</small>')+'<button class="ghost" data-witch-action="skip">Passer cette nuit</button></div>';}
+      else if(night&&role==='witch'&&s.my_alive)html+='<p class="waiting-note">Vos deux potions ont été utilisées. Vous n’avez plus d’action nocturne.</p>';
       if(night&&role==='villager')html+='<p class="waiting-note">Attendez le passage au jour.</p>';
       if(!s.my_alive)html+='<p class="waiting-note">Vous êtes éliminé. Vous pouvez observer la suite de la partie.</p>';
       html+='</div>';}
@@ -255,9 +257,11 @@
         $('wolf-start')?.addEventListener('click',async()=>{const r=await sb.rpc('start_game_room',{p_room_id:id});if(r.error)toast(r.error.message);else{toast('La partie commence. Les rôles ont été distribués.');await refreshRoom();}});
         $('wolf-leave')?.addEventListener('click',async()=>{const r=await sb.rpc('leave_game_room',{p_room_id:id});if(r.error)toast(r.error.message);else closeRoom();});
       }else{
-        const r=await sb.rpc('get_my_game_state',{p_room_id:id});if(r.error){box.textContent=r.error.message;return;}
+        const r=await sb.rpc('get_my_game_state',{p_room_id:id});if(r.error){box.textContent=r.error.message;return;}if(r.data.my_role==='witch'){const w=await sb.rpc('get_my_witch_state',{p_room_id:id});if(w.error){box.textContent=w.error.message;return;}r.data.witch_state=w.data||{};}
         box.innerHTML='<div class="wolf-hub"><section class="hub-scene">'+gameHTML(r.data)+'</section><aside class="hub-panel" id="wolf-hub-panel"></aside></div>';attachChat($('wolf-hub-panel'),{waiting:false,state:r.data});if(r.data.status==='finished')await loadProfile(u);
         box.querySelectorAll('[data-target]').forEach(b=>b.addEventListener('click',async()=>{b.disabled=true;const a=await sb.rpc('submit_game_action',{p_room_id:id,p_target_id:b.dataset.target});if(a.error)toast(a.error.message);else{toast('Choix enregistré.');await refreshRoom();}}));
+        box.querySelectorAll('[data-witch-action]').forEach(b=>b.addEventListener('click',async()=>{b.disabled=true;const a=await sb.rpc('submit_witch_action',{p_room_id:id,p_action:b.dataset.witchAction,p_target_id:null});if(a.error){toast(a.error.message);b.disabled=false;}else{toast(b.dataset.witchAction==='skip'?'Vous passez cette nuit.':'Potion utilisée.');await refreshRoom();}}));
+        box.querySelectorAll('[data-witch-poison]').forEach(b=>b.addEventListener('click',async()=>{b.disabled=true;const a=await sb.rpc('submit_witch_action',{p_room_id:id,p_action:'poison',p_target_id:b.dataset.witchPoison});if(a.error){toast(a.error.message);b.disabled=false;}else{toast('Potion de mort utilisée.');await refreshRoom();}}));
         $('wolf-resolve')?.addEventListener('click',async()=>{const b=$('wolf-resolve');b.disabled=true;const a=await sb.rpc('resolve_game_phase',{p_room_id:id});if(a.error){toast(a.error.message);b.disabled=false;}else{toast(a.data?.message||'Phase terminée.');await refreshRoom();}});
         $('wolf-finish-close')?.addEventListener('click',closeRoom);
       }
@@ -285,7 +289,7 @@
   $('wolf-join').addEventListener('click',()=>joinRoom($('wolf-room-code').value));
   $('wolf-room-code').addEventListener('input',e=>{e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,8);});
   $('wolf-room-max').addEventListener('change',()=>{const max=Number($('wolf-room-max').value),wolves=Math.max(1,Math.ceil(max/4));$('wolf-comp-wolf').value=wolves;$('wolf-comp-seer').value=1;$('wolf-comp-healer').value=1;$('wolf-comp-witch').value=0;$('wolf-comp-villager').value=Math.max(0,max-wolves-2);updateCompositionTotal();});
-  ['wolf-comp-wolf','wolf-comp-seer','wolf-comp-healer','wolf-comp-villager'].forEach(id=>$(id).addEventListener('input',updateCompositionTotal));updateCompositionTotal();
+  ['wolf-comp-wolf','wolf-comp-seer','wolf-comp-healer','wolf-comp-witch','wolf-comp-villager'].forEach(id=>$(id).addEventListener('input',updateCompositionTotal));updateCompositionTotal();
   $('play-now').addEventListener('click',async()=>{const session=sb?await sb.auth.getSession():{data:{session:null}};if(session.data.session)showLobby();else showAuth();});
   $('back-home').addEventListener('click',()=>{$('lobby').classList.add('hidden');$('home').classList.remove('hidden');window.scrollTo({top:0,behavior:'smooth'});});
   $('auth-back').addEventListener('click',()=>{$('auth-screen').classList.add('hidden');$('home').classList.remove('hidden');window.scrollTo({top:0,behavior:'smooth'});});
