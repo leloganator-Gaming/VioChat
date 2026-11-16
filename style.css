@@ -148,3 +148,7 @@
 .hub-editor .composition-fields{grid-template-columns:repeat(2,minmax(0,1fr))}
 .hub-editor button:disabled{opacity:.4;cursor:not-allowed}
 @media(max-width:520px){.hub-editor .composition-fields{grid-template-columns:1fr 1fr}}
+
+.kick-player{display:inline-flex;margin-top:7px;padding:5px 8px;border:1px solid #8b5366;border-radius:7px;background:#8b263b22;color:#f2a9b8;font-size:10px;cursor:pointer}
+.room-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.room-heading .button-row{margin:0}
