@@ -14,14 +14,14 @@ GitHub Pages : https://leloganator-gaming.github.io/Wolfanator/
 - Inscription, connexion et profils avec pseudo.
 - Salons publics/privés, code d'accès, joueurs prêts et gestion par l'hôte.
 - Hub de partie avec scène, discussion et composition.
-- Moteur de base jour/nuit avec Loup-garou, Voyante, Protecteur, Sorcière, Ancien et Villageois.
+- Moteur jour/nuit avec actions serveur pour les camps de loups, les variantes de Voyante, le Protecteur, le Garde, les potions de Sorcière/Guérisseuse/Empoisonneuse et l'Ancien.
 - Chat de meute séparé.
 - Historique de parties, Lunes, grade Loup Alpha et outils administrateur.
-- Encyclopédie de 21 rôles principaux et 9 variantes.
+- Catalogue Supabase de 32 rôles, dont les rôles Alpha.
 - Classement par lauriers, demandes d'amis, niveaux/XP, boutique cosmétique, inventaire, signalements et modération des signalements dans la console administrateur.
 
 ## État important
-Le catalogue des 30 rôles est disponible dans l'encyclopédie. Cela ne signifie pas que les 30 pouvoirs sont déjà jouables : le moteur de partie actuel ne distribue et ne résout encore que les rôles de base listés ci-dessus. Les écrans communautaires, la boutique, les signalements et la modération utilisent les tables et RPC Supabase ajoutés le 16 novembre 2026. Le classement est ordonné par lauriers.
+Les 32 rôles peuvent maintenant être choisis dans la composition d'un salon, enregistrés par le hub et distribués par le serveur au lancement. Les rôles Alpha (Mercenaire, Rat Malade et Pillard) sont contrôlés côté serveur par l'entitlement `wolf_alpha`. Le moteur sait aussi traiter les actions communes aux factions de loups, aux variantes de Voyante, au Protecteur/Garde et aux rôles à potion. Attention : la distribution de tous les rôles ne signifie pas que chaque pouvoir spécial est terminé. Les pouvoirs complexes (Cupidon, Chasseur, Loup Blanc, Dictateur, etc.) restent à implémenter et à tester individuellement avant de considérer le jeu complet. Les écrans communautaires, la boutique, les signalements et la modération utilisent les tables et RPC Supabase ajoutés le 16 novembre 2026. Le classement est ordonné par lauriers.
 
 ## Base Supabase
 Projet : `bphfjhmmfwsnjnbnjkjl`
@@ -29,6 +29,9 @@ Projet : `bphfjhmmfwsnjnbnjkjl`
 Migrations ajoutées :
 - `20261116190420_wolfanator_social_progression_and_catalog`
 - `20261116190432_wolfanator_friendship_update_guard`
+- `wolfanator_full_role_compositions_and_assignment`
+- `wolfanator_alpha_role_entitlement_guard`
+- `wolfanator_split_protector_and_potion_roles` (applied in focused steps)
 
 Les tables exposées utilisent RLS. Les achats cosmétiques sont des achats directs avec des Lunes, sans tirage aléatoire.
 
