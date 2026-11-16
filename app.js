@@ -76,7 +76,7 @@
     if(mine.error){$('wolf-rooms').textContent=mine.error.message;return;}
     const ids=(mine.data||[]).map(x=>x.room_id);
     const [waiting,playing]=await Promise.all([
-      sb.from('game_rooms').select('id,room_code,name,status,max_players,created_at,room_players(count)').eq('status','waiting').order('created_at',{ascending:false}).limit(30),
+      sb.from('game_rooms').select('id,room_code,name,status,max_players,created_at,settings,room_players(count)').eq('status','waiting').order('created_at',{ascending:false}).limit(30),
       ids.length?sb.from('game_rooms').select('id,room_code,name,status,max_players,created_at,room_players(count)').in('id',ids).eq('status','playing').order('created_at',{ascending:false}):Promise.resolve({data:[],error:null})
     ]);
     if(waiting.error||playing.error){$('wolf-rooms').textContent=(waiting.error||playing.error).message;return;}
@@ -242,7 +242,7 @@
   $('back-home').addEventListener('click',()=>{$('lobby').classList.add('hidden');$('home').classList.remove('hidden');window.scrollTo({top:0,behavior:'smooth'});});
   $('auth-back').addEventListener('click',()=>{$('auth-screen').classList.add('hidden');$('home').classList.remove('hidden');window.scrollTo({top:0,behavior:'smooth'});});
   $('wolf-avatar').addEventListener('change',()=>{$('wolf-profile-preview').querySelector('span').textContent=$('wolf-avatar').value;});
-  $('quick-join').addEventListener('click',async()=>{const u=await user();if(!u)return;const r=await sb.from('game_rooms').select('room_code,max_players,room_players(count)').eq('status','waiting').order('created_at',{ascending:true}).limit(30);if(r.error){toast(r.error.message);return;}const room=(r.data||[]).find(x=>x.settings?.visibility!=='private'&&(x.room_players?.[0]?.count||0)<x.max_players);if(room)joinRoom(room.room_code);else toast('Aucun salon avec des places disponibles. Créez le vôtre ou utilisez un code.');});
+  $('quick-join').addEventListener('click',async()=>{const u=await user();if(!u)return;const r=await sb.from('game_rooms').select('room_code,max_players,settings,room_players(count)').eq('status','waiting').order('created_at',{ascending:true}).limit(30);if(r.error){toast(r.error.message);return;}const room=(r.data||[]).find(x=>x.settings?.visibility!=='private'&&(x.room_players?.[0]?.count||0)<x.max_players);if(room)joinRoom(room.room_code);else toast('Aucun salon avec des places disponibles. Créez le vôtre ou utilisez un code.');});
   $('create-room').addEventListener('click',createRoom);
   $('profile-btn').addEventListener('click',()=>profile.scrollIntoView({behavior:'smooth',block:'center'}));
   if(!configured){status('Configuration Supabase manquante dans config.js.');profile.hidden=true;panel.hidden=true;}
