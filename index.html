@@ -1,155 +1,16 @@
 <!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#100b18">
-  <title>VioChat — Discutez librement</title>
-  <link rel="stylesheet" href="style.css?v=6">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
-  <script src="config.js?v=2"></script>
-  <script src="app.js?v=6" defer></script>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#100d18"><title>Wolfanator — Le village a besoin de toi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=1"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js?v=1"></script><script src="app.js?v=1" defer></script>
 </head>
 <body>
-  <div class="ambient ambient-one"></div><div class="ambient ambient-two"></div>
-  <main class="shell">
-    <header class="topbar">
-      <a class="brand" href="#" aria-label="VioChat accueil"><span class="brand-mark">V</span><span>Vio<span>Chat</span></span></a>
-      <span class="top-note"><i></i> Votre espace de discussion</span>
-    </header>
-
-    <section id="auth-view" class="auth-layout">
-      <div class="intro">
-        <div class="eyebrow"><span class="sparkle">✦</span> CONNECTÉS, TOUT SIMPLEMENT</div>
-        <h1>Les conversations<br>prennent <span>vie.</span></h1>
-        <p>Retrouvez vos amis, échangez vos idées et créez de nouvelles conversations dans votre espace VioChat.</p>
-        <div class="feature-pills"><span>✦ Messages privés</span><span>✦ Communautés</span><span>✦ Profils personnalisés</span></div>
-        <div class="orb-art" aria-hidden="true"><div class="orb orb-a"></div><div class="orb orb-b"></div><div class="orb orb-c"></div><div class="orbit-line"></div></div>
-      </div>
-
-      <div class="auth-card">
-        <div class="card-heading">
-          <div class="mini-mark">V</div>
-          <div><p class="eyebrow">BIENVENUE SUR VIOCHAT</p><h2 id="form-title">Créer un compte</h2></div>
-        </div>
-        <p class="muted" id="form-subtitle">Rejoignez la communauté, c'est gratuit.</p>
-
-        <div class="tabs" role="tablist" aria-label="Type de formulaire">
-          <button class="tab active" id="signup-tab" type="button">Inscription</button>
-          <button class="tab" id="login-tab" type="button">Connexion</button>
-        </div>
-
-        <form id="auth-form">
-          <div class="field" id="username-field">
-            <label for="username">Pseudo</label>
-            <input id="username" type="text" autocomplete="nickname" minlength="3" maxlength="20" placeholder="Ex. AlexViolet">
-            <small>3 à 20 caractères. Lettres, chiffres et _ uniquement.</small>
-          </div>
-          <div class="field">
-            <label for="email">Adresse e-mail</label>
-            <input id="email" type="email" autocomplete="email" placeholder="toi@exemple.fr" required>
-          </div>
-          <div class="field">
-            <label for="password">Mot de passe</label>
-            <input id="password" type="password" autocomplete="new-password" minlength="8" placeholder="8 caractères minimum" required>
-          </div>
-          <button class="primary-btn" id="submit-btn" type="submit"><span>Créer mon compte</span><b>→</b></button>
-        </form>
-        <div id="feedback" class="feedback" role="status" aria-live="polite"></div>
-        <p class="terms">En continuant, tu acceptes d'utiliser VioChat de manière respectueuse.</p>
-      </div>
-    </section>
-
-    <section id="app-view" class="app-view hidden">
-      <aside class="sidebar">
-        <a class="brand side-brand" href="#"><span class="brand-mark">V</span><span>Vio<span>Chat</span></span></a>
-        <p class="side-label">ESPACE PERSONNEL</p>
-        <div class="user-chip"><div class="avatar" id="avatar-letter">V</div><div><strong id="user-pseudo">Membre</strong><small id="user-email"></small></div></div>
-        <button id="logout-btn" class="logout-btn" type="button">↪ Déconnexion</button>
-      </aside>
-      <div class="member-area">
-        <div class="member-heading"><div><p class="eyebrow">TON ESPACE VIOCHAT</p><h1>Salut, <span id="welcome-name">membre</span> !</h1></div><span class="online-pill">● En ligne</span></div>
-        <nav id="social-nav" class="social-nav" aria-label="Navigation principale"><button class="social-nav-btn active" data-section="home">⌂ Accueil</button><button class="social-nav-btn" data-section="friends">♧ Amis</button><button class="social-nav-btn" data-section="stories">◉ Stories</button><button class="social-nav-btn" data-section="notifications">♢ Notifications <span id="notification-count" class="notification-count hidden">0</span></button></nav>
-        <div id="section-home"><div class="member-grid">
-          <section class="panel avatar-panel">
-            <div class="panel-heading"><div><p class="eyebrow">TON PERSONNAGE</p><h2>Mon avatar 3D</h2></div><span class="panel-icon">✦</span></div>
-            <div id="avatar-canvas" class="avatar-canvas" aria-label="Aperçu 3D de ton avatar"></div>
-            <p class="avatar-hint">Fais glisser le personnage pour le faire tourner.</p>
-            <div class="avatar-editor">
-              <div class="avatar-editor-title"><strong>Personnalise ton personnage</strong><span>Modifie chaque détail</span></div>
-              <div class="avatar-tabs">
-                <button type="button" class="avatar-tab active" data-avatar-tab="face">Visage</button>
-                <button type="button" class="avatar-tab" data-avatar-tab="hair">Cheveux</button>
-                <button type="button" class="avatar-tab" data-avatar-tab="style">Tenue</button>
-                <button type="button" class="avatar-tab" data-avatar-tab="extras">Accessoires</button>
-              </div>
-              <div class="avatar-options active" data-avatar-panel="face">
-                <label>Couleur de peau <input id="skin-color" type="color" value="#d99a70"></label>
-                <label>Forme du visage <select id="face-shape"><option value="oval">Ovale</option><option value="round">Rond</option><option value="square">Carré</option><option value="long">Allongé</option></select></label>
-                <label>Yeux <select id="eye-style"><option value="round">Ronds</option><option value="soft">Doux</option><option value="wide">Grands</option><option value="narrow">Fins</option></select></label>
-                <label>Couleur des yeux <input id="eye-color" type="color" value="#38251f"></label>
-                <label>Sourcils <select id="brow-style"><option value="natural">Naturels</option><option value="thick">Épais</option><option value="thin">Fins</option></select></label>
-                <label>Nez <select id="nose-style"><option value="small">Petit</option><option value="round">Arrondi</option><option value="long">Allongé</option></select></label>
-                <label>Bouche <select id="mouth-style"><option value="smile">Sourire</option><option value="small">Discrète</option><option value="wide">Large</option></select></label>
-              </div>
-              <div class="avatar-options" data-avatar-panel="hair">
-                <label>Coiffure <select id="hair-style"><option value="short">Courte</option><option value="long">Longue</option><option value="curly">Bouclée</option><option value="afro">Volume afro</option><option value="bob">Carré</option><option value="ponytail">Queue-de-cheval</option><option value="spiky">Ébouriffée</option><option value="bun">Chignon</option></select></label>
-                <label>Couleur des cheveux <input id="hair-color" type="color" value="#51302a"></label>
-              </div>
-              <div class="avatar-options" data-avatar-panel="style">
-                <label>Haut <select id="outfit-style"><option value="hoodie">Sweat à capuche</option><option value="tee">T-shirt</option><option value="jacket">Veste</option><option value="shirt">Chemise</option></select></label>
-                <label>Couleur du haut <input id="shirt-color" type="color" value="#8d45df"></label>
-                <label>Bas <select id="pants-style"><option value="jeans">Jean</option><option value="shorts">Short</option><option value="skirt">Jupe</option></select></label>
-                <label>Couleur du bas <input id="pants-color" type="color" value="#292b52"></label>
-                <label>Chaussures <select id="shoe-style"><option value="sneakers">Baskets</option><option value="boots">Bottines</option><option value="high">Chaussures montantes</option></select></label>
-                <label>Couleur des chaussures <input id="shoe-color" type="color" value="#f2edf8"></label>
-              </div>
-              <div class="avatar-options" data-avatar-panel="extras">
-                <label>Lunettes <select id="glasses-style"><option value="none">Aucune</option><option value="round">Rondes</option><option value="square">Carrées</option><option value="sunglasses">Soleil</option></select></label>
-                <label>Chapeau <select id="hat-style"><option value="none">Aucun</option><option value="cap">Casquette</option><option value="beanie">Bonnet</option><option value="crown">Couronne</option></select></label>
-                <label>Accessoire <select id="accessory-style"><option value="none">Aucun</option><option value="earrings">Boucles d'oreilles</option><option value="chain">Chaîne</option><option value="headphones">Casque audio</option></select></label>
-                <label>Couleur accessoire <input id="accessory-color" type="color" value="#f4c95d"></label>
-              </div>
-            </div>
-            <button id="save-avatar" class="primary-btn" type="button"><span>Enregistrer mon avatar</span><b>✓</b></button>
-            <p id="avatar-save-status" class="status-line"></p>
-          </section>
-          <section class="panel messages-panel">
-            <div class="panel-heading"><div><p class="eyebrow">RESTE EN CONTACT</p><h2>Messages privés</h2></div><span class="panel-icon">◈</span></div>
-            <form id="find-user" class="find-user"><input id="find-username" placeholder="Rechercher un pseudo…" required><button type="submit">Trouver</button></form>
-            <p id="find-status" class="status-line"></p>
-            <div class="messenger">
-              <div class="chat-list-wrap"><p class="side-label">CONVERSATIONS</p><div id="chat-list" class="chat-list"><p class="muted">Chargement…</p></div></div>
-              <div class="chat-main">
-                <div id="chat-empty" class="chat-empty"><span>✦</span><strong>Ta messagerie</strong><small>Recherche un pseudo pour commencer à discuter.</small></div>
-                <div id="chat-room" class="chat-room hidden">
-                  <div class="chat-title"><div class="chat-person"><div id="chat-avatar" class="mini-avatar chat-avatar" aria-label="Avatar 3D du correspondant"></div><strong id="active-chat-name">Conversation</strong></div><span>● En ligne</span></div>
-                  <div id="messages" class="messages"></div>
-                  <form id="send-message" class="send-message"><input id="message-input" maxlength="2000" placeholder="Écris un message…" required><button type="submit" aria-label="Envoyer">➤</button></form>
-                  <p id="chat-status" class="status-line"></p>
-                </div>
-              </div>
-            </div>
-          </section>
-        </div></div>
-        <section id="section-friends" class="social-section hidden">
-          <div class="social-section-heading"><div><p class="eyebrow">TON CERCLE</p><h2>Amis</h2><p class="muted">Retrouve tes amis ou envoie une demande avec leur pseudo.</p></div></div>
-          <form id="friend-search" class="social-form"><input id="friend-username" maxlength="20" placeholder="Rechercher un pseudo…" required><button type="submit">Ajouter</button></form><p id="friend-search-status" class="status-line"></p>
-          <div class="social-columns"><div class="panel"><h3>Demandes reçues</h3><div id="friend-requests" class="social-list"><p class="muted">Chargement…</p></div></div><div class="panel"><h3>Mes amis</h3><div id="friends-list" class="social-list"><p class="muted">Chargement…</p></div></div></div>
-        </section>
-        <section id="section-stories" class="social-section hidden">
-          <div class="social-section-heading"><div><p class="eyebrow">À LA UNE</p><h2>Stories</h2><p class="muted">Partage une photo ou une vidéo qui disparaîtra automatiquement après 24 heures.</p></div></div>
-          <form id="story-form" class="panel story-create"><label for="story-file">Photo ou vidéo</label><input id="story-file" type="file" accept="image/*,video/*" required><label for="story-caption">Petit texte (facultatif)</label><input id="story-caption" maxlength="180" placeholder="Quoi de neuf ?"><button type="submit" class="primary-btn"><span>Publier ma story</span><b>↗</b></button><p id="story-status" class="status-line"></p></form>
-          <div id="story-feed" class="story-feed"><p class="muted">Chargement des stories…</p></div>
-        </section>
-        <section id="section-notifications" class="social-section hidden">
-          <div class="social-section-heading"><div><p class="eyebrow">ACTUALITÉS</p><h2>Notifications</h2><p class="muted">Les nouveautés concernant ton compte et tes amis.</p></div><button id="mark-notifications-read" class="secondary-btn" type="button">Tout marquer comme lu</button></div>
-          <div id="notifications-list" class="panel social-list"><p class="muted">Chargement…</p></div>
-        </section>
-      </div>
-    </section>
-    <footer><span>© 2026 VioChat</span><span>Fait pour garder le lien <b>✦</b></span></footer>
-  </main>
-</body>
-</html>
+<div class="moon"></div><header class="topbar"><a class="brand" href="#"><span class="logo">W</span>WOLFANATOR</a><span class="status"><i></i> Le village t'attend</span></header>
+<main>
+<section class="hero" id="home"><div class="hero-copy"><p class="eyebrow">LE VILLAGE N'EST PAS CE QU'IL SEMBLE ÊTRE</p><h1>La nuit tombe.<br><em>Qui croire ?</em></h1><p class="lead">Forme ton équipe, découvre ton rôle et tente de survivre. Mais prends garde : les apparences sont trompeuses.</p><div class="actions"><button class="primary" id="play-now">Entrer dans le village <span>→</span></button><a class="text-link" href="#how">Comment jouer ?</a></div><div class="facts"><span>🐺 Loups contre village</span><span>🌙 Jour & nuit</span><span>🎭 Rôles secrets</span></div></div><div class="hero-art"><div class="moon-disc"></div><div class="wolf-silhouette">🐺</div><div class="art-caption">LA NUIT A SES SECRETS</div></div></section>
+<section class="lobby hidden" id="lobby"><div class="section-head"><div><p class="eyebrow">BIENVENUE AU VILLAGE</p><h2>Choisis ta partie</h2></div><button class="ghost" id="back-home">← Accueil</button></div><div class="lobby-grid"><article class="panel featured"><div class="panel-icon">⚔️</div><p class="eyebrow">PARTIE RAPIDE</p><h3>Rejoindre une partie</h3><p>Entre dans une salle ouverte et découvre ton rôle au début de la partie.</p><button class="primary wide" id="quick-join">Trouver une partie</button><small id="quick-feedback">La recherche multijoueur sera activée après la connexion de la base de données.</small></article><article class="panel"><div class="panel-icon">🏰</div><p class="eyebrow">ENTRE AMIS</p><h3>Créer un salon privé</h3><p>Prépare une partie et invite tes amis avec un code de salon.</p><button class="secondary wide" id="create-room">Créer un salon</button><small id="room-feedback">La création de salons sera disponible après configuration du serveur.</small></article><article class="panel"><div class="panel-icon">🎭</div><p class="eyebrow">TON IDENTITÉ</p><h3>Profil joueur</h3><p>Ton pseudo, ton avatar, tes statistiques et tes badges seront réunis ici.</p><button class="secondary wide" id="profile-btn">Voir le profil</button><small>Profils joueurs à venir.</small></article></div><div class="notice">🚧 <span><strong>Version de construction</strong> — l'interface Wolfanator est en place. Les vraies parties en temps réel nécessitent encore la configuration de Supabase.</span></div></section>
+<section class="how" id="how"><p class="eyebrow">LES RÈGLES DU VILLAGE</p><h2>Une partie. Deux camps. <em>Des secrets.</em></h2><div class="rule-grid"><article><b>🌙 La nuit</b><p>Les rôles spéciaux agissent en secret. Les loups choisissent leur cible.</p></article><article><b>☀️ Le jour</b><p>Le village débat, partage ses soupçons et tente de démasquer les loups.</p></article><article><b>🗳️ Le vote</b><p>Chaque joueur vote. Le village doit unir ses forces pour gagner.</p></article></div></section>
+</main><footer><span>WOLFANATOR</span><span>Un jeu original inspiré du jeu du Loup-Garou.</span></footer><div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body></html>
