@@ -35,7 +35,7 @@
   async function refreshAuth(){
     if(!sb)return;const r=await sb.auth.getSession(),session=r.data.session;
     $('wolf-logout').hidden=!session;$('wolf-login').hidden=!!session;$('wolf-signup').hidden=!!session;$('wolf-pseudo').hidden=!!session;
-    profile.hidden=!session;panel.hidden=!session;
+    profile.hidden=!session;panel.hidden=!session;premium.hidden=!session;
     if(session){$('auth-screen').classList.add('hidden');$('lobby').classList.remove('hidden');status('Connecté : '+(session.user.email||'joueur'));await loadProfile(session.user);await loadPremium();await loadRooms();}
     else{profileName='';status('Non connecté.');$('wolf-rooms').innerHTML='<small>Connectez-vous pour afficher les salons.</small>';}
   }
@@ -173,7 +173,7 @@
   $('wolf-tab-signup').addEventListener('click',()=>setAuthMode('signup'));
   $('wolf-login').addEventListener('click',()=>authAction('login'));
   $('wolf-signup').addEventListener('click',()=>authAction('signup'));
-  $('wolf-logout').addEventListener('click',async()=>{await sb.auth.signOut();closeRoom();await refreshAuth();});
+  $('wolf-logout').addEventListener('click',async()=>{await sb.auth.signOut();closeRoom();await refreshAuth();showAuth();});
   $('wolf-save-profile').addEventListener('click',saveProfile);
   $('wolf-create').addEventListener('click',createRoom);
   $('wolf-join').addEventListener('click',()=>joinRoom($('wolf-room-code').value));
