@@ -17,6 +17,7 @@
         <button data-wx-tab="friends">👥 Amis</button>
         <button data-wx-tab="shop">🛍️ Boutique</button>
         <button data-wx-tab="profile">🪪 Mon profil</button>
+        <button data-wx-tab="report">🚩 Signaler</button>
       </nav>
       <div class="wx-content" id="wx-content"><p>Chargement du village…</p></div>
     </section>`;
@@ -47,6 +48,7 @@
     if(active==='friends')await friendsPane(pane);
     if(active==='shop')await shopPane(pane);
     if(active==='profile')await profilePane(pane);
+    if(active==='report')reportPane(pane);
   }
   function home(){
     const xp=profile?.xp||0,level=profile?.level||1,next=level*level*100;
@@ -80,6 +82,9 @@
     pane.innerHTML=`<div class="wx-section-title"><div><h3>Amis du village</h3><p>Ajoute des joueurs avec leur pseudo Wolfanator.</p></div></div>
       <form class="wx-form" data-wx-form="friend"><input name="username" minlength="3" maxlength="20" placeholder="Pseudo du joueur" required><button class="wx-primary">Envoyer une demande</button></form>
       <div class="wx-friend-list">${rows.length?rows.map(x=>{const incoming=x.addressee_id===user.id&&x.status==='pending',other=x.requester_id===user.id?x.addressee_id:x.requester_id,p=people[other]||{};return `<div class="wx-friend"><div><strong>${esc(p.username||'Joueur')}</strong><small>Niveau ${p.level||1} · ${x.status==='accepted'?'Ami':incoming?'Demande reçue':'Demande envoyée'}</small></div>${incoming?`<div class="wx-actions"><button data-wx-action="friend-accept" data-id="${x.id}" class="wx-primary">Accepter</button><button data-wx-action="friend-decline" data-id="${x.id}" class="wx-secondary">Refuser</button></div>`:''}</div>`}).join(''):'<div class="wx-empty">Tu n’as pas encore d’amis. Envoie ta première demande !</div>'}</div>`;
+  }
+  function reportPane(pane){
+    pane.innerHTML='<div class="wx-section-title"><div><h3>Signaler un comportement</h3><p>Transmets un signalement à l’administration Wolfanator.</p></div></div><form class="wx-form wx-bio-form" data-wx-form="report"><label for="wx-report-user">Pseudo du joueur</label><input id="wx-report-user" name="username" minlength="3" maxlength="20" placeholder="Pseudo exact" required><label for="wx-report-reason">Motif</label><select id="wx-report-reason" name="reason"><option value="harassment">Harcèlement</option><option value="spam">Spam</option><option value="cheating">Triche</option><option value="inappropriate_name">Pseudo inapproprié</option><option value="other">Autre</option></select><label for="wx-report-details">Détails (facultatif)</label><textarea id="wx-report-details" name="details" maxlength="1000" placeholder="Explique brièvement ce qui s’est passé…"></textarea><button class="wx-primary">Envoyer le signalement</button></form>';
   }
   async function shopPane(pane){
     const [{data:items,error},{data:owned}]=await Promise.all([
