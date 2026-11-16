@@ -10,6 +10,9 @@
   const icons=Object.fromEntries(roleCatalog.map(r=>[r.key,r.icon]));
   const descriptions=Object.fromEntries(roleCatalog.map(r=>[r.key,r.description]));
   const roleKeys=roleCatalog.map(r=>r.key);
+  const alphaRoleKeys=['mercenary','sick_rat','raider'];
+  roleCatalog.forEach(r=>{r.alphaOnly=alphaRoleKeys.includes(r.key);});
+  const wolfCount=c=>wolfRoleKeys.reduce((n,k)=>n+Number(c[k]||0),0);
   const wolfRoleKeys=['wolf','black_wolf','talkative_wolf','white_wolf','wolf_hood','literate_wolf'];
   const seerRoleKeys=['seer','chatty_seer','aura_seer'];
   const protectorRoleKeys=['healer','guard'];
@@ -26,7 +29,7 @@
   const panel=document.createElement('div'); panel.className='panel room-panel';
   panel.innerHTML='<p class="eyebrow">SALONS EN LIGNE</p><h3>Salons disponibles</h3><div class="field-grid room-fields"><input id="wolf-room-name" maxlength="40" placeholder="Nom du salon"><select id="wolf-room-max"><option value="5">5 joueurs</option><option value="8">8 joueurs</option><option value="10">10 joueurs</option><option value="12" selected>12 joueurs</option><option value="15">15 joueurs</option><option value="20">20 joueurs</option></select><select id="wolf-room-visibility" aria-label="Visibilité du salon"><option value="public">🌐 Public</option><option value="private">🔒 Privé (code)</option></select></div><div class="composition-editor"><h4>Choisissez les rôles de votre partie</h4><p>Le total des rôles doit correspondre au nombre de places. La composition est enregistrée dans le salon.</p><div class="composition-fields" id="wolf-composition-fields"></div><div class="composition-total" id="wolf-comp-total">Total : 12 / 12 joueurs</div></div><div class="button-row"><button class="primary" id="wolf-create">Créer le salon avec cette composition</button></div><div class="field-grid room-fields"><input id="wolf-room-code" maxlength="8" placeholder="Code du salon" autocomplete="off"><button class="secondary" id="wolf-join">Rejoindre avec un code</button></div><div id="wolf-rooms" class="room-list"><small>Les salons apparaîtront ici.</small></div><div id="wolf-current-room" class="current-room"></div>';
   $('lobby').appendChild(panel);
-  function renderCompositionFields(comp={}){const box=$('wolf-composition-fields');if(!box)return;box.innerHTML=roleCatalog.map(r=>'<label>'+r.icon+' '+esc(r.name)+'<input type="number" id="wolf-comp-'+r.key+'" min="0" max="19" step="1" value="'+Number(comp[r.key]||0)+'" data-role-count="'+r.key+'"></label>').join('');box.querySelectorAll('[data-role-count]').forEach(input=>input.addEventListener('input',updateCompositionTotal));}
+  function renderCompositionFields(comp={}){const box=$('wolf-composition-fields');if(!box)return;box.innerHTML=roleCatalog.map(r=>'<label>'+r.icon+' '+esc(r.name)+(r.alphaOnly?' <small>🔒 Alpha</small>':'')+'<input type="number" id="wolf-comp-'+r.key+'" min="0" max="19" step="1" value="'+Number(comp[r.key]||0)+'" data-role-count="'+r.key+'"></label>').join('');box.querySelectorAll('[data-role-count]').forEach(input=>input.addEventListener('input',updateCompositionTotal));}
   renderCompositionFields({wolf:3,seer:1,healer:1,villager:7});
   const status=s=>$('wolf-auth-status').textContent=s;
   const pseudo=()=>($('wolf-profile-name').value||$('wolf-pseudo').value||profileName||'Joueur').trim();
@@ -157,7 +160,7 @@
 
   async function createRoom(){
     const u=await user();if(!u)return;const comp=getComposition(),max=Number($('wolf-room-max').value),sum=Object.values(comp).reduce((a,b)=>a+b,0);
-    if(comp.wolf<1||sum!==max)return toast('La composition doit contenir au moins un loup et totaliser exactement '+max+' rôles.');
+    if(wolfCount(comp)<1||sum!==max)return toast('La composition doit contenir au moins un rôle du camp des loups et totaliser exactement '+max+' rôles.');
     const r=await sb.rpc('create_game_room',{p_name:$('wolf-room-name').value.trim()||'Salon Wolfanator',p_max_players:max,p_display_name:pseudo(),p_composition:comp,p_visibility:$('wolf-room-visibility').value});
     if(r.error)return toast(r.error.message);await openRoom(r.data[0].room_id,r.data[0].room_code);
   }
@@ -183,7 +186,7 @@
   }
   function gameHTML(s){
     const players=s.players||[],alive=players.filter(p=>p.is_alive),role=s.my_role,night=s.phase==='night',day=s.phase==='day',done=s.status==='finished'||s.phase==='finished';
-    let desc=night?({wolf:'Choisissez une cible avec les autres loups.',seer:'Choisissez un joueur à examiner.',healer:'Choisissez une personne à protéger.',guard:'Choisissez une personne à protéger (pas la même deux nuits de suite).',witch:'Vous pouvez sauver la cible des loups ou empoisonner un joueur. Chaque potion ne s’utilise qu’une fois.',ancient:'Vous avez deux vies. La première attaque des loups vous blesse ; la seconde peut vous éliminer.',villager:'Vous êtes à l’abri cette nuit. Attendez le matin.'}[role]):'Le village débat. Votez pour la personne que vous pensez être un loup.';
+    let desc=night?({wolf:'Choisissez une cible avec les autres loups.',seer:'Choisissez un joueur à examiner.',healer:'Choisissez une personne à protéger.',guard:'Choisissez une personne à protéger (pas la même deux nuits de suite).',witch:'Vous pouvez sauver la cible des loups ou empoisonner un joueur. Chaque potion ne s’utilise qu’une fois.',ancient:'Vous avez deux vies. La première attaque des loups vous blesse ; la seconde peut vous éliminer.',villager:'Vous êtes à l’abri cette nuit. Attendez le matin.'}[role]||descriptions[role]||'Votre rôle attend la prochaine phase.'):'Le village débat. Votez pour la personne que vous pensez être un loup.';
     const canAct=!done&&s.my_alive&&(night&&[...wolfRoleKeys,...seerRoleKeys,...protectorRoleKeys].includes(role)||day),witchTurn=!done&&s.my_alive&&night&&role==='witch';
     const targets=alive.filter(p=>p.user_id!==(day||seerRoleKeys.includes(role)||wolfRoleKeys.includes(role)||role==='witch'?currentUserId:''));
     const label=night?({wolf:'Désigner la cible',seer:'Examiner ce joueur',healer:'Protéger ce joueur',guard:'Protéger ce joueur'}[role]||''):'Voter contre ce joueur';
