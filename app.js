@@ -140,7 +140,7 @@
   $('wolf-room-code').addEventListener('input',e=>{e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,8);});
   $('play-now').addEventListener('click',()=>{$('home').classList.add('hidden');$('lobby').classList.remove('hidden');window.scrollTo({top:0,behavior:'smooth'});});
   $('back-home').addEventListener('click',()=>{$('lobby').classList.add('hidden');$('home').classList.remove('hidden');window.scrollTo({top:0,behavior:'smooth'});});
-  $('quick-join').addEventListener('click',async()=>{const u=await user();if(!u)return;const r=await sb.from('game_rooms').select('room_code').eq('status','waiting').order('created_at',{ascending:true}).limit(1).maybeSingle();if(r.error)toast(r.error.message);else if(r.data)joinRoom(r.data.room_code);else toast('Aucun salon ouvert. Créez le vôtre ou utilisez un code.');});
+  $('quick-join').addEventListener('click',async()=>{const u=await user();if(!u)return;const r=await sb.from('game_rooms').select('room_code,max_players,room_players(count)').eq('status','waiting').order('created_at',{ascending:true}).limit(30);if(r.error){toast(r.error.message);return;}const room=(r.data||[]).find(x=>(x.room_players?.[0]?.count||0)<x.max_players);if(room)joinRoom(room.room_code);else toast('Aucun salon avec des places disponibles. Créez le vôtre ou utilisez un code.');});
   $('create-room').addEventListener('click',createRoom);
   $('profile-btn').addEventListener('click',()=>profile.scrollIntoView({behavior:'smooth',block:'center'}));
   if(!configured){status('Configuration Supabase manquante dans config.js.');profile.hidden=true;panel.hidden=true;}
