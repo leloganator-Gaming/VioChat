@@ -177,3 +177,9 @@ button.danger{flex:0 0 auto;padding:9px 12px;border:1px solid #a94c68;border-rad
 .admin-audit-row{display:grid;gap:3px;padding:10px 12px;border:1px solid #493a5d;border-radius:9px;background:#ffffff06}
 .admin-audit-row strong{font-size:12px;color:#e6d3ff}
 .admin-audit-row small{font-size:10px;color:#bcaecb}
+
+.witch-actions{display:grid;gap:10px;margin:16px 0;padding:14px;border:1px solid #a77aff66;border-radius:13px;background:#9c6bff0d}
+.witch-actions h4{margin:0;color:#e5d4ff}
+.witch-actions .target-grid{margin:5px 0}
+.witch-actions [data-witch-action="heal"]{border-color:#69b98a;color:#b7f2cb}
+.witch-actions [data-witch-action="skip"]{justify-self:start}
