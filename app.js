@@ -41,14 +41,14 @@
   }
   async function loadPremium(){
     const box=$('wolf-premium-status');if(!box)return;
-    const r=await sb.from('user_entitlements').select('entitlement_key,expires_at').eq('entitlement_key','wolf_alpha').maybeSingle();
+    const r=await sb.from('user_entitlements').select('entitlement_key,expires_at').eq('user_id',currentUserId).eq('entitlement_key','wolf_alpha').maybeSingle();
     if(r.error){box.textContent='Statut indisponible.';return;}
     const active=!!r.data&&(!r.data.expires_at||new Date(r.data.expires_at)>new Date());
     box.innerHTML=active?'<strong class="premium-active">✓ Loup Alpha activé sur ce compte</strong>':'<strong>Préparation en cours</strong><small>Le paiement sécurisé et l’activation automatique seront ajoutés avant l’ouverture des abonnements.</small>';
   }
   async function loadStats(){
     const box=$('wolf-stats');if(!box)return;
-    const r=await sb.from('game_history').select('room_name,role_key,won,rounds,finished_at').order('finished_at',{ascending:false}).limit(1000);
+    const r=await sb.from('game_history').select('room_name,role_key,won,rounds,finished_at').eq('user_id',currentUserId).order('finished_at',{ascending:false}).limit(1000);
     if(r.error){box.innerHTML='<small>Statistiques indisponibles : '+esc(r.error.message)+'</small>';return;}
     const rows=r.data||[],wins=rows.filter(x=>x.won).length,losses=rows.length-wins,rate=rows.length?Math.round(wins/rows.length*100):0;
     box.innerHTML='<h4>Statistiques</h4><div class="stats-grid"><div><strong>'+rows.length+'</strong><small>Parties</small></div><div><strong>'+wins+'</strong><small>Victoires</small></div><div><strong>'+rate+'%</strong><small>Taux de victoire</small></div></div><h4>Dernières parties</h4>'+(rows.length?'<div class="history-list">'+rows.slice(0,10).map(x=>'<div class="history-row"><span><strong>'+esc(x.room_name)+'</strong><small>'+esc(roles[x.role_key]||x.role_key)+' · '+new Date(x.finished_at).toLocaleDateString('fr-FR')+'</small></span><b class="'+(x.won?'win':'loss')+'">'+(x.won?'Victoire':'Défaite')+'</b></div>').join('')+'</div>':'<small>Aucune partie terminée pour le moment.</small>');
