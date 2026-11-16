@@ -15,6 +15,9 @@
   const profile=document.createElement('div'); profile.className='panel profile-panel';
   profile.innerHTML='<p class="eyebrow">VOTRE IDENTITÉ</p><h3>Mon profil joueur</h3><div class="field-grid"><input id="wolf-profile-name" maxlength="20" minlength="3" placeholder="Votre pseudo"><select id="wolf-avatar" aria-label="Avatar"><option value="🐺">🐺 Loup</option><option value="🦊">🦊 Renard</option><option value="🦉">🦉 Hibou</option><option value="🐱">🐱 Chat</option><option value="🐻">🐻 Ours</option><option value="🦇">🦇 Chauve-souris</option><option value="👻">👻 Fantôme</option><option value="🧙">🧙 Mage</option></select><button class="secondary" id="wolf-save-profile">Enregistrer le profil</button></div><div class="profile-preview" id="wolf-profile-preview"><span>🐺</span><strong>Votre profil</strong></div><small>Votre pseudo et votre avatar seront affichés dans les salons.</small><div id="wolf-stats" class="stats-panel"><small>Chargement des statistiques…</small></div>';
   $('lobby').appendChild(profile);
+  const premium=document.createElement('div');premium.className='panel premium-panel';
+  premium.innerHTML='<p class="eyebrow">ABONNEMENT PREMIUM</p><h3>🐺 Loup Alpha</h3><div class="premium-price">10 € <small>/ mois</small></div><p>Un statut premium avec accès au rôle spécial Loup Alpha dans les parties compatibles.</p><div id="wolf-premium-status" class="premium-status">Vérification de votre accès…</div>';
+  $('lobby').appendChild(premium);
   const panel=document.createElement('div'); panel.className='panel room-panel';
   panel.innerHTML='<p class="eyebrow">SALONS EN LIGNE</p><h3>Salons disponibles</h3><div class="field-grid room-fields"><input id="wolf-room-name" maxlength="40" placeholder="Nom du salon"><select id="wolf-room-max"><option value="5">5 joueurs</option><option value="8">8 joueurs</option><option value="10">10 joueurs</option><option value="12" selected>12 joueurs</option><option value="15">15 joueurs</option><option value="20">20 joueurs</option></select><button class="secondary" id="wolf-create">Créer un salon</button></div><div class="field-grid room-fields"><input id="wolf-room-code" maxlength="8" placeholder="Code du salon" autocomplete="off"><button class="secondary" id="wolf-join">Rejoindre avec un code</button></div><div id="wolf-rooms" class="room-list"><small>Les salons apparaîtront ici.</small></div><div id="wolf-current-room" class="current-room"></div>';
   $('lobby').appendChild(panel);
@@ -33,8 +36,15 @@
     if(!sb)return;const r=await sb.auth.getSession(),session=r.data.session;
     $('wolf-logout').hidden=!session;$('wolf-login').hidden=!!session;$('wolf-signup').hidden=!!session;$('wolf-pseudo').hidden=!!session;
     profile.hidden=!session;panel.hidden=!session;
-    if(session){$('auth-screen').classList.add('hidden');$('lobby').classList.remove('hidden');status('Connecté : '+(session.user.email||'joueur'));await loadProfile(session.user);await loadRooms();}
+    if(session){$('auth-screen').classList.add('hidden');$('lobby').classList.remove('hidden');status('Connecté : '+(session.user.email||'joueur'));await loadProfile(session.user);await loadPremium();await loadRooms();}
     else{profileName='';status('Non connecté.');$('wolf-rooms').innerHTML='<small>Connectez-vous pour afficher les salons.</small>';}
+  }
+  async function loadPremium(){
+    const box=$('wolf-premium-status');if(!box)return;
+    const r=await sb.from('user_entitlements').select('entitlement_key,expires_at').eq('entitlement_key','wolf_alpha').maybeSingle();
+    if(r.error){box.textContent='Statut indisponible.';return;}
+    const active=!!r.data&&(!r.data.expires_at||new Date(r.data.expires_at)>new Date());
+    box.innerHTML=active?'<strong class="premium-active">✓ Loup Alpha activé sur ce compte</strong>':'<strong>Préparation en cours</strong><small>Le paiement sécurisé et l’activation automatique seront ajoutés avant l’ouverture des abonnements.</small>';
   }
   async function loadStats(){
     const box=$('wolf-stats');if(!box)return;
