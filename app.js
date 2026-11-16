@@ -4,7 +4,7 @@
   const toast = s => { const el=$('toast'); el.textContent=s; el.classList.add('show'); clearTimeout(window.__wolfToast); window.__wolfToast=setTimeout(()=>el.classList.remove('show'),4200); };
   const cfg=window.WOLFANATOR_CONFIG||{}, configured=!!(cfg.supabaseUrl&&cfg.supabasePublishableKey&&window.supabase);
   const sb=configured?window.supabase.createClient(cfg.supabaseUrl,cfg.supabasePublishableKey):null;
-  let currentRoom=null,channel=null,profileName='',currentUserId='',refreshing=false,isAlpha=false;
+  let currentRoom=null,channel=null,profileName='',currentUserId='',refreshing=false,isAlpha=false,isAdmin=false,adminPanel=null;
   const roles={wolf:'Loup-garou',seer:'Voyante',healer:'Protecteur',villager:'Villageois'};
   const icons={wolf:'🐺',seer:'🔮',healer:'🛡️',villager:'🏡'};
   const descriptions={wolf:'Chaque nuit, choisissez une personne à éliminer. Les loups gagnent lorsqu’ils sont aussi nombreux que les autres joueurs encore en vie.',seer:'Chaque nuit, examinez un joueur pour découvrir secrètement son rôle. Aidez le village à trouver les loups.',healer:'Chaque nuit, choisissez une personne à protéger. Si les loups la ciblent, elle survit.',villager:'Vous n’avez pas de pouvoir nocturne. Le jour, discutez et votez pour éliminer les loups.'};
@@ -37,17 +37,57 @@
     if(!sb)return;const r=await sb.auth.getSession(),session=r.data.session;
     $('wolf-logout').hidden=!session;$('wolf-logout-lobby').hidden=!session;$('wolf-login').hidden=!!session;$('wolf-signup').hidden=!!session;$('wolf-pseudo').hidden=!!session;
     profile.hidden=!session;panel.hidden=!session;premium.hidden=!session;
-    if(session){currentUserId=session.user.id;$('auth-screen').classList.add('hidden');$('lobby').classList.remove('hidden');status('Connecté : '+(session.user.email||'joueur'));await loadProfile(session.user);await loadPremium();await loadRooms();}
-    else{currentUserId='';profileName='';status('Non connecté.');$('wolf-rooms').innerHTML='<small>Connectez-vous pour afficher les salons.</small>';}
+    if(session){currentUserId=session.user.id;$('auth-screen').classList.add('hidden');$('lobby').classList.remove('hidden');status('Connecté : '+(session.user.email||'joueur'));await loadProfile(session.user);await loadPremium();await loadRooms();await renderAdminPanel();}
+    else{currentUserId='';profileName='';isAdmin=false;if(adminPanel)adminPanel.hidden=true;status('Non connecté.');$('wolf-rooms').innerHTML='<small>Connectez-vous pour afficher les salons.</small>';}
   }
   async function loadPremium(){
     const box=$('wolf-premium-status');if(!box)return;
-    const r=await sb.from('user_entitlements').select('entitlement_key,expires_at').eq('user_id',currentUserId).eq('entitlement_key','wolf_alpha').maybeSingle();
+    const r=await sb.from('user_entitlements').select('entitlement_key,expires_at,source').eq('user_id',currentUserId).eq('entitlement_key','wolf_alpha').maybeSingle();
     if(r.error){box.textContent='Statut indisponible.';return;}
-    const active=!!r.data&&(!r.data.expires_at||new Date(r.data.expires_at)>new Date());isAlpha=active;
+    const active=!!r.data&&(!r.data.expires_at||new Date(r.data.expires_at)>new Date());isAlpha=active;isAdmin=active&&r.data.source==='admin'&&!r.data.expires_at;
     const preview=$('wolf-profile-preview');if(preview){const old=preview.querySelector('.alpha-badge');if(old)old.remove();if(active)preview.insertAdjacentHTML('beforeend','<small class="alpha-badge">🐺 LOUP ALPHA</small>');}
     box.innerHTML=active?'<strong class="premium-active">✓ Loup Alpha activé sur ce compte</strong><small>'+(r.data.expires_at?'Valable jusqu’au '+new Date(r.data.expires_at).toLocaleDateString('fr-FR'):'Accès administrateur permanent')+'</small>':'<strong>Débloquez les avantages Alpha</strong><button class="secondary wide" id="wolf-buy-alpha">Activer pour 10 Lunes</button><small>10 Lunes sont déduites de votre solde pour 30 jours.</small>';
     const buy=$('wolf-buy-alpha');if(buy)buy.addEventListener('click',async()=>{buy.disabled=true;const a=await sb.rpc('buy_wolf_alpha_with_moons');if(a.error){toast(a.error.message);buy.disabled=false;return;}toast('Loup Alpha activé pour 30 jours !');await loadProfile({id:currentUserId});await loadPremium();});
+  }
+  async function renderAdminPanel(){
+    if(!isAdmin)return;
+    if(!adminPanel){adminPanel=document.createElement('section');adminPanel.className='panel admin-panel';adminPanel.id='wolf-admin-panel';$('lobby').appendChild(adminPanel);}
+    adminPanel.hidden=false;
+    adminPanel.innerHTML='<p class="eyebrow">CONSOLE PRIVILÉGIÉE</p><h3>🛠️ Administration Wolfanator</h3><p class="muted-note">Outils réservés au compte administrateur permanent.</p><div class="admin-actions"><button class="secondary" id="admin-refresh">Actualiser les données</button><button class="secondary" id="admin-test-hub">🧪 Tester le hub</button><button class="ghost" id="admin-cleanup">Nettoyer les salons en attente de plus de 24 h</button></div><div id="admin-stats" class="admin-stats">Chargement des indicateurs…</div><h4>Gestion de tous les salons</h4><div id="admin-room-list" class="admin-room-list">Chargement…</div><div id="admin-diagnostics" class="admin-diagnostics"></div>';
+    $('admin-refresh').addEventListener('click',loadAdminData);
+    $('admin-test-hub').addEventListener('click',async()=>{
+      const b=$('admin-test-hub');b.disabled=true;
+      const comp={wolf:1,seer:1,healer:1,villager:2};
+      const r=await sb.rpc('create_game_room',{p_name:'[TEST ADMIN] Hub Wolfanator',p_max_players:5,p_display_name:pseudo(),p_composition:comp,p_visibility:'private'});
+      b.disabled=false;
+      if(r.error){toast('Création du salon de test impossible : '+r.error.message);return;}
+      toast('Salon de test créé. Vous pouvez inspecter le hub et ses réglages.');
+      await openRoom(r.data[0].room_id,r.data[0].room_code);
+      await loadAdminData();
+    });
+    $('admin-cleanup').addEventListener('click',async()=>{
+      if(!confirm('Supprimer définitivement tous les salons EN ATTENTE créés il y a plus de 24 heures ? Les parties en cours ne seront pas touchées.'))return;
+      const b=$('admin-cleanup');b.disabled=true;const r=await sb.rpc('admin_cleanup_stale_rooms',{p_hours:24});b.disabled=false;
+      if(r.error){toast(r.error.message);return;}toast(Number(r.data)+' salon(s) ancien(s) supprimé(s).');await loadAdminData();await loadRooms();
+    });
+    await loadAdminData();
+  }
+  async function loadAdminData(){
+    if(!isAdmin||!adminPanel)return;
+    const [stats,rooms]=await Promise.all([sb.rpc('admin_dashboard_stats'),sb.rpc('admin_list_rooms')]);
+    if(stats.error||rooms.error){$('admin-diagnostics').textContent='Erreur admin : '+(stats.error||rooms.error).message;return;}
+    const s=stats.data||{};
+    $('admin-stats').innerHTML='<div class="admin-stat-grid">'+[['Salons',s.rooms_total],['En attente',s.rooms_waiting],['Parties en cours',s.rooms_playing],['Terminées',s.rooms_finished],['Joueurs présents',s.players_online],['Messages',s.messages_total],['Parties enregistrées',s.games_total],['Lunes en circulation',s.lunes_in_circulation]].map(x=>'<div><strong>'+Number(x[1]||0).toLocaleString('fr-FR')+'</strong><small>'+x[0]+'</small></div>').join('')+'</div>';
+    const list=Array.isArray(rooms.data)?rooms.data:[];
+    $('admin-room-list').innerHTML=list.length?list.map(r=>'<article class="admin-room-card"><div><strong>'+esc(r.name)+'</strong><small>'+esc(r.room_code)+' · '+esc(r.status)+' · '+Number(r.player_count)+'/'+Number(r.max_players)+' joueurs · '+(r.visibility==='private'?'Privé':'Public')+'</small><small>Hôte : '+esc(r.host_name)+' · '+new Date(r.created_at).toLocaleString('fr-FR')+'</small><small>'+((r.players||[]).map(p=>esc(p.name)+(p.is_alive?'':' (éliminé)')).join(' · ')||'Aucun joueur')+'</small></div><button class="danger" data-admin-delete="'+r.id+'">Supprimer</button></article>').join(''):'<p class="muted-note">Aucun salon enregistré.</p>';
+    $('admin-room-list').querySelectorAll('[data-admin-delete]').forEach(b=>b.addEventListener('click',async()=>{
+      const room=list.find(x=>x.id===b.dataset.adminDelete);if(!room)return;
+      if(!confirm('Supprimer définitivement le salon « '+room.name+' » ('+room.room_code+') et ses données associées ?'))return;
+      b.disabled=true;const d=await sb.rpc('admin_delete_room',{p_room_id:room.id,p_reason:'Suppression manuelle depuis la console admin'});
+      if(d.error){toast(d.error.message);b.disabled=false;return;}
+      if(currentRoom===room.id)closeRoom();toast('Salon supprimé.');await loadAdminData();await loadRooms();
+    }));
+    $('admin-diagnostics').innerHTML='<strong>Diagnostic rapide</strong><p>Connexion Supabase : OK · Accès administrateur : OK · Lecture des salons : OK · Outils de suppression : disponibles.</p><small>Les salons en cours ne sont pas supprimés par le nettoyage automatique.</small>';
   }
   async function loadStats(){
     const box=$('wolf-stats');if(!box)return;
