@@ -41,3 +41,6 @@ Les tables exposées utilisent RLS. Les achats cosmétiques sont des achats dire
 - `app.js` : authentification, salons, partie et administration.
 - `features.js` : encyclopédie, classement, amis, boutique et profil enrichi.
 - `config.js` : URL Supabase et clé publishable.
+
+
+Dernières migrations de durcissement : `wolfanator_lock_room_tables_and_profile_economy_columns`, `wolfanator_restrict_direct_social_economy_and_audit_writes`, `wolfanator_leave_active_game_safely` et `wolfanator_lovers_team_victory_and_rewards`.
