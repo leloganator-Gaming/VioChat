@@ -126,6 +126,13 @@
     box.innerHTML=(r.data||[]).map(m=>'<div class="chat-message '+(m.user_id===currentUserId?'mine':'')+'"><div><strong>'+esc(m.display_name)+'</strong><small>'+new Date(m.created_at).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})+'</small></div><p>'+esc(m.body)+'</p></div>').join('')||'<small>La conversation est vide. Envoyez le premier message.</small>';
     box.scrollTop=box.scrollHeight;
   }
+  async function loadWolfChat(){
+    const box=$('wolf-private-chat-messages');if(!currentRoom||!sb||!box)return;
+    const r=await sb.rpc('get_wolf_chat',{p_room_id:currentRoom});
+    if(r.error){box.innerHTML='<small>Discussion secrète indisponible : '+esc(r.error.message)+'</small>';return;}
+    box.innerHTML=(r.data||[]).map(m=>'<div class="chat-message"><div><strong>'+esc(m.display_name)+'</strong><small>'+new Date(m.created_at).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})+'</small></div><p>'+esc(m.body)+'</p></div>').join('')||'<small>Aucun message des loups pour le moment.</small>';
+    box.scrollTop=box.scrollHeight;
+  }
   function attachChat(box,context={}){
     const wrap=document.createElement('section');wrap.className='hub-chat';
     wrap.innerHTML='<div class="hub-tabs"><button class="hub-tab active" data-hub-tab="discussion">💬 Discussion</button><button class="hub-tab" data-hub-tab="composition">📜 Composition</button><button class="hub-tab" data-hub-tab="rules">❔ Règles</button></div><div class="hub-tab-content" id="wolf-hub-tab-content"></div>';
@@ -136,6 +143,12 @@
       if(key==='discussion'){
         content.innerHTML='<div class="chat-heading"><div><p class="eyebrow">VILLAGE EN DIRECT</p><h3>Discussion de la partie</h3></div><small>Messages du salon</small></div><div class="chat-messages" id="wolf-chat-messages" aria-live="polite"><small>Chargement…</small></div><form class="chat-form" id="wolf-chat-form"><input id="wolf-chat-input" maxlength="500" autocomplete="off" placeholder="Écrire un message…" aria-label="Votre message" required><button class="primary" type="submit">Envoyer</button></form>';
         loadChat();$('wolf-chat-form').addEventListener('submit',sendChat);
+        if(context.state?.my_role==='wolf'&&context.state?.my_alive){
+          content.insertAdjacentHTML('beforeend','<section class="wolf-private-chat"><div class="chat-heading"><div><p class="eyebrow">CANAL CONFIDENTIEL</p><h3>🐺 Discussion des loups</h3></div><button type="button" class="ghost" id="wolf-private-refresh">Actualiser</button></div><div class="chat-messages private-messages" id="wolf-private-chat-messages"><small>Chargement…</small></div><form class="chat-form" id="wolf-private-chat-form"><input id="wolf-private-chat-input" maxlength="500" autocomplete="off" placeholder="Message réservé aux loups…" aria-label="Message privé aux loups" required><button class="primary" type="submit">Envoyer</button></form><small>Seuls les loups encore en jeu peuvent lire et envoyer ces messages.</small></section>');
+          loadWolfChat();
+          $('wolf-private-refresh').addEventListener('click',loadWolfChat);
+          $('wolf-private-chat-form').addEventListener('submit',sendWolfChat);
+        }
       }else if(key==='composition'){
         if(context.waiting){
           content.innerHTML='<p class="eyebrow">COMPOSITION DU SALON</p><h3>Préparation de la partie</h3><div class="hub-info-row"><span>Joueurs présents</span><strong>'+context.players.length+'/'+context.room.max_players+'</strong></div><div class="hub-info-row"><span>Salon</span><strong>'+esc(context.room.name)+'</strong></div><div class="hub-info-row"><span>Accès</span><strong>Avec code d’invitation</strong></div><p class="muted-note">La partie démarre lorsque l’hôte lance le salon et que les conditions sont remplies.</p>';
@@ -147,6 +160,11 @@
         const s=context.state||{},role=s.my_role;
         content.innerHTML='<p class="eyebrow">AIDE DE PARTIE</p><h3>'+(context.waiting?'Comment jouer':'Votre rôle : '+esc(roles[role]||'Inconnu'))+'</h3><p class="hub-rule">🌙 <strong>La nuit</strong><br>Les rôles qui possèdent un pouvoir agissent secrètement.</p><p class="hub-rule">☀️ <strong>Le jour</strong><br>Les joueurs discutent puis votent pour tenter d’éliminer un loup.</p><p class="hub-rule">🏆 <strong>Victoire</strong><br>Le village gagne lorsque tous les loups sont éliminés. Les loups gagnent lorsqu’ils sont au moins aussi nombreux que les autres joueurs vivants.</p>'+(role?'<div class="hub-own-role"><strong>Votre rôle secret</strong><p>'+esc(descriptions[role]||'')+'</p></div>':'');
       }
+    };
+    const sendWolfChat=async e=>{
+      e.preventDefault();const input=$('wolf-private-chat-input'),body=input?.value.trim();if(!body||!currentRoom)return;
+      input.disabled=true;const r=await sb.rpc('send_wolf_chat',{p_room_id:currentRoom,p_body:body});input.disabled=false;
+      if(r.error){toast(r.error.message);return;}input.value='';await loadWolfChat();input.focus();
     };
     const sendChat=async e=>{
       e.preventDefault();const input=$('wolf-chat-input'),body=input?.value.trim();if(!body||!currentRoom)return;
