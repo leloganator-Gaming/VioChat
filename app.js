@@ -13,7 +13,7 @@
   auth.innerHTML='<p class="eyebrow">COMPTE JOUEUR</p><h3>Connexion au village</h3><div class="field-grid"><input id="wolf-email" type="email" autocomplete="email" placeholder="Adresse e-mail"><input id="wolf-password" type="password" autocomplete="current-password" placeholder="Mot de passe (6 caractères minimum)"><input id="wolf-pseudo" maxlength="20" minlength="3" placeholder="Pseudo (3 à 20 caractères)"></div><div class="button-row"><button class="primary" id="wolf-login">Se connecter</button><button class="secondary" id="wolf-signup">Créer un compte</button><button class="ghost" id="wolf-logout" hidden>Déconnexion</button></div><small id="wolf-auth-status">Connectez-vous pour créer ou rejoindre un salon.</small>';
   $('lobby').insertBefore(auth,$('lobby').querySelector('.lobby-grid'));
   const profile=document.createElement('div'); profile.className='panel profile-panel';
-  profile.innerHTML='<p class="eyebrow">VOTRE IDENTITÉ</p><h3>Mon profil</h3><div class="field-grid"><input id="wolf-profile-name" maxlength="20" minlength="3" placeholder="Votre pseudo"><button class="secondary" id="wolf-save-profile">Enregistrer le pseudo</button></div><small>Votre pseudo sera affiché dans les salons et les parties.</small>';
+  profile.innerHTML='<p class="eyebrow">VOTRE IDENTITÉ</p><h3>Mon profil</h3><div class="field-grid"><input id="wolf-profile-name" maxlength="20" minlength="3" placeholder="Votre pseudo"><button class="secondary" id="wolf-save-profile">Enregistrer le pseudo</button></div><small>Votre pseudo sera affiché dans les salons et les parties.</small><div id="wolf-stats" class="stats-panel"><small>Chargement des statistiques…</small></div>';
   $('lobby').appendChild(profile);
   const panel=document.createElement('div'); panel.className='panel room-panel';
   panel.innerHTML='<p class="eyebrow">SALONS EN LIGNE</p><h3>Salons disponibles</h3><div class="field-grid room-fields"><input id="wolf-room-name" maxlength="40" placeholder="Nom du salon"><select id="wolf-room-max"><option value="5">5 joueurs</option><option value="8">8 joueurs</option><option value="10">10 joueurs</option><option value="12" selected>12 joueurs</option><option value="15">15 joueurs</option><option value="20">20 joueurs</option></select><button class="secondary" id="wolf-create">Créer un salon</button></div><div class="field-grid room-fields"><input id="wolf-room-code" maxlength="8" placeholder="Code du salon" autocomplete="off"><button class="secondary" id="wolf-join">Rejoindre avec un code</button></div><div id="wolf-rooms" class="room-list"><small>Les salons apparaîtront ici.</small></div><div id="wolf-current-room" class="current-room"></div>';
@@ -27,7 +27,7 @@
     if(r.error){status('Connecté. Profil non chargé : '+r.error.message);return;}
     if(r.data&&r.data.username)profileName=r.data.username;
     else{let n=String(u.user_metadata?.username||u.email?.split('@')[0]||'Joueur').slice(0,20);if(n.length<3)n='Joueur';const w=await sb.from('profiles').upsert({id:u.id,username:n},{onConflict:'id'});if(!w.error)profileName=n;}
-    $('wolf-profile-name').value=profileName;$('wolf-pseudo').value=profileName;
+    $('wolf-profile-name').value=profileName;$('wolf-pseudo').value=profileName;await loadStats();
   }
   async function refreshAuth(){
     if(!sb)return;const r=await sb.auth.getSession(),session=r.data.session;
@@ -35,6 +35,13 @@
     profile.hidden=!session;panel.hidden=!session;
     if(session){status('Connecté : '+(session.user.email||'joueur'));await loadProfile(session.user);await loadRooms();}
     else{profileName='';status('Non connecté.');$('wolf-rooms').innerHTML='<small>Connectez-vous pour afficher les salons.</small>';}
+  }
+  async function loadStats(){
+    const box=$('wolf-stats');if(!box)return;
+    const r=await sb.from('game_history').select('room_name,role_key,won,rounds,finished_at').order('finished_at',{ascending:false}).limit(1000);
+    if(r.error){box.innerHTML='<small>Statistiques indisponibles : '+esc(r.error.message)+'</small>';return;}
+    const rows=r.data||[],wins=rows.filter(x=>x.won).length,losses=rows.length-wins,rate=rows.length?Math.round(wins/rows.length*100):0;
+    box.innerHTML='<h4>Statistiques</h4><div class="stats-grid"><div><strong>'+rows.length+'</strong><small>Parties</small></div><div><strong>'+wins+'</strong><small>Victoires</small></div><div><strong>'+rate+'%</strong><small>Taux de victoire</small></div></div><h4>Dernières parties</h4>'+(rows.length?'<div class="history-list">'+rows.slice(0,10).map(x=>'<div class="history-row"><span><strong>'+esc(x.room_name)+'</strong><small>'+esc(roles[x.role_key]||x.role_key)+' · '+new Date(x.finished_at).toLocaleDateString('fr-FR')+'</small></span><b class="'+(x.won?'win':'loss')+'">'+(x.won?'Victoire':'Défaite')+'</b></div>').join('')+'</div>':'<small>Aucune partie terminée pour le moment.</small>');
   }
   async function authAction(mode){
     if(!needClient())return;const email=$('wolf-email').value.trim(),password=$('wolf-password').value,p=$('wolf-pseudo').value.trim();
