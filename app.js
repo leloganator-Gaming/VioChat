@@ -10,10 +10,10 @@
   const descriptions={wolf:'Chaque nuit, choisissez une personne à éliminer. Les loups gagnent lorsqu’ils sont aussi nombreux que les autres joueurs encore en vie.',seer:'Chaque nuit, examinez un joueur pour découvrir secrètement son rôle. Aidez le village à trouver les loups.',healer:'Chaque nuit, choisissez une personne à protéger. Si les loups la ciblent, elle survit.',villager:'Vous n’avez pas de pouvoir nocturne. Le jour, discutez et votez pour éliminer les loups.'};
 
   const auth=document.createElement('div'); auth.className='panel account-panel';
-  auth.innerHTML='<p class="eyebrow">COMPTE JOUEUR</p><h3>Connexion au village</h3><div class="field-grid"><input id="wolf-email" type="email" autocomplete="email" placeholder="Adresse e-mail"><input id="wolf-password" type="password" autocomplete="current-password" placeholder="Mot de passe (6 caractères minimum)"><input id="wolf-pseudo" maxlength="20" minlength="3" placeholder="Pseudo (3 à 20 caractères)"></div><div class="button-row"><button class="primary" id="wolf-login">Se connecter</button><button class="secondary" id="wolf-signup">Créer un compte</button><button class="ghost" id="wolf-logout" hidden>Déconnexion</button></div><small id="wolf-auth-status">Connectez-vous pour créer ou rejoindre un salon.</small>';
-  $('lobby').insertBefore(auth,$('lobby').querySelector('.lobby-grid'));
+  auth.innerHTML='<div class="auth-tabs"><button type="button" class="auth-tab active" id="wolf-tab-login">Connexion</button><button type="button" class="auth-tab" id="wolf-tab-signup">Créer un compte</button></div><h3 id="wolf-auth-title">Ravi de vous revoir</h3><div class="field-grid auth-fields"><input id="wolf-email" type="email" autocomplete="email" placeholder="Adresse e-mail"><input id="wolf-password" type="password" autocomplete="current-password" placeholder="Mot de passe (6 caractères minimum)"><input id="wolf-pseudo" maxlength="20" minlength="3" placeholder="Pseudo (3 à 20 caractères)" hidden></div><div class="button-row"><button class="primary wide" id="wolf-login">Se connecter</button><button class="primary wide" id="wolf-signup" hidden>Créer mon compte</button><button class="ghost" id="wolf-logout" hidden>Déconnexion</button></div><small id="wolf-auth-status">Connectez-vous pour créer ou rejoindre un salon.</small>';
+  $('auth-mount').appendChild(auth);
   const profile=document.createElement('div'); profile.className='panel profile-panel';
-  profile.innerHTML='<p class="eyebrow">VOTRE IDENTITÉ</p><h3>Mon profil</h3><div class="field-grid"><input id="wolf-profile-name" maxlength="20" minlength="3" placeholder="Votre pseudo"><button class="secondary" id="wolf-save-profile">Enregistrer le pseudo</button></div><small>Votre pseudo sera affiché dans les salons et les parties.</small><div id="wolf-stats" class="stats-panel"><small>Chargement des statistiques…</small></div>';
+  profile.innerHTML='<p class="eyebrow">VOTRE IDENTITÉ</p><h3>Mon profil joueur</h3><div class="field-grid"><input id="wolf-profile-name" maxlength="20" minlength="3" placeholder="Votre pseudo"><select id="wolf-avatar" aria-label="Avatar"><option value="🐺">🐺 Loup</option><option value="🦊">🦊 Renard</option><option value="🦉">🦉 Hibou</option><option value="🐱">🐱 Chat</option><option value="🐻">🐻 Ours</option><option value="🦇">🦇 Chauve-souris</option><option value="👻">👻 Fantôme</option><option value="🧙">🧙 Mage</option></select><button class="secondary" id="wolf-save-profile">Enregistrer le profil</button></div><div class="profile-preview" id="wolf-profile-preview"><span>🐺</span><strong>Votre profil</strong></div><small>Votre pseudo et votre avatar seront affichés dans les salons.</small><div id="wolf-stats" class="stats-panel"><small>Chargement des statistiques…</small></div>';
   $('lobby').appendChild(profile);
   const panel=document.createElement('div'); panel.className='panel room-panel';
   panel.innerHTML='<p class="eyebrow">SALONS EN LIGNE</p><h3>Salons disponibles</h3><div class="field-grid room-fields"><input id="wolf-room-name" maxlength="40" placeholder="Nom du salon"><select id="wolf-room-max"><option value="5">5 joueurs</option><option value="8">8 joueurs</option><option value="10">10 joueurs</option><option value="12" selected>12 joueurs</option><option value="15">15 joueurs</option><option value="20">20 joueurs</option></select><button class="secondary" id="wolf-create">Créer un salon</button></div><div class="field-grid room-fields"><input id="wolf-room-code" maxlength="8" placeholder="Code du salon" autocomplete="off"><button class="secondary" id="wolf-join">Rejoindre avec un code</button></div><div id="wolf-rooms" class="room-list"><small>Les salons apparaîtront ici.</small></div><div id="wolf-current-room" class="current-room"></div>';
@@ -23,11 +23,11 @@
   const needClient=()=>{if(!sb){toast('Connexion Supabase indisponible. Vérifiez config.js.');return false;}return true;};
   async function user(){if(!needClient())return null;const r=await sb.auth.getUser();if(r.error||!r.data.user){toast('Connectez-vous pour continuer.');return null;}return r.data.user;}
   async function loadProfile(u){
-    const r=await sb.from('profiles').select('username').eq('id',u.id).maybeSingle();
+    const r=await sb.from('profiles').select('username,avatar').eq('id',u.id).maybeSingle();
     if(r.error){status('Connecté. Profil non chargé : '+r.error.message);return;}
     if(r.data&&r.data.username)profileName=r.data.username;
     else{let n=String(u.user_metadata?.username||u.email?.split('@')[0]||'Joueur').slice(0,20);if(n.length<3)n='Joueur';const w=await sb.from('profiles').upsert({id:u.id,username:n},{onConflict:'id'});if(!w.error)profileName=n;}
-    $('wolf-profile-name').value=profileName;$('wolf-pseudo').value=profileName;await loadStats();
+    $('wolf-profile-name').value=profileName;$('wolf-pseudo').value=profileName;$('wolf-avatar').value=r.data?.avatar?.emoji||'🐺';$('wolf-profile-preview').innerHTML='<span>'+esc($('wolf-avatar').value)+'</span><strong>'+esc(profileName)+'</strong>';await loadStats();
   }
   async function refreshAuth(){
     if(!sb)return;const r=await sb.auth.getSession(),session=r.data.session;
@@ -55,8 +55,8 @@
   async function saveProfile(){
     const u=await user();if(!u)return;const n=$('wolf-profile-name').value.trim();
     if(n.length<3||n.length>20)return toast('Le pseudo doit contenir entre 3 et 20 caractères.');
-    const r=await sb.from('profiles').upsert({id:u.id,username:n},{onConflict:'id'});
-    if(r.error)return toast(r.error.message);profileName=n;$('wolf-pseudo').value=n;toast('Pseudo enregistré.');
+    const emoji=$('wolf-avatar').value;const r=await sb.from('profiles').upsert({id:u.id,username:n,avatar:{emoji}},{onConflict:'id'});
+    if(r.error)return toast(r.error.message);profileName=n;$('wolf-pseudo').value=n;$('wolf-profile-preview').innerHTML='<span>'+esc(emoji)+'</span><strong>'+esc(n)+'</strong>';toast('Profil enregistré.');
   }
   async function loadRooms(){
     const r=await sb.from('game_rooms').select('id,room_code,name,status,max_players,room_players(count)').in('status',['waiting','playing']).order('created_at',{ascending:false}).limit(30);
@@ -75,7 +75,7 @@
   }
   async function openRoom(id,code){
     currentRoom=id;if(channel)await sb.removeChannel(channel);
-    channel=sb.channel('wolf-room-'+id).on('postgres_changes',{event:'*',schema:'public',table:'room_players',filter:'room_id=eq.'+id},refreshRoom).on('postgres_changes',{event:'UPDATE',schema:'public',table:'game_rooms',filter:'id=eq.'+id},refreshRoom).subscribe();
+    channel=sb.channel('wolf-room-'+id).on('postgres_changes',{event:'*',schema:'public',table:'room_players',filter:'room_id=eq.'+id},refreshRoom).on('postgres_changes',{event:'UPDATE',schema:'public',table:'game_rooms',filter:'id=eq.'+id},refreshRoom).on('postgres_changes',{event:'INSERT',schema:'public',table:'room_messages',filter:'room_id=eq.'+id},loadChat).subscribe();
     $('wolf-current-room').innerHTML='<div class="room-heading"><h3>Salon '+esc(code)+'</h3><button class="ghost" id="wolf-close-room">Fermer</button></div><div id="wolf-room-detail">Chargement…</div>';
     $('wolf-close-room').addEventListener('click',closeRoom);await refreshRoom();
   }
@@ -109,6 +109,24 @@
     if(done)html+='<div class="button-row"><button class="secondary" id="wolf-finish-close">Retour aux salons</button></div>';
     return html;
   }
+  async function loadChat(){
+    if(!currentRoom||!sb)return;const box=$('wolf-chat-messages');if(!box)return;
+    const r=await sb.from('room_messages').select('id,user_id,display_name,body,created_at').eq('room_id',currentRoom).order('created_at',{ascending:true}).limit(60);
+    if(r.error){box.innerHTML='<small>Chat indisponible : '+esc(r.error.message)+'</small>';return;}
+    box.innerHTML=(r.data||[]).map(m=>'<div class="chat-message '+(m.user_id===currentUserId?'mine':'')+'"><div><strong>'+esc(m.display_name)+'</strong><small>'+new Date(m.created_at).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})+'</small></div><p>'+esc(m.body)+'</p></div>').join('')||'<small>La conversation est vide. Envoyez le premier message.</small>';
+    box.scrollTop=box.scrollHeight;
+  }
+  function attachChat(box){
+    const wrap=document.createElement('section');wrap.className='hub-chat';
+    wrap.innerHTML='<div class="chat-heading"><div><p class="eyebrow">LE HUB DU VILLAGE</p><h3>💬 Discussion du salon</h3></div><small>Messages visibles par les membres du salon</small></div><div class="chat-messages" id="wolf-chat-messages" aria-live="polite"><small>Chargement de la discussion…</small></div><form class="chat-form" id="wolf-chat-form"><input id="wolf-chat-input" maxlength="500" autocomplete="off" placeholder="Écrire un message…" aria-label="Votre message" required><button class="primary" type="submit">Envoyer</button></form>';
+    box.appendChild(wrap);loadChat();
+    $('wolf-chat-form').addEventListener('submit',async e=>{
+      e.preventDefault();const input=$('wolf-chat-input'),body=input.value.trim();if(!body||!currentRoom)return;
+      const roomId=currentRoom;input.disabled=true;
+      const r=await sb.from('room_messages').insert({room_id:roomId,user_id:currentUserId,display_name:(profileName||'Joueur').slice(0,24),body});
+      input.disabled=false;if(r.error){toast(r.error.message);return;}input.value='';await loadChat();input.focus();
+    });
+  }
   async function refreshRoom(){
     if(!currentRoom||!sb||refreshing)return;refreshing=true;const id=currentRoom;
     try{
@@ -118,19 +136,31 @@
       if(values[0].error||values[1].error){box.textContent=(values[0].error||values[1].error).message;return;}
       currentUserId=u.id;
       if(room.status==='waiting'){
-        box.innerHTML=waitingHTML(room,players,u);
+        box.innerHTML=waitingHTML(room,players,u);attachChat(box);
         $('wolf-ready')?.addEventListener('click',async()=>{const me=players.find(p=>p.user_id===u.id);const r=await sb.rpc('set_room_ready',{p_room_id:id,p_ready:!me?.is_ready});if(r.error)toast(r.error.message);else await refreshRoom();});
         $('wolf-start')?.addEventListener('click',async()=>{const r=await sb.rpc('start_game_room',{p_room_id:id});if(r.error)toast(r.error.message);else{toast('La partie commence. Les rôles ont été distribués.');await refreshRoom();}});
         $('wolf-leave')?.addEventListener('click',async()=>{const r=await sb.rpc('leave_game_room',{p_room_id:id});if(r.error)toast(r.error.message);else closeRoom();});
       }else{
         const r=await sb.rpc('get_my_game_state',{p_room_id:id});if(r.error){box.textContent=r.error.message;return;}
-        box.innerHTML=gameHTML(r.data);
+        box.innerHTML=gameHTML(r.data);attachChat(box);
         box.querySelectorAll('[data-target]').forEach(b=>b.addEventListener('click',async()=>{b.disabled=true;const a=await sb.rpc('submit_game_action',{p_room_id:id,p_target_id:b.dataset.target});if(a.error)toast(a.error.message);else{toast('Choix enregistré.');await refreshRoom();}}));
         $('wolf-resolve')?.addEventListener('click',async()=>{const b=$('wolf-resolve');b.disabled=true;const a=await sb.rpc('resolve_game_phase',{p_room_id:id});if(a.error){toast(a.error.message);b.disabled=false;}else{toast(a.data?.message||'Phase terminée.');await refreshRoom();}});
         $('wolf-finish-close')?.addEventListener('click',closeRoom);
       }
     }finally{refreshing=false;}
   }
+  let authMode='login';
+  function setAuthMode(mode){
+    authMode=mode;const signup=mode==='signup';
+    $('wolf-pseudo').hidden=!signup;$('wolf-login').hidden=signup;$('wolf-signup').hidden=!signup;
+    $('wolf-tab-login').classList.toggle('active',!signup);$('wolf-tab-signup').classList.toggle('active',signup);
+    $('wolf-auth-title').textContent=signup?'Créer votre compte':'Ravi de vous revoir';
+  }
+  function showAuth(){ $('home').classList.add('hidden');$('lobby').classList.add('hidden');$('auth-screen').classList.remove('hidden');setAuthMode('login');window.scrollTo({top:0,behavior:'smooth'}); }
+  function showLobby(){ $('home').classList.add('hidden');$('auth-screen').classList.add('hidden');$('lobby').classList.remove('hidden');window.scrollTo({top:0,behavior:'smooth'}); }
+
+  $('wolf-tab-login').addEventListener('click',()=>setAuthMode('login'));
+  $('wolf-tab-signup').addEventListener('click',()=>setAuthMode('signup'));
   $('wolf-login').addEventListener('click',()=>authAction('login'));
   $('wolf-signup').addEventListener('click',()=>authAction('signup'));
   $('wolf-logout').addEventListener('click',async()=>{await sb.auth.signOut();closeRoom();await refreshAuth();});
@@ -138,8 +168,10 @@
   $('wolf-create').addEventListener('click',createRoom);
   $('wolf-join').addEventListener('click',()=>joinRoom($('wolf-room-code').value));
   $('wolf-room-code').addEventListener('input',e=>{e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,8);});
-  $('play-now').addEventListener('click',()=>{$('home').classList.add('hidden');$('lobby').classList.remove('hidden');window.scrollTo({top:0,behavior:'smooth'});});
+  $('play-now').addEventListener('click',async()=>{const session=sb?await sb.auth.getSession():{data:{session:null}};if(session.data.session)showLobby();else showAuth();});
   $('back-home').addEventListener('click',()=>{$('lobby').classList.add('hidden');$('home').classList.remove('hidden');window.scrollTo({top:0,behavior:'smooth'});});
+  $('auth-back').addEventListener('click',()=>{$('auth-screen').classList.add('hidden');$('home').classList.remove('hidden');window.scrollTo({top:0,behavior:'smooth'});});
+  $('wolf-avatar').addEventListener('change',()=>{$('wolf-profile-preview').querySelector('span').textContent=$('wolf-avatar').value;});
   $('quick-join').addEventListener('click',async()=>{const u=await user();if(!u)return;const r=await sb.from('game_rooms').select('room_code,max_players,room_players(count)').eq('status','waiting').order('created_at',{ascending:true}).limit(30);if(r.error){toast(r.error.message);return;}const room=(r.data||[]).find(x=>(x.room_players?.[0]?.count||0)<x.max_players);if(room)joinRoom(room.room_code);else toast('Aucun salon avec des places disponibles. Créez le vôtre ou utilisez un code.');});
   $('create-room').addEventListener('click',createRoom);
   $('profile-btn').addEventListener('click',()=>profile.scrollIntoView({behavior:'smooth',block:'center'}));
