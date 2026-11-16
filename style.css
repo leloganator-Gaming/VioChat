@@ -232,3 +232,8 @@ button.danger{flex:0 0 auto;padding:9px 12px;border:1px solid #a94c68;border-rad
 .wx-bio-form{align-items:flex-start;flex-direction:column}.wx-bio-form label{font-size:13px;color:#d7cde1}.wx-form textarea{width:100%;min-height:80px;resize:vertical}
 .wx-win{color:#8de1a6!important}.wx-loss{color:#ff9a9a!important}.wx-empty{padding:25px;text-align:center;border:1px dashed #ffffff25;border-radius:14px;color:#b9aec5;font-size:13px}
 @media(max-width:760px){.wx-shell{margin:22px 14px;padding:17px}.wx-heading{align-items:flex-start;flex-direction:column}.wx-welcome{align-items:stretch;flex-direction:column}.wx-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.wx-role-list,.wx-shop-grid{grid-template-columns:1fr}.wx-stats{grid-template-columns:repeat(2,1fr)}.wx-form{align-items:stretch;flex-direction:column}.wx-search{width:100%}.wx-rank-row{flex-wrap:wrap}.wx-rank-row>span{order:3;width:100%}.wx-nav{margin:0 -2px}.wx-friend{align-items:flex-start}.wx-actions{flex-direction:column}}
+
+
+.wx-form select{background:#120f19;color:#fff;border:1px solid #ffffff24;border-radius:10px;padding:12px 14px;font:inherit;min-width:0}
+.wx-report-form{align-items:stretch;flex-direction:column}
+.wx-report-form textarea{width:100%;min-height:90px}
