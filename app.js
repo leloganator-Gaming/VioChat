@@ -159,9 +159,9 @@
   }
   function gameHTML(s){
     const players=s.players||[],alive=players.filter(p=>p.is_alive),role=s.my_role,night=s.phase==='night',day=s.phase==='day',done=s.status==='finished'||s.phase==='finished';
-    let desc=night?({wolf:'Choisissez une cible avec les autres loups.',seer:'Choisissez un joueur à examiner.',healer:'Choisissez une personne à protéger.',villager:'Vous êtes à l’abri cette nuit. Attendez le matin.'}[role]):'Le village débat. Votez pour la personne que vous pensez être un loup.';
+    let desc=night?({wolf:'Choisissez une cible avec les autres loups.',seer:'Choisissez un joueur à examiner.',healer:'Choisissez une personne à protéger.',witch:'Vous pouvez sauver la cible des loups ou empoisonner un joueur. Chaque potion ne s’utilise qu’une fois.',villager:'Vous êtes à l’abri cette nuit. Attendez le matin.'}[role]):'Le village débat. Votez pour la personne que vous pensez être un loup.';
     const canAct=!done&&s.my_alive&&(night&&['wolf','seer','healer'].includes(role)||day),witchTurn=!done&&s.my_alive&&night&&role==='witch'&&(s.witch_state?.heal_available||s.witch_state?.poison_available);
-    const targets=alive.filter(p=>p.user_id!==(day||role==='seer'||role==='wolf'?currentUserId:''));
+    const targets=alive.filter(p=>p.user_id!==(day||role==='seer'||role==='wolf'||role==='witch'?currentUserId:''));
     const label=night?({wolf:'Désigner la cible',seer:'Examiner ce joueur',healer:'Protéger ce joueur'}[role]||''):'Voter contre ce joueur';
     const targetHTML=canAct?'<div class="target-grid">'+targets.map(p=>'<button class="target-button" data-target="'+p.user_id+'"><strong>'+esc(p.display_name)+'</strong><small>'+(p.is_host?'👑 Hôte':'Joueur')+' · '+label+'</small></button>').join('')+'</div>':'';
     const rows=players.map(p=>'<div class="player-chip '+(p.is_alive?'':'is-out')+'"><span>'+esc(p.display_name)+(p.is_host?' 👑':'')+'</span><small>'+(p.is_alive?'En jeu':'Éliminé'+(p.revealed_role?' · '+esc(roles[p.revealed_role]||p.revealed_role):''))+'</small></div>').join('');
