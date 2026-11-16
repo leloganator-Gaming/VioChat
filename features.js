@@ -29,7 +29,7 @@
       const action=e.target.closest('[data-wx-action]');if(action)handleAction(action.dataset.wxAction,action.dataset);
     });
     $('#wolf-extra-app').addEventListener('submit',e=>{if(e.target.matches('[data-wx-form]')){e.preventDefault();handleForm(e.target);}});
-    db.auth.getUser().then(async({data})=>{user=data.user;if(user){await loadProfile();render();}else $('#wx-content').innerHTML='<p>Connectez-vous pour accéder aux fonctions communautaires.</p>';});
+    const syncSession=async(nextUser)=>{user=nextUser||null;if(user){await loadProfile();await render();}else{profile=null;const balance=$('#wx-balance');if(balance)balance.textContent='🌙 Connectez-vous';const pane=$('#wx-content');if(pane)pane.innerHTML='<p>Connectez-vous pour accéder aux fonctions communautaires.</p>';}};db.auth.onAuthStateChange((_event,session)=>{setTimeout(()=>syncSession(session?.user||null),0);});db.auth.getUser().then(({data})=>syncSession(data.user));
   }
   async function loadProfile(){
     const {data,error}=await db.from('profiles').select('username,avatar,moon_balance,xp,level,laurel_count,bio').eq('id',user.id).maybeSingle();
@@ -52,7 +52,7 @@
     const xp=profile?.xp||0,level=profile?.level||1,next=level*level*100;
     return `<div class="wx-welcome"><div><p class="eyebrow">TON AVENTURE CONTINUE</p><h3>Bienvenue, ${esc(profile?.username||'joueur')} !</h3><p>Retrouve les rôles, ton classement, tes amis et les objets à collectionner.</p></div><div class="wx-level"><strong>Niv. ${level}</strong><span>${xp} XP</span><div class="wx-progress"><i style="width:${Math.min(100,Math.round((xp%Math.max(1,next))/Math.max(1,next)*100))}%"></i></div></div></div>
     <div class="wx-tiles">
-      <button data-wx-tab="roles"><b>🎭</b><strong>30 rôles et variantes</strong><small>Consulter le guide du jeu</small></button>
+      <button data-wx-tab="roles"><b>🎭</b><strong>21 rôles principaux · 9 variantes</strong><small>Consulter le guide du jeu</small></button>
       <button data-wx-tab="ranking"><b>🏆</b><strong>Classement</strong><small>Comparer les performances</small></button>
       <button data-wx-tab="friends"><b>👥</b><strong>Amis</strong><small>Retrouver les joueurs</small></button>
       <button data-wx-tab="shop"><b>🛍️</b><strong>Boutique</strong><small>Personnaliser ton avatar</small></button>
