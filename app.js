@@ -28,8 +28,9 @@
   async function loadProfile(u){
     const r=await sb.from('profiles').select('username,avatar,moon_balance').eq('id',u.id).maybeSingle();
     if(r.error){status('Connecté. Profil non chargé : '+r.error.message);return;}
-    if(r.data&&r.data.username)profileName=r.data.username;$('wolf-wallet').innerHTML='<strong>🌙 '+Number(r.data?.moon_balance||0)+' Lunes</strong><small>Vous gagnez 1 Lune à chaque victoire.</small>';
+    if(r.data&&r.data.username){profileName=r.data.username;}
     else{let n=String(u.user_metadata?.username||u.email?.split('@')[0]||'Joueur').slice(0,20);if(n.length<3)n='Joueur';const w=await sb.from('profiles').upsert({id:u.id,username:n},{onConflict:'id'});if(!w.error)profileName=n;}
+    $('wolf-wallet').innerHTML='<strong>🌙 '+Number(r.data?.moon_balance||0)+' Lunes</strong><small>Vous gagnez 1 Lune à chaque victoire.</small>';
     $('wolf-profile-name').value=profileName;$('wolf-pseudo').value=profileName;$('wolf-avatar').value=r.data?.avatar?.emoji||'🐺';$('wolf-profile-preview').innerHTML='<span>'+esc($('wolf-avatar').value)+'</span><strong>'+esc(profileName)+'</strong>';await loadStats();
   }
   async function refreshAuth(){
