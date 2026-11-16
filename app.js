@@ -225,7 +225,7 @@
         }
       }else{
         const s=context.state||{},role=s.my_role;
-        content.innerHTML='<p class="eyebrow">AIDE DE PARTIE</p><h3>'+(context.waiting?'Comment jouer':'Votre rôle : '+esc(roles[role]||'Inconnu'))+'</h3><p class="hub-rule">🌙 <strong>La nuit</strong><br>Les rôles qui possèdent un pouvoir agissent secrètement.</p><p class="hub-rule">☀️ <strong>Le jour</strong><br>Les joueurs discutent puis votent pour tenter d’éliminer un loup.</p><p class="hub-rule">🏆 <strong>Victoire</strong><br>Le village gagne lorsque tous les loups sont éliminés. Les loups gagnent lorsqu’ils sont au moins aussi nombreux que les autres joueurs vivants.</p>'+(role?'<div class="hub-own-role"><strong>Votre rôle secret</strong><p>'+esc(descriptions[role]||'')+'</p></div>':'');
+        content.innerHTML='<p class="eyebrow">AIDE DE PARTIE</p><h3>'+(context.waiting?'Comment jouer':'Votre rôle : '+esc(roles[role]||'Inconnu'))+'</h3><p class="hub-rule">🌙 <strong>La nuit</strong><br>Les rôles qui possèdent un pouvoir agissent secrètement.</p><p class="hub-rule">☀️ <strong>Le jour</strong><br>Les joueurs discutent puis votent pour tenter d’éliminer un loup.</p><p class="hub-rule">🏆 <strong>Victoire</strong><br>Le village gagne lorsque tous les loups sont éliminés. Les loups gagnent lorsqu’ils sont au moins aussi nombreux que les autres joueurs vivants.</p><h4>📚 Rôles disponibles dans Wolfanator</h4>'+Object.keys(roles).map(k=>'<div class="role-library-row"><span>'+icons[k]+' <strong>'+esc(roles[k])+'</strong></span><small>'+esc(descriptions[k])+'</small></div>').join('')+(role?'<div class="hub-own-role"><strong>Votre rôle secret</strong><p>'+esc(descriptions[role]||'')+'</p></div>':'');
       }
     };
     const sendWolfChat=async e=>{
