@@ -59,10 +59,11 @@
     if(r.error)return toast(r.error.message);profileName=n;$('wolf-pseudo').value=n;toast('Pseudo enregistré.');
   }
   async function loadRooms(){
-    const r=await sb.from('game_rooms').select('id,room_code,name,max_players,room_players(count)').eq('status','waiting').order('created_at',{ascending:false}).limit(20);
+    const r=await sb.from('game_rooms').select('id,room_code,name,status,max_players,room_players(count)').in('status',['waiting','playing']).order('created_at',{ascending:false}).limit(30);
     if(r.error){$('wolf-rooms').textContent=r.error.message;return;}
-    $('wolf-rooms').innerHTML=r.data.length?r.data.map(x=>'<div class="room-card"><span><strong>'+esc(x.name)+'</strong><small>Code '+esc(x.room_code)+' · '+(x.room_players?.[0]?.count||0)+'/'+x.max_players+' joueurs</small></span><button class="secondary" data-enter="'+esc(x.room_code)+'">Rejoindre</button></div>').join(''):'<small>Aucun salon ouvert. Créez-en un ou utilisez un code.</small>';
+    $('wolf-rooms').innerHTML=r.data.length?r.data.map(x=>'<div class="room-card"><span><strong>'+esc(x.name)+'</strong><small>'+(x.status==='playing'?'🎮 Partie en cours':'🏰 En attente')+' · Code '+esc(x.room_code)+' · '+(x.room_players?.[0]?.count||0)+'/'+x.max_players+' joueurs</small></span>'+(x.status==='playing'?'<button class="secondary" data-resume="'+x.id+'" data-code="'+esc(x.room_code)+'">Reprendre</button>':'<button class="secondary" data-enter="'+esc(x.room_code)+'">Rejoindre</button>')+'</div>').join(''):'<small>Aucun salon disponible. Créez-en un ou utilisez un code.</small>';
     $('wolf-rooms').querySelectorAll('[data-enter]').forEach(b=>b.addEventListener('click',()=>joinRoom(b.dataset.enter)));
+    $('wolf-rooms').querySelectorAll('[data-resume]').forEach(b=>b.addEventListener('click',()=>openRoom(b.dataset.resume,b.dataset.code)));
   }
   async function createRoom(){
     const u=await user();if(!u)return;const r=await sb.rpc('create_game_room',{p_name:$('wolf-room-name').value.trim()||'Salon Wolfanator',p_max_players:Number($('wolf-room-max').value),p_display_name:pseudo()});
