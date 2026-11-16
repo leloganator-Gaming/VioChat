@@ -103,7 +103,7 @@
     const r=await sb.rpc('get_wolfanator_leaderboard');
     if(r.error){box.innerHTML='<small>Classement indisponible : '+esc(r.error.message)+'</small>';return;}
     const rows=Array.isArray(r.data)?r.data:[];
-    box.innerHTML='<h4>🏆 Classement Wolfanator</h4>'+(rows.length?'<div class="leaderboard-list">'+rows.map(x=>'<div class="leaderboard-row '+(x.username===profileName?'is-me':'')+'><b>#'+Number(x.rank)+'</b><strong>'+esc(x.username)+'</strong><small>'+Number(x.wins)+' victoires · '+Number(x.win_rate)+'% · '+Number(x.lunes)+' 🌙</small></div>').join('')+'</div>':'<small>Jouez des parties pour apparaître dans le classement.</small>');
+    box.innerHTML='<h4>🏆 Classement Wolfanator</h4>'+(rows.length?'<div class="leaderboard-list">'+rows.map(x=>'<div class="leaderboard-row '+(x.username===profileName?'is-me':'')+'"><b>#'+Number(x.rank)+'</b><strong>'+esc(x.username)+'</strong><small>'+Number(x.laurels||0)+' lauriers · '+Number(x.wins)+' victoires · '+Number(x.win_rate)+'% · '+Number(x.lunes)+' 🌙</small></div>').join('')+'</div>':'<small>Jouez des parties pour apparaître dans le classement.</small>');
   }
   async function authAction(mode){
     if(!needClient())return;const email=$('wolf-email').value.trim(),password=$('wolf-password').value,p=$('wolf-pseudo').value.trim();
