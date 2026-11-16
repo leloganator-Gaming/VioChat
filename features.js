@@ -29,7 +29,7 @@
       const action=e.target.closest('[data-wx-action]');if(action)handleAction(action.dataset.wxAction,action.dataset);
     });
     $('#wolf-extra-app').addEventListener('submit',e=>{if(e.target.matches('[data-wx-form]')){e.preventDefault();handleForm(e.target);}});
-    const syncSession=async(nextUser)=>{user=nextUser||null;if(user){await loadProfile();await render();}else{profile=null;const balance=$('#wx-balance');if(balance)balance.textContent='🌙 Connectez-vous';const pane=$('#wx-content');if(pane)pane.innerHTML='<p>Connectez-vous pour accéder aux fonctions communautaires.</p>';}};db.auth.onAuthStateChange((_event,session)=>{setTimeout(()=>syncSession(session?.user||null),0);});db.auth.getUser().then(({data})=>syncSession(data.user));
+    const syncSession=async(nextUser)=>{user=nextUser||null;profile=null;if(user){await loadProfile();await render();}else{profile=null;const balance=$('#wx-balance');if(balance)balance.textContent='🌙 Connectez-vous';const pane=$('#wx-content');if(pane)pane.innerHTML='<p>Connectez-vous pour accéder aux fonctions communautaires.</p>';}};db.auth.onAuthStateChange((_event,session)=>{setTimeout(()=>syncSession(session?.user||null),0);});db.auth.getUser().then(({data})=>syncSession(data.user));
   }
   async function loadProfile(){
     const {data,error}=await db.from('profiles').select('username,avatar,moon_balance,xp,level,laurel_count,bio').eq('id',user.id).maybeSingle();
@@ -70,7 +70,7 @@
     if(error){pane.innerHTML='<p>Classement indisponible : '+esc(error.message)+'</p>';return;}
     const rows=Array.isArray(data)?data:[];
     pane.innerHTML='<div class="wx-section-title"><div><h3>Classement Wolfanator</h3><p>Les performances sont calculées à partir des parties terminées.</p></div></div>'+
-      (rows.length?'<div class="wx-table">'+rows.map((p,i)=>`<div class="wx-rank-row"><b>#${p.rank||i+1}</b><strong>${esc(p.username)}</strong><span>${p.wins||0} victoires / ${p.games||0} parties</span><em>🌙 ${p.lunes||0}</em></div>`).join('')+'</div>':'<div class="wx-empty">Le classement apparaîtra après les premières parties terminées.</div>');
+      (rows.length?'<div class="wx-table">'+rows.map((p,i)=>`<div class="wx-rank-row"><b>#${p.rank||i+1}</b><strong>${esc(p.username)}</strong><span>${p.laurels||0} lauriers · ${p.wins||0} victoires / ${p.games||0} parties</span><em>🌙 ${p.lunes||0}</em></div>`).join('')+'</div>':'<div class="wx-empty">Le classement apparaîtra après les premières parties terminées.</div>');
   }
   async function friendsPane(pane){
     const {data,error}=await db.from('wolfanator_friendships').select('id,requester_id,addressee_id,status,created_at').or('requester_id.eq.'+user.id+',addressee_id.eq.'+user.id).order('created_at',{ascending:false});
