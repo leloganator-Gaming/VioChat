@@ -36,8 +36,8 @@
     if(!sb)return;const r=await sb.auth.getSession(),session=r.data.session;
     $('wolf-logout').hidden=!session;$('wolf-logout-lobby').hidden=!session;$('wolf-login').hidden=!!session;$('wolf-signup').hidden=!!session;$('wolf-pseudo').hidden=!!session;
     profile.hidden=!session;panel.hidden=!session;premium.hidden=!session;
-    if(session){$('auth-screen').classList.add('hidden');$('lobby').classList.remove('hidden');status('Connecté : '+(session.user.email||'joueur'));await loadProfile(session.user);await loadPremium();await loadRooms();}
-    else{profileName='';status('Non connecté.');$('wolf-rooms').innerHTML='<small>Connectez-vous pour afficher les salons.</small>';}
+    if(session){currentUserId=session.user.id;$('auth-screen').classList.add('hidden');$('lobby').classList.remove('hidden');status('Connecté : '+(session.user.email||'joueur'));await loadProfile(session.user);await loadPremium();await loadRooms();}
+    else{currentUserId='';profileName='';status('Non connecté.');$('wolf-rooms').innerHTML='<small>Connectez-vous pour afficher les salons.</small>';}
   }
   async function loadPremium(){
     const box=$('wolf-premium-status');if(!box)return;
