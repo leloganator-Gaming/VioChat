@@ -338,3 +338,53 @@ body{background:radial-gradient(ellipse at 50% -18%,#46305e 0,transparent 43%),r
 .wx-nav{border-bottom-color:#ffffff14}
 @media(max-width:980px){.wolf-waiting-columns{grid-template-columns:1fr}.wolf-lobby-side{grid-template-columns:repeat(2,minmax(0,1fr))}.wolf-hub{grid-template-columns:1fr}.hub-scene,.hub-panel,.hub-chat{min-height:0}}
 @media(max-width:620px){.lobby{padding:20px 14px 45px}.topbar{padding:14px 16px}.lobby-grid{grid-template-columns:1fr}.wolf-waiting-room{padding:14px}.wolf-room-banner{align-items:flex-start;flex-direction:column}.wolf-room-codebox{width:100%;display:grid;grid-template-columns:1fr auto;align-items:center;text-align:left}.wolf-room-codebox small{grid-column:1}.wolf-room-codebox strong{grid-column:1;grid-row:2}.wolf-room-codebox button{grid-column:2;grid-row:1/3}.wolf-seat-grid{grid-template-columns:1fr}.wolf-lobby-side{grid-template-columns:1fr}.wolf-lobby-actions #wolf-start{margin-left:0}.section-head{align-items:flex-start;gap:12px;flex-direction:column}.section-head .button-row{margin-top:0}}
+
+/* Optimisation mobile : navigation rapide et panneaux compacts */
+.mobile-dock{display:none}
+@media(max-width:700px){
+ html{scroll-padding-top:76px;scroll-padding-bottom:92px}
+ body{padding-bottom:calc(78px + env(safe-area-inset-bottom))}
+ .topbar{position:sticky;top:0;z-index:80;padding:9px 14px;min-height:56px;background:#100d18ed;backdrop-filter:blur(16px);border-bottom:1px solid #ffffff18}
+ .brand{font-size:14px;letter-spacing:1.5px;gap:8px}.brand .logo{width:32px!important;height:32px!important;max-width:32px!important;max-height:32px!important}
+ .status{font-size:9px;padding:6px 8px}
+ .hero{min-height:0;display:block;padding:24px 16px 18px}.hero h1{font-size:clamp(34px,10vw,48px);letter-spacing:-1.8px;margin:10px 0}
+ .hero .eyebrow{font-size:8px;letter-spacing:1.5px}.hero .lead{font-size:13px;line-height:1.55;margin:10px 0}.hero-art{display:none}
+ .actions{gap:10px;margin-top:17px}.actions .primary{flex:1}.facts{gap:8px 12px;margin-top:17px;font-size:10px}
+ .how{margin:10px auto 22px;padding:0 14px}.how h2{font-size:22px;margin:7px 0 12px}
+ .rule-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.rule-grid article{padding:10px;border-radius:11px}.rule-grid b{font-size:10px}.rule-grid p{font-size:9px;line-height:1.45;margin:6px 0 0}
+ .lobby{padding:12px 12px 30px;margin:0 auto 25px}.section-head{margin-bottom:12px;padding:4px 0 10px}.section-head h2{font-size:23px;margin:5px 0}.section-head .eyebrow{font-size:8px}
+ .lobby-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.lobby-grid .panel{min-height:0;padding:12px;border-radius:12px}.lobby-grid .panel:last-child{grid-column:1/-1}
+ .lobby-grid .panel-icon{width:34px;height:34px;font-size:18px;margin-bottom:7px}.lobby-grid .panel h3{font-size:13px;margin:5px 0}.lobby-grid .panel p{font-size:10px;line-height:1.4;min-height:0;margin:5px 0 9px}.lobby-grid .panel .eyebrow{font-size:7px;letter-spacing:1px}
+ .primary,.secondary,.ghost{min-height:42px;padding:10px 12px;font-size:12px;border-radius:10px}
+ .account-panel,.profile-panel,.room-panel,.premium-panel{padding:14px!important;margin:10px 0!important}.profile-panel h3,.room-panel h3{font-size:17px;margin:5px 0}
+ .field-grid{grid-template-columns:1fr 1fr;gap:7px;margin:9px 0}.field-grid input,.field-grid select{min-height:42px;padding:10px;font-size:12px}
+ .button-row{gap:7px;margin:9px 0}.button-row>*{min-height:40px}
+ .composition-editor{padding:11px;margin:10px 0}.composition-editor h4{font-size:13px}.composition-editor>p{font-size:10px;margin-bottom:9px}
+ .composition-fields{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.composition-fields label{padding:7px;gap:5px;font-size:9px}.composition-fields input{padding:7px;font-size:13px;min-height:35px}
+ .room-list{gap:7px;margin-top:10px}.room-card{padding:10px;gap:7px}.room-card strong{font-size:11px}.room-card small{font-size:9px}.current-room{margin-top:12px;padding-top:12px}
+ .wolf-hub{display:flex;flex-direction:column;gap:9px;margin-top:9px}.hub-scene{order:1;padding:10px;min-height:0;border-radius:13px}.hub-panel{order:2;min-height:0;border-radius:13px}
+ .hub-chat{min-height:0;height:auto;padding:9px}.hub-tabs{position:sticky;top:57px;z-index:30;margin-bottom:9px;padding:4px;gap:3px}.hub-tab{min-height:38px;padding:8px 3px;font-size:10px}
+ .hub-tab-content{min-height:0}.hub-tab-content .chat-messages{height:clamp(150px,28vh,230px);min-height:150px;flex:none;margin:9px 0}
+ .chat-form{display:flex;flex-direction:row;gap:6px}.chat-form input{min-height:42px;padding:9px;font-size:12px}.chat-form button{width:auto;min-width:72px;min-height:42px}
+ .wolf-waiting-room{padding:11px;min-height:0}.wolf-room-banner{gap:9px;padding-bottom:12px}.wolf-room-banner h2{font-size:21px}.wolf-room-banner p{font-size:10px}
+ .wolf-room-codebox{min-width:0;padding:8px 10px}.wolf-waiting-columns{gap:8px;padding-top:10px}.wolf-roster-card,.wolf-side-card{padding:10px}
+ .wolf-card-head{margin-bottom:9px}.wolf-card-head h3{font-size:14px}.wolf-seat-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+ .wolf-seat{padding:7px;gap:6px}.wolf-seat-avatar{width:29px;height:29px;flex-basis:29px;font-size:10px}.wolf-seat-meta strong{font-size:10px}.wolf-seat-meta small{font-size:8px}.wolf-seat-tag{font-size:6px}
+ .wolf-ready-progress{margin-top:10px}.wolf-lobby-actions{gap:6px}.wolf-lobby-actions button{min-height:40px;padding:8px 10px}
+ .wolf-lobby-side{grid-template-columns:1fr 1fr;gap:7px}.wolf-side-card{padding:9px}.wolf-side-card p,.wolf-side-hint{font-size:9px}.wolf-role-pill{font-size:8px;padding:5px 7px}
+ .game-status{gap:7px;margin:8px 0;padding:8px}.game-status>*{font-size:10px}.player-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:8px 0}.player-chip{padding:8px;font-size:10px}
+ .role-card{gap:10px;padding:12px;margin:9px 0}.role-icon{font-size:30px}.role-card h3{font-size:19px}.role-card p,.action-area p{font-size:11px;line-height:1.45}
+ .action-area{padding:11px;margin:9px 0}.action-area h3,.subheading{font-size:15px}.target-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:9px}.target-button{padding:10px;font-size:11px}
+ .stats-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.stats-grid>div{padding:8px}.stats-grid strong{font-size:17px}.stats-grid small{font-size:9px}
+ .wx-shell{margin:8px 0!important;padding:12px!important;border-radius:13px}.wx-heading{gap:8px}
+ .wx-nav{position:sticky;top:57px;z-index:35;display:flex;overflow-x:auto;white-space:nowrap;gap:5px;padding:5px;margin:0 -2px 10px;scrollbar-width:none;background:#171421f2;backdrop-filter:blur(12px)}
+ .wx-nav::-webkit-scrollbar{display:none}.wx-nav>*{flex:0 0 auto;min-height:36px;padding:8px 10px;font-size:10px}.wx-content{min-width:0}
+ .wx-tiles,.wx-role-list,.wx-shop-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.wx-table{display:block;max-width:100%;overflow-x:auto}
+ .admin-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-room-card{align-items:flex-start;flex-direction:column}
+ footer{padding:16px 14px 22px;font-size:9px}
+ .mobile-dock{position:fixed;z-index:120;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:3px;padding:7px 7px calc(7px + env(safe-area-inset-bottom));border-top:1px solid #ffffff1c;background:#100d18f2;backdrop-filter:blur(18px);box-shadow:0 -8px 28px #0005}
+ .mobile-dock button{display:grid;justify-items:center;align-content:center;gap:3px;min-width:0;min-height:48px;padding:4px 2px;border:0;border-radius:10px;background:transparent;color:#b9adc8;font:600 9px 'DM Sans';cursor:pointer}
+ .mobile-dock button span{font-size:18px;line-height:1}.mobile-dock button:active,.mobile-dock button:focus-visible{background:#9d79e82b;color:#fff;outline:1px solid #9d79e855}
+ .toast{bottom:calc(82px + env(safe-area-inset-bottom))}
+}
+@media(max-width:380px){.wolf-lobby-side{grid-template-columns:1fr}.wolf-seat-grid{grid-template-columns:1fr}.rule-grid{grid-template-columns:1fr}.rule-grid article{padding:9px}.rule-grid p{font-size:10px}.mobile-dock button{font-size:8px}}
