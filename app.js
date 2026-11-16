@@ -231,9 +231,22 @@
     box.innerHTML=(r.data||[]).map(m=>'<div class="chat-message"><div><strong>'+esc(m.display_name)+'</strong><small>'+new Date(m.created_at).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})+'</small></div><p>'+esc(m.body)+'</p></div>').join('')||'<small>Aucun message des loups pour le moment.</small>';
     box.scrollTop=box.scrollHeight;
   }
+  async function loadDeadChat(){
+    const box=$('wolf-dead-chat-messages');if(!currentRoom||!sb||!box)return;
+    const r=await sb.rpc('get_dead_chat',{p_room_id:currentRoom});
+    if(r.error){box.innerHTML='<small>Discussion des esprits indisponible : '+esc(r.error.message)+'</small>';return;}
+    box.innerHTML=(r.data||[]).map(m=>'<div class="chat-message"><div><strong>'+esc(m.display_name)+'</strong><small>'+new Date(m.created_at).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})+'</small></div><p>'+esc(m.body)+'</p></div>').join('')||'<small>Aucun message des esprits.</small>';
+    box.scrollTop=box.scrollHeight;
+  }
+  async function sendDeadChat(e){
+    e.preventDefault();const input=$('wolf-dead-chat-input'),body=input?.value.trim();if(!body||!currentRoom)return;
+    input.disabled=true;const r=await sb.rpc('send_dead_chat',{p_room_id:currentRoom,p_body:body});input.disabled=false;
+    if(r.error){toast(r.error.message);return;}input.value='';await loadDeadChat();input.focus();
+  }
+
   function attachChat(box,context={}){
     const wrap=document.createElement('section');wrap.className='hub-chat';
-    wrap.innerHTML='<div class="hub-tabs"><button class="hub-tab active" data-hub-tab="discussion">💬 Discussion</button><button class="hub-tab" data-hub-tab="composition">📜 Composition</button><button class="hub-tab" data-hub-tab="rules">❔ Règles</button></div><div class="hub-tab-content" id="wolf-hub-tab-content"></div>';
+    wrap.innerHTML='<div class="hub-tabs"><button class="hub-tab active" data-hub-tab="discussion">💬 Discussion</button><button class="hub-tab" data-hub-tab="composition">📜 Composition</button><button class="hub-tab" data-hub-tab="rules">❔ Règles</button>'+(context.state&&((context.state.my_role==='necromancer'&&context.state.my_alive&&context.state.phase==='night')||!context.state.my_alive)?'<button class="hub-tab" data-hub-tab="dead">💀 Esprits</button>':'')+'</div><div class="hub-tab-content" id="wolf-hub-tab-content"></div>';
     box.appendChild(wrap);
     const content=$('wolf-hub-tab-content'),tabs=wrap.querySelectorAll('[data-hub-tab]');
     const showTab=key=>{
@@ -259,6 +272,9 @@
           const s=context.state||{},ps=s.players||[],alive=ps.filter(p=>p.is_alive).length,comp=s.composition||{};
           content.innerHTML='<p class="eyebrow">COMPOSITION DE LA PARTIE</p><h3>Rôles distribués</h3><div class="hub-info-row"><span>Manche</span><strong>'+Number(s.round||1)+'</strong></div><div class="hub-info-row"><span>Phase</span><strong>'+(s.phase==='night'?'Nuit':'Jour')+'</strong></div><div class="hub-info-row"><span>Joueurs en vie</span><strong>'+alive+'/'+ps.length+'</strong></div>'+roleCatalog.map(r=>'<div class="hub-role-line">'+r.icon+' '+esc(r.name)+' <span>'+Number(comp[r.key]||0)+' · '+esc(r.camp)+'</span></div>').join('')+'<p class="muted-note">Les rôles secrets des autres joueurs restent masqués jusqu’à leur élimination ou à la fin de la partie.</p>';
         }
+      }else if(key==='dead'){
+        content.innerHTML='<div class="chat-heading"><div><p class="eyebrow">SALON DES ESPRITS</p><h3>💀 Discussion des éliminés</h3></div><button type="button" class="ghost" id="wolf-dead-refresh">Actualiser</button></div><div class="chat-messages" id="wolf-dead-chat-messages"><small>Chargement…</small></div><form class="chat-form" id="wolf-dead-chat-form"><input id="wolf-dead-chat-input" maxlength="500" autocomplete="off" placeholder="Écrire aux esprits…" required><button class="primary" type="submit">Envoyer</button></form><small>Les joueurs éliminés peuvent discuter ici. Le Nécromancien y accède pendant la nuit.</small>';
+        loadDeadChat();$('wolf-dead-refresh').addEventListener('click',loadDeadChat);$('wolf-dead-chat-form').addEventListener('submit',sendDeadChat);
       }else{
         const s=context.state||{},role=s.my_role;
         content.innerHTML='<p class="eyebrow">AIDE DE PARTIE</p><h3>'+(context.waiting?'Comment jouer':'Votre rôle : '+esc(roles[role]||'Inconnu'))+'</h3><p class="hub-rule">🌙 <strong>La nuit</strong><br>Les rôles qui possèdent un pouvoir agissent secrètement.</p><p class="hub-rule">☀️ <strong>Le jour</strong><br>Les joueurs discutent puis votent pour tenter d’éliminer un loup.</p><p class="hub-rule">🏆 <strong>Victoire</strong><br>Le village gagne lorsque tous les loups sont éliminés. Les loups gagnent lorsqu’ils sont au moins aussi nombreux que les autres joueurs vivants.</p><h4>📚 Rôles disponibles dans Wolfanator</h4>'+Object.keys(roles).map(k=>'<div class="role-library-row"><span>'+icons[k]+' <strong>'+esc(roles[k])+'</strong></span><small>'+esc(descriptions[k])+'</small></div>').join('')+(role?'<div class="hub-own-role"><strong>Votre rôle secret</strong><p>'+esc(descriptions[role]||'')+'</p></div>':'');
