@@ -187,3 +187,11 @@ button.danger{flex:0 0 auto;padding:9px 12px;border:1px solid #a94c68;border-rad
 .role-library-row{display:grid;gap:5px;padding:10px 0;border-bottom:1px solid #ffffff12}
 .role-library-row>span{display:flex;gap:8px;align-items:center;color:#eee2ff;font-size:13px}
 .role-library-row small{font-size:11px;line-height:1.5;color:#bdb0cb}
+
+.leaderboard-panel{margin-top:16px;padding-top:12px;border-top:1px solid #ffffff18}
+.leaderboard-list{display:grid;gap:6px;margin-top:10px}
+.leaderboard-row{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:8px;align-items:center;padding:9px 10px;border-radius:9px;background:#ffffff08}
+.leaderboard-row>b{color:#c9a7ff}
+.leaderboard-row>strong{font-size:12px;overflow:hidden;text-overflow:ellipsis}
+.leaderboard-row>small{font-size:10px;color:#b9acc8}
+.leaderboard-row.is-me{border:1px solid #a77aff66;background:#a77aff12}
