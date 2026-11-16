@@ -53,7 +53,7 @@
     if(!isAdmin)return;
     if(!adminPanel){adminPanel=document.createElement('section');adminPanel.className='panel admin-panel';adminPanel.id='wolf-admin-panel';$('lobby').appendChild(adminPanel);}
     adminPanel.hidden=false;
-    adminPanel.innerHTML='<p class="eyebrow">CONSOLE PRIVILÉGIÉE</p><h3>🛠️ Administration Wolfanator</h3><p class="muted-note">Outils réservés au compte administrateur permanent.</p><div class="admin-actions"><button class="secondary" id="admin-refresh">Actualiser les données</button><button class="secondary" id="admin-test-hub">🧪 Tester le hub</button><button class="ghost" id="admin-cleanup">Nettoyer les salons en attente de plus de 24 h</button></div><div id="admin-stats" class="admin-stats">Chargement des indicateurs…</div><h4>Gestion de tous les salons</h4><div id="admin-room-list" class="admin-room-list">Chargement…</div><div id="admin-diagnostics" class="admin-diagnostics"></div>';
+    adminPanel.innerHTML='<p class="eyebrow">CONSOLE PRIVILÉGIÉE</p><h3>🛠️ Administration Wolfanator</h3><p class="muted-note">Outils réservés au compte administrateur permanent.</p><div class="admin-actions"><button class="secondary" id="admin-refresh">Actualiser les données</button><button class="secondary" id="admin-test-hub">🧪 Tester le hub</button><button class="ghost" id="admin-cleanup">Nettoyer les salons en attente de plus de 24 h</button></div><div id="admin-stats" class="admin-stats">Chargement des indicateurs…</div><h4>Gestion de tous les salons</h4><div id="admin-room-list" class="admin-room-list">Chargement…</div><div id="admin-diagnostics" class="admin-diagnostics"></div><h4>Journal des actions administrateur</h4><div id="admin-audit-list" class="admin-audit-list">Chargement…</div>';
     $('admin-refresh').addEventListener('click',loadAdminData);
     $('admin-test-hub').addEventListener('click',async()=>{
       const b=$('admin-test-hub');b.disabled=true;
@@ -74,8 +74,8 @@
   }
   async function loadAdminData(){
     if(!isAdmin||!adminPanel)return;
-    const [stats,rooms]=await Promise.all([sb.rpc('admin_dashboard_stats'),sb.rpc('admin_list_rooms')]);
-    if(stats.error||rooms.error){$('admin-diagnostics').textContent='Erreur admin : '+(stats.error||rooms.error).message;return;}
+    const [stats,rooms,audit]=await Promise.all([sb.rpc('admin_dashboard_stats'),sb.rpc('admin_list_rooms'),sb.rpc('admin_get_audit_log')]);
+    if(stats.error||rooms.error||audit.error){$('admin-diagnostics').textContent='Erreur admin : '+(stats.error||rooms.error||audit.error).message;return;}
     const s=stats.data||{};
     $('admin-stats').innerHTML='<div class="admin-stat-grid">'+[['Salons',s.rooms_total],['En attente',s.rooms_waiting],['Parties en cours',s.rooms_playing],['Terminées',s.rooms_finished],['Joueurs présents',s.players_online],['Messages',s.messages_total],['Parties enregistrées',s.games_total],['Lunes en circulation',s.lunes_in_circulation]].map(x=>'<div><strong>'+Number(x[1]||0).toLocaleString('fr-FR')+'</strong><small>'+x[0]+'</small></div>').join('')+'</div>';
     const list=Array.isArray(rooms.data)?rooms.data:[];
@@ -87,6 +87,8 @@
       if(d.error){toast(d.error.message);b.disabled=false;return;}
       if(currentRoom===room.id)closeRoom();toast('Salon supprimé.');await loadAdminData();await loadRooms();
     }));
+    const auditRows=Array.isArray(audit.data)?audit.data:[];
+    $('admin-audit-list').innerHTML=auditRows.length?auditRows.map(x=>'<div class="admin-audit-row"><strong>'+esc(x.action)+'</strong><small>'+esc(x.admin_name)+' · '+new Date(x.created_at).toLocaleString('fr-FR')+'</small><small>'+esc(x.details?.room_name||x.details?.room_code||'Action administrateur')+'</small></div>').join(''):'<small>Aucune action enregistrée pour le moment.</small>';
     $('admin-diagnostics').innerHTML='<strong>Diagnostic rapide</strong><p>Connexion Supabase : OK · Accès administrateur : OK · Lecture des salons : OK · Outils de suppression : disponibles.</p><small>Les salons en cours ne sont pas supprimés par le nettoyage automatique.</small>';
   }
   async function loadStats(){
