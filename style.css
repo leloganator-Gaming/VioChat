@@ -195,3 +195,40 @@ button.danger{flex:0 0 auto;padding:9px 12px;border:1px solid #a94c68;border-rad
 .leaderboard-row>strong{font-size:12px;overflow:hidden;text-overflow:ellipsis}
 .leaderboard-row>small{font-size:10px;color:#b9acc8}
 .leaderboard-row.is-me{border:1px solid #a77aff66;background:#a77aff12}
+
+
+/* Wolfanator community, progression and collection */
+.wx-shell{max-width:1120px;margin:38px auto 0;padding:28px;background:linear-gradient(145deg,#1c1728,#171320);border:1px solid #ffffff16;border-radius:22px;box-shadow:0 22px 70px #0005}
+.wx-heading,.wx-section-title,.wx-friend,.wx-rank-row,.wx-item-foot{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.wx-heading h2{margin:5px 0 0;font-size:clamp(25px,4vw,36px)}
+.wx-balance{padding:11px 15px;border:1px solid #8f6bba55;background:#30233d;border-radius:12px;color:#f1d99c;font-weight:700;white-space:nowrap}
+.wx-nav{display:flex;gap:8px;overflow:auto;padding:20px 0 14px;border-bottom:1px solid #ffffff16}
+.wx-nav button{white-space:nowrap;border:1px solid transparent;background:#ffffff08;color:#c8bfd2;padding:11px 14px;border-radius:11px;cursor:pointer;font:600 13px 'DM Sans'}
+.wx-nav button.active,.wx-nav button:hover{background:#8d63bd24;border-color:#a77aff77;color:#fff}
+.wx-content{padding-top:22px;min-height:180px}
+.wx-welcome{display:flex;justify-content:space-between;gap:24px;align-items:center;padding:25px;border:1px solid #ffffff16;border-radius:17px;background:radial-gradient(circle at 90% 0,#7649a633,transparent 45%),#211b2c}
+.wx-welcome h3{font-size:26px;margin:5px 0}.wx-welcome p:not(.eyebrow){color:#bdb2c9;line-height:1.6;max-width:550px}
+.wx-level{min-width:160px;padding:15px;border-radius:13px;background:#ffffff09}.wx-level strong,.wx-level span{display:block}.wx-level span{font-size:12px;color:#c4b8ce;margin:5px 0 10px}
+.wx-progress{height:7px;background:#ffffff16;border-radius:99px;overflow:hidden}.wx-progress i{display:block;height:100%;background:linear-gradient(90deg,#9b70d3,#f1cb83);border-radius:99px}
+.wx-tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:17px}
+.wx-tiles button{display:flex;flex-direction:column;align-items:flex-start;gap:7px;text-align:left;padding:18px;border-radius:15px;border:1px solid #ffffff15;background:#211b2c;color:#f8f4ff;cursor:pointer}
+.wx-tiles button:hover{border-color:#a77aff88;transform:translateY(-2px)}.wx-tiles b{font-size:24px}.wx-tiles strong{font-size:14px}.wx-tiles small,.wx-note{font-size:12px;color:#b9aec5}
+.wx-note{margin:15px 0 0;line-height:1.6}
+.wx-section-title{margin-bottom:17px}.wx-section-title h3{font-size:23px;margin:0 0 5px}.wx-section-title p{color:#b9aec5;margin:0;font-size:13px}
+.wx-search,.wx-form input,.wx-form textarea{background:#120f19;color:#fff;border:1px solid #ffffff24;border-radius:10px;padding:12px 14px;font:inherit;min-width:0}
+.wx-search{width:min(260px,45%)}
+.wx-role-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.wx-role{display:flex;gap:13px;padding:15px;border-radius:14px;border:1px solid #ffffff14;background:#211b2b}
+.wx-role-icon{font-size:25px}.wx-role strong{font-size:14px}.wx-role strong small{font-size:9px;color:#e8c47d;margin-left:5px}.wx-role p{font-size:12px;line-height:1.5;color:#c1b6cc;margin:6px 0}.wx-role span{font-size:10px;color:#a78bc6}
+.wx-table{border:1px solid #ffffff15;border-radius:14px;overflow:hidden}.wx-rank-row{padding:14px 16px;border-bottom:1px solid #ffffff12;font-size:13px}.wx-rank-row:last-child{border:0}.wx-rank-row>b{color:#e9c77f;min-width:35px}.wx-rank-row>strong{flex:1}.wx-rank-row>span{color:#bcb1c8}.wx-rank-row>em{font-style:normal;color:#f0d28b}
+.wx-form{display:flex;gap:10px;align-items:center;margin:15px 0 20px}.wx-form input{flex:1}
+.wx-primary,.wx-secondary{border:0;border-radius:10px;padding:11px 14px;font:700 12px 'DM Sans';cursor:pointer;white-space:nowrap}
+.wx-primary{background:linear-gradient(135deg,#a67ce0,#7547ac);color:white}.wx-secondary{background:#ffffff12;color:#e8dff1;border:1px solid #ffffff18}
+.wx-friend{padding:13px 15px;border-bottom:1px solid #ffffff12}.wx-friend:last-child{border:0}.wx-friend strong,.wx-friend small{display:block}.wx-friend small{color:#b9aec5;font-size:11px;margin-top:4px}.wx-actions{display:flex;gap:7px}
+.wx-shop-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.wx-item{border:1px solid #ffffff15;border-radius:15px;padding:16px;background:#211b2b}.wx-item-icon{height:64px;display:grid;place-items:center;background:#ffffff08;border-radius:12px;font-size:32px;margin-bottom:12px}.wx-item>strong,.wx-item>small{display:block}.wx-item>small{font-size:10px;color:#bca5d4;margin-top:4px;text-transform:capitalize}.wx-item p{font-size:12px;line-height:1.5;color:#bcb1c8;min-height:36px}.wx-item-foot{border-top:1px solid #ffffff12;padding-top:11px}.wx-item-foot b{font-size:12px;color:#f0d28b}
+.wx-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:17px}.wx-stats>div{padding:17px;border:1px solid #ffffff15;border-radius:13px;background:#211b2b}.wx-stats b,.wx-stats small{display:block}.wx-stats b{font:700 25px 'Space Grotesk'}.wx-stats small{color:#b9aec5;font-size:11px;margin-top:4px}
+.wx-profile-card{padding:17px;border-radius:13px;background:#2b2138;border:1px solid #9d76c644}.wx-profile-card strong,.wx-profile-card small{display:block}.wx-profile-card small{color:#c1b6cc;margin-top:5px;font-size:12px}
+.wx-bio-form{align-items:flex-start;flex-direction:column}.wx-bio-form label{font-size:13px;color:#d7cde1}.wx-form textarea{width:100%;min-height:80px;resize:vertical}
+.wx-win{color:#8de1a6!important}.wx-loss{color:#ff9a9a!important}.wx-empty{padding:25px;text-align:center;border:1px dashed #ffffff25;border-radius:14px;color:#b9aec5;font-size:13px}
+@media(max-width:760px){.wx-shell{margin:22px 14px;padding:17px}.wx-heading{align-items:flex-start;flex-direction:column}.wx-welcome{align-items:stretch;flex-direction:column}.wx-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.wx-role-list,.wx-shop-grid{grid-template-columns:1fr}.wx-stats{grid-template-columns:repeat(2,1fr)}.wx-form{align-items:stretch;flex-direction:column}.wx-search{width:100%}.wx-rank-row{flex-wrap:wrap}.wx-rank-row>span{order:3;width:100%}.wx-nav{margin:0 -2px}.wx-friend{align-items:flex-start}.wx-actions{flex-direction:column}}
