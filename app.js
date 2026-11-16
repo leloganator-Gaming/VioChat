@@ -176,7 +176,7 @@
   function gameHTML(s){
     const players=s.players||[],alive=players.filter(p=>p.is_alive),role=s.my_role,night=s.phase==='night',day=s.phase==='day',done=s.status==='finished'||s.phase==='finished';
     let desc=night?({wolf:'Choisissez une cible avec les autres loups.',seer:'Choisissez un joueur à examiner.',healer:'Choisissez une personne à protéger.',witch:'Vous pouvez sauver la cible des loups ou empoisonner un joueur. Chaque potion ne s’utilise qu’une fois.',ancient:'Vous avez deux vies. La première attaque des loups vous blesse ; la seconde peut vous éliminer.',villager:'Vous êtes à l’abri cette nuit. Attendez le matin.'}[role]):'Le village débat. Votez pour la personne que vous pensez être un loup.';
-    const canAct=!done&&s.my_alive&&(night&&['wolf','seer','healer'].includes(role)||day),witchTurn=!done&&s.my_alive&&night&&role==='witch'&&(s.witch_state?.heal_available||s.witch_state?.poison_available);
+    const canAct=!done&&s.my_alive&&(night&&['wolf','seer','healer'].includes(role)||day),witchTurn=!done&&s.my_alive&&night&&role==='witch';
     const targets=alive.filter(p=>p.user_id!==(day||role==='seer'||role==='wolf'||role==='witch'?currentUserId:''));
     const label=night?({wolf:'Désigner la cible',seer:'Examiner ce joueur',healer:'Protéger ce joueur'}[role]||''):'Voter contre ce joueur';
     const targetHTML=canAct?'<div class="target-grid">'+targets.map(p=>'<button class="target-button" data-target="'+p.user_id+'"><strong>'+esc(p.display_name)+'</strong><small>'+(p.is_host?'👑 Hôte':'Joueur')+' · '+label+'</small></button>').join('')+'</div>':'';
