@@ -33,3 +33,15 @@
 .winner-card{background:linear-gradient(135deg,#3a2b4d,#211a2c);border-color:#c6a0ff;text-align:center;padding:24px}
 .winner-card h3{font-size:24px;margin:0 0 8px}.host-controls{margin-top:20px}
 @media(max-width:600px){.role-card{align-items:flex-start}.role-icon{font-size:34px}.room-card{align-items:flex-start}.game-status{align-items:flex-start}}
+
+
+.stats-panel{margin-top:22px;padding-top:16px;border-top:1px solid var(--line)}
+.stats-panel h4{font:700 15px 'Space Grotesk';margin:14px 0 10px}
+.stats-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.stats-grid>div{padding:13px;border:1px solid var(--line);border-radius:12px;background:#ffffff06}
+.stats-grid strong{display:block;font:700 23px 'Space Grotesk';color:var(--purple)}
+.stats-grid small,.history-row small{display:block;color:var(--muted);font-size:11px;margin-top:4px}
+.history-list{display:grid;gap:8px}
+.history-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--line);border-radius:10px}
+.history-row b{font-size:11px}.history-row .win{color:#8ee0a9}.history-row .loss{color:#d7a3a3}
+@media(max-width:480px){.stats-grid{grid-template-columns:1fr 1fr}}
