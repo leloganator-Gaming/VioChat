@@ -53,7 +53,7 @@
     if(!isAdmin){if(adminPanel)adminPanel.hidden=true;return;}
     if(!adminPanel){adminPanel=document.createElement('section');adminPanel.className='panel admin-panel';adminPanel.id='wolf-admin-panel';$('lobby').appendChild(adminPanel);}
     adminPanel.hidden=false;
-    adminPanel.innerHTML='<p class="eyebrow">CONSOLE PRIVILÉGIÉE</p><h3>🛠️ Administration Wolfanator</h3><p class="muted-note">Outils réservés au compte administrateur permanent.</p><div class="admin-actions"><button class="secondary" id="admin-refresh">Actualiser les données</button><button class="secondary" id="admin-test-hub">🧪 Tester le hub</button><button class="ghost" id="admin-cleanup">Nettoyer les salons en attente de plus de 24 h</button></div><div id="admin-stats" class="admin-stats">Chargement des indicateurs…</div><h4>Gestion de tous les salons</h4><div id="admin-room-list" class="admin-room-list">Chargement…</div><div id="admin-diagnostics" class="admin-diagnostics"></div><h4>Journal des actions administrateur</h4><div id="admin-audit-list" class="admin-audit-list">Chargement…</div>';
+    adminPanel.innerHTML='<p class="eyebrow">CONSOLE PRIVILÉGIÉE</p><h3>🛠️ Administration Wolfanator</h3><p class="muted-note">Outils réservés au compte administrateur permanent.</p><div class="admin-actions"><button class="secondary" id="admin-refresh">Actualiser les données</button><button class="secondary" id="admin-test-hub">🧪 Tester le hub</button><button class="ghost" id="admin-cleanup">Nettoyer les salons en attente de plus de 24 h</button></div><div id="admin-stats" class="admin-stats">Chargement des indicateurs…</div><h4>Gestion de tous les salons</h4><div id="admin-room-list" class="admin-room-list">Chargement…</div><div id="admin-diagnostics" class="admin-diagnostics"></div><h4>Journal des actions administrateur</h4><div id="admin-audit-list" class="admin-audit-list">Chargement…</div><h4>Signalements des joueurs</h4><div id="admin-report-list" class="admin-audit-list">Chargement…</div>';
     $('admin-refresh').addEventListener('click',loadAdminData);
     $('admin-test-hub').addEventListener('click',async()=>{
       const b=$('admin-test-hub');b.disabled=true;
@@ -90,6 +90,15 @@
     const auditRows=Array.isArray(audit.data)?audit.data:[];
     $('admin-audit-list').innerHTML=auditRows.length?auditRows.map(x=>'<div class="admin-audit-row"><strong>'+esc(x.action)+'</strong><small>'+esc(x.admin_name)+' · '+new Date(x.created_at).toLocaleString('fr-FR')+'</small><small>'+esc(x.details?.room_name||x.details?.room_code||'Action administrateur')+'</small></div>').join(''):'<small>Aucune action enregistrée pour le moment.</small>';
     $('admin-diagnostics').innerHTML='<strong>Diagnostic rapide</strong><p>Connexion Supabase : OK · Accès administrateur : OK · Lecture des salons : OK · Outils de suppression : disponibles.</p><small>Les salons en cours ne sont pas supprimés par le nettoyage automatique.</small>';
+    await loadAdminReports();
+  }
+  async function loadAdminReports(){
+    const box=$('admin-report-list');if(!box||!isAdmin)return;
+    const r=await sb.rpc('admin_list_wolfanator_reports');
+    if(r.error){box.textContent='Signalements indisponibles : '+r.error.message;return;}
+    const rows=Array.isArray(r.data)?r.data:[];
+    box.innerHTML=rows.length?rows.map(x=>'<article class="admin-room-card"><div><strong>'+esc(x.reported)+' · '+esc(x.reason)+'</strong><small>Signalé par '+esc(x.reporter)+' · '+new Date(x.created_at).toLocaleString('fr-FR')+'</small><small>'+esc(x.details||'Aucun détail fourni')+'</small><small>Statut : '+esc(x.status)+'</small></div><div class="admin-actions"><button class="secondary" data-report-status="reviewing" data-report-id="'+x.id+'">En cours</button><button class="secondary" data-report-status="resolved" data-report-id="'+x.id+'">Résolu</button><button class="ghost" data-report-status="dismissed" data-report-id="'+x.id+'">Classer</button></div></article>').join(''):'<small>Aucun signalement en attente.</small>';
+    box.querySelectorAll('[data-report-status]').forEach(b=>b.addEventListener('click',async()=>{b.disabled=true;const u=await sb.rpc('admin_update_wolfanator_report',{p_report_id:b.dataset.reportId,p_status:b.dataset.reportStatus});if(u.error){toast(u.error.message);b.disabled=false;return;}toast('Signalement mis à jour.');await loadAdminReports();}));
   }
   async function loadStats(){
     const box=$('wolf-stats');if(!box)return;
