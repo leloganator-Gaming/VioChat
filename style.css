@@ -115,3 +115,9 @@
 .room-heading .eyebrow{margin:0 0 4px}
 @media(max-width:900px){.wolf-hub{grid-template-columns:1fr}.hub-scene,.hub-panel{min-height:0}.hub-chat{min-height:480px}.hub-tab-content .chat-messages{min-height:220px}}
 @media(max-width:520px){.hub-scene{padding:14px}.hub-tabs{grid-template-columns:1fr 1fr 1fr}.hub-tab{font-size:10px}.hub-chat{padding:10px}.hub-scene .player-grid{grid-template-columns:1fr 1fr}}
+
+/* Canal privé des loups */
+.wolf-private-chat{margin-top:22px;padding-top:18px;border-top:1px solid var(--line)}
+.wolf-private-chat .chat-heading{align-items:center;gap:10px}
+.wolf-private-chat .private-messages{max-height:240px;background:rgba(12,9,28,.42)}
+.wolf-private-chat>small{display:block;margin-top:8px;color:var(--muted);font-size:.78rem}
