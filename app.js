@@ -261,7 +261,7 @@
           loadWolfChat();
           $('wolf-private-refresh').addEventListener('click',loadWolfChat);
           $('wolf-private-chat-form').addEventListener('submit',sendWolfChat);
-        }else if(context.state?.my_role==='little_girl'&&context.state?.my_alive){
+        }else if(context.state?.my_role==='little_girl'&&context.state?.my_alive&&context.state?.phase==='night'){
           content.insertAdjacentHTML('beforeend','<section class="wolf-private-chat"><div class="chat-heading"><div><p class="eyebrow">ESPIONNAGE NOCTURNE</p><h3>👧 Écoute de la meute</h3></div><button type="button" class="ghost" id="wolf-private-refresh">Actualiser</button></div><div class="chat-messages private-messages" id="wolf-private-chat-messages"><small>Chargement…</small></div><small>La Petite Fille peut lire les messages de la meute, mais ne peut pas y participer.</small></section>');
           loadWolfChat();$('wolf-private-refresh').addEventListener('click',loadWolfChat);
         }
