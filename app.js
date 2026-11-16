@@ -41,7 +41,7 @@
     else{currentUserId='';profileName='';isAdmin=false;if(adminPanel)adminPanel.hidden=true;status('Non connecté.');$('wolf-rooms').innerHTML='<small>Connectez-vous pour afficher les salons.</small>';}
   }
   async function loadPremium(){
-    const box=$('wolf-premium-status');if(!box)return;
+    isAdmin=false;const box=$('wolf-premium-status');if(!box)return;
     const r=await sb.from('user_entitlements').select('entitlement_key,expires_at,source').eq('user_id',currentUserId).eq('entitlement_key','wolf_alpha').maybeSingle();
     if(r.error){box.textContent='Statut indisponible.';return;}
     const active=!!r.data&&(!r.data.expires_at||new Date(r.data.expires_at)>new Date());isAlpha=active;isAdmin=active&&r.data.source==='admin'&&!r.data.expires_at;
@@ -50,7 +50,7 @@
     const buy=$('wolf-buy-alpha');if(buy)buy.addEventListener('click',async()=>{buy.disabled=true;const a=await sb.rpc('buy_wolf_alpha_with_moons');if(a.error){toast(a.error.message);buy.disabled=false;return;}toast('Loup Alpha activé pour 30 jours !');await loadProfile({id:currentUserId});await loadPremium();});
   }
   async function renderAdminPanel(){
-    if(!isAdmin)return;
+    if(!isAdmin){if(adminPanel)adminPanel.hidden=true;return;}
     if(!adminPanel){adminPanel=document.createElement('section');adminPanel.className='panel admin-panel';adminPanel.id='wolf-admin-panel';$('lobby').appendChild(adminPanel);}
     adminPanel.hidden=false;
     adminPanel.innerHTML='<p class="eyebrow">CONSOLE PRIVILÉGIÉE</p><h3>🛠️ Administration Wolfanator</h3><p class="muted-note">Outils réservés au compte administrateur permanent.</p><div class="admin-actions"><button class="secondary" id="admin-refresh">Actualiser les données</button><button class="secondary" id="admin-test-hub">🧪 Tester le hub</button><button class="ghost" id="admin-cleanup">Nettoyer les salons en attente de plus de 24 h</button></div><div id="admin-stats" class="admin-stats">Chargement des indicateurs…</div><h4>Gestion de tous les salons</h4><div id="admin-room-list" class="admin-room-list">Chargement…</div><div id="admin-diagnostics" class="admin-diagnostics"></div><h4>Journal des actions administrateur</h4><div id="admin-audit-list" class="admin-audit-list">Chargement…</div>';
