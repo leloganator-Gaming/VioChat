@@ -121,3 +121,19 @@
 .wolf-private-chat .chat-heading{align-items:center;gap:10px}
 .wolf-private-chat .private-messages{max-height:240px;background:rgba(12,9,28,.42)}
 .wolf-private-chat>small{display:block;margin-top:8px;color:var(--muted);font-size:.78rem}
+
+/* Création de salon et composition des rôles */
+.composition-editor{margin:18px 0;padding:18px;border:1px solid #6e568b;border-radius:15px;background:linear-gradient(135deg,#251c32,#171321)}
+.composition-editor h4{font:700 16px 'Space Grotesk';margin:0 0 5px;color:#f7f0ff}
+.composition-editor>p{font-size:12px;color:var(--muted);line-height:1.5;margin:0 0 14px}
+.composition-fields{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.composition-fields label{display:grid;gap:8px;font-size:12px;font-weight:700;color:#e7d9f8}
+.composition-fields input{width:100%;min-width:0;padding:12px;border:1px solid #5c4974;border-radius:10px;background:#100d18;color:white;font:700 16px 'DM Sans'}
+.composition-total{margin-top:13px;padding:10px 12px;border-radius:10px;background:#a77aff16;color:#e4d6ff;font-size:12px;font-weight:700}
+.composition-editor~.button-row button:disabled{opacity:.4;cursor:not-allowed;filter:grayscale(1)}
+.alpha-badge{display:inline-block;padding:5px 9px;border:1px solid #d8ae5b77;border-radius:999px;background:#d8ae5b1c;color:#f2ca79;font-size:10px;font-weight:800;letter-spacing:1px}
+.wallet-card{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:15px;padding:14px;border:1px solid #8b6bad66;border-radius:12px;background:#a77aff12}
+.wallet-card strong{font:700 18px 'Space Grotesk';color:#d7bcff}
+.wallet-card small{margin:0;text-align:right}
+.alpha-benefits{margin:10px 0 16px;padding-left:20px;color:#e6d8f3;font-size:12px;line-height:1.9}
+@media(max-width:650px){.composition-fields{grid-template-columns:repeat(2,minmax(0,1fr))}.wallet-card{align-items:flex-start;flex-direction:column}.wallet-card small{text-align:left}}
