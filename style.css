@@ -84,3 +84,34 @@
 .premium-status{display:grid;gap:5px;padding:12px;border:1px solid #d8ae5b44;border-radius:10px;background:#0002;font-size:12px}
 .premium-status small{color:var(--muted);line-height:1.5}
 .premium-active{color:#9be4ad}
+
+
+/* Wolfanator room hub: game scene on the left, live chat and rules on the right */
+.wolf-hub{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(300px,.85fr);gap:16px;align-items:stretch;margin-top:16px}
+.hub-scene{min-width:0;min-height:540px;padding:22px;border:1px solid #55436c;border-radius:20px;background:radial-gradient(ellipse at 50% 0%,#48345e 0,transparent 48%),linear-gradient(160deg,#211a2c,#100d18);box-shadow:inset 0 1px #ffffff0c}
+.hub-panel{min-width:0;min-height:540px;border:1px solid #51446a;border-radius:20px;background:#171321;overflow:hidden}
+.hub-chat{height:100%;min-height:540px;margin:0;padding:14px;display:flex;flex-direction:column;border:0;border-radius:0;background:transparent}
+.hub-tabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;padding:5px;background:#0d0b12;border-radius:12px;margin-bottom:15px}
+.hub-tab{padding:10px 5px;border:0;border-radius:8px;background:transparent;color:#b5aabd;font:600 11px 'DM Sans';cursor:pointer}
+.hub-tab.active{background:#49315f;color:#fff;box-shadow:0 3px 12px #0003}
+.hub-tab-content{min-height:0;flex:1;display:flex;flex-direction:column}
+.hub-tab-content .chat-messages{height:auto;min-height:240px;flex:1}
+.hub-tab-content>h3{font:700 19px 'Space Grotesk';margin:6px 0 18px}
+.hub-info-row{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);font-size:12px;color:var(--muted)}
+.hub-info-row strong{color:var(--text);text-align:right}
+.hub-role-line{display:flex;justify-content:space-between;gap:8px;padding:11px 0;border-bottom:1px solid var(--line);font-size:12px}
+.hub-role-line span{color:var(--muted);font-size:11px}
+.muted-note,.hub-rule{font-size:12px;line-height:1.65;color:var(--muted);padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:#ffffff06}
+.hub-own-role{padding:13px;margin-top:10px;border:1px solid #a77aff66;border-radius:12px;background:#a77aff12;font-size:12px}
+.hub-own-role p{color:var(--muted);line-height:1.6;margin-bottom:0}
+.hub-scene .game-status{margin-top:0}
+.hub-scene .player-grid{grid-template-columns:repeat(auto-fit,minmax(130px,1fr))}
+.hub-scene .player-chip{background:#ffffff0a;border-color:#79648f66;padding:12px}
+.hub-scene .action-area{background:#0c0a12aa;border-color:#8b6bad66}
+.hub-scene .role-card{background:linear-gradient(130deg,#48315f,#211a2c);box-shadow:0 12px 30px #0003}
+.hub-scene .winner-card{background:linear-gradient(130deg,#4a3a25,#211a2c)}
+.room-heading{padding:12px 0;border-bottom:1px solid var(--line);margin-bottom:12px}
+.room-heading h3{font:700 19px 'Space Grotesk'}
+.room-heading .eyebrow{margin:0 0 4px}
+@media(max-width:900px){.wolf-hub{grid-template-columns:1fr}.hub-scene,.hub-panel{min-height:0}.hub-chat{min-height:480px}.hub-tab-content .chat-messages{min-height:220px}}
+@media(max-width:520px){.hub-scene{padding:14px}.hub-tabs{grid-template-columns:1fr 1fr 1fr}.hub-tab{font-size:10px}.hub-chat{padding:10px}.hub-scene .player-grid{grid-template-columns:1fr 1fr}}
