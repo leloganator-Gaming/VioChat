@@ -104,13 +104,13 @@
     const label=night?({wolf:'Désigner la cible',seer:'Examiner ce joueur',healer:'Protéger ce joueur'}[role]||''):'Voter contre ce joueur';
     const targetHTML=canAct?'<div class="target-grid">'+targets.map(p=>'<button class="target-button" data-target="'+p.user_id+'"><strong>'+esc(p.display_name)+'</strong><small>'+(p.is_host?'👑 Hôte':'Joueur')+' · '+label+'</small></button>').join('')+'</div>':'';
     const rows=players.map(p=>'<div class="player-chip '+(p.is_alive?'':'is-out')+'"><span>'+esc(p.display_name)+(p.is_host?' 👑':'')+'</span><small>'+(p.is_alive?'En jeu':'Éliminé'+(p.revealed_role?' · '+esc(roles[p.revealed_role]||p.revealed_role):''))+'</small></div>').join('');
-    const winner=s.winner==='village'?'Le village a gagné !':s.winner==='loups'?'Les loups-garous ont gagné !':'Partie terminée';
+    const winner=s.winner==='village'?'Le village a gagné !':s.winner==='loups'?'Les loups-garous ont gagné !':'Partie terminée',personalWin=(role==='wolf'&&s.winner==='loups')||(role!=='wolf'&&s.winner==='village');
     let html='<div class="game-status"><span class="phase-chip">'+(done?'🏁 Partie terminée':night?'🌙 Nuit':'☀️ Jour')+' · Manche '+s.round+'</span><span>'+alive.length+'/'+players.length+' encore en jeu</span></div>';
     html+='<div class="role-card"><div class="role-icon">'+(icons[role]||'🎭')+'</div><div><small>VOTRE RÔLE SECRET</small><h3>'+esc(roles[role]||'En attente')+'</h3><p>'+esc(descriptions[role]||'')+'</p></div></div>';
     if(role==='wolf'&&s.wolf_team?.length)html+='<p class="team-note">Vos alliés : '+s.wolf_team.map(esc).join(', ')+'</p>';
     if(s.last_event)html+='<div class="story-event">'+esc(s.last_event)+'</div>';
     if(role==='seer'&&s.seer_result)html+='<div class="seer-result">🔮 Votre vision : '+esc(s.seer_result.name)+' est '+esc(roles[s.seer_result.role]||s.seer_result.role)+'.</div>';
-    if(done)html+='<div class="winner-card"><h3>'+winner+'</h3><p>Les rôles de tous les joueurs sont révélés.</p></div>';
+    if(done)html+='<div class="winner-card"><h3>'+winner+'</h3><p>Les rôles de tous les joueurs sont révélés.</p>'+(personalWin?'<strong class="win">🌙 Vous gagnez 1 Lune !</strong>':'<small>Pas de Lune cette fois. Une victoire vous rapporte 1 Lune.</small>')+'</div>';
     else{html+='<div class="action-area"><h3>'+(night?'Actions de la nuit':'Vote du village')+'</h3><p>'+esc(desc)+'</p>';
       if(canAct)html+='<p class="action-state">'+(s.my_action_submitted?'Votre choix est enregistré. Vous pouvez le modifier avant la fin de la phase.':'Vous n’avez pas encore envoyé votre choix.')+'</p>'+targetHTML;
       if(night&&role==='villager')html+='<p class="waiting-note">Attendez le passage au jour.</p>';
@@ -192,7 +192,7 @@
         $('wolf-leave')?.addEventListener('click',async()=>{const r=await sb.rpc('leave_game_room',{p_room_id:id});if(r.error)toast(r.error.message);else closeRoom();});
       }else{
         const r=await sb.rpc('get_my_game_state',{p_room_id:id});if(r.error){box.textContent=r.error.message;return;}
-        box.innerHTML='<div class="wolf-hub"><section class="hub-scene">'+gameHTML(r.data)+'</section><aside class="hub-panel" id="wolf-hub-panel"></aside></div>';attachChat($('wolf-hub-panel'),{waiting:false,state:r.data});
+        box.innerHTML='<div class="wolf-hub"><section class="hub-scene">'+gameHTML(r.data)+'</section><aside class="hub-panel" id="wolf-hub-panel"></aside></div>';attachChat($('wolf-hub-panel'),{waiting:false,state:r.data});if(r.data.status==='finished')await loadProfile(u);
         box.querySelectorAll('[data-target]').forEach(b=>b.addEventListener('click',async()=>{b.disabled=true;const a=await sb.rpc('submit_game_action',{p_room_id:id,p_target_id:b.dataset.target});if(a.error)toast(a.error.message);else{toast('Choix enregistré.');await refreshRoom();}}));
         $('wolf-resolve')?.addEventListener('click',async()=>{const b=$('wolf-resolve');b.disabled=true;const a=await sb.rpc('resolve_game_phase',{p_room_id:id});if(a.error){toast(a.error.message);b.disabled=false;}else{toast(a.data?.message||'Phase terminée.');await refreshRoom();}});
         $('wolf-finish-close')?.addEventListener('click',closeRoom);
