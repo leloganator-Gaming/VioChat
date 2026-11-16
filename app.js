@@ -289,7 +289,7 @@
   $('wolf-join').addEventListener('click',()=>joinRoom($('wolf-room-code').value));
   $('wolf-room-code').addEventListener('input',e=>{e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,8);});
   $('wolf-room-max').addEventListener('change',()=>{const max=Number($('wolf-room-max').value),wolves=Math.max(1,Math.ceil(max/4));$('wolf-comp-wolf').value=wolves;$('wolf-comp-seer').value=1;$('wolf-comp-healer').value=1;$('wolf-comp-witch').value=0;$('wolf-comp-ancient').value=0;$('wolf-comp-villager').value=Math.max(0,max-wolves-2);updateCompositionTotal();});
-  ['wolf-comp-wolf','wolf-comp-seer','wolf-comp-healer','wolf-comp-witch','wolf-comp-villager'].forEach(id=>$(id).addEventListener('input',updateCompositionTotal));updateCompositionTotal();
+  ['wolf-comp-wolf','wolf-comp-seer','wolf-comp-healer','wolf-comp-witch','wolf-comp-ancient','wolf-comp-villager'].forEach(id=>$(id).addEventListener('input',updateCompositionTotal));updateCompositionTotal();
   $('play-now').addEventListener('click',async()=>{const session=sb?await sb.auth.getSession():{data:{session:null}};if(session.data.session)showLobby();else showAuth();});
   $('back-home').addEventListener('click',()=>{$('lobby').classList.add('hidden');$('home').classList.remove('hidden');window.scrollTo({top:0,behavior:'smooth'});});
   $('auth-back').addEventListener('click',()=>{$('auth-screen').classList.add('hidden');$('home').classList.remove('hidden');window.scrollTo({top:0,behavior:'smooth'});});
