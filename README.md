@@ -18,10 +18,10 @@ GitHub Pages : https://leloganator-gaming.github.io/Wolfanator/
 - Chat de meute séparé.
 - Historique de parties, Lunes, grade Loup Alpha et outils administrateur.
 - Encyclopédie de 21 rôles principaux et 9 variantes.
-- Classement, demandes d'amis, niveaux/XP, lauriers, boutique cosmétique, inventaire et signalements.
+- Classement par lauriers, demandes d'amis, niveaux/XP, boutique cosmétique, inventaire, signalements et modération des signalements dans la console administrateur.
 
 ## État important
-Le catalogue des 30 rôles est disponible dans l'encyclopédie. Cela ne signifie pas que les 30 pouvoirs sont déjà jouables : le moteur de partie actuel ne distribue et ne résout encore que les rôles de base listés ci-dessus. Les nouveaux écrans communautaires et la boutique utilisent les tables et RPC Supabase ajoutés le 16 novembre 2026.
+Le catalogue des 30 rôles est disponible dans l'encyclopédie. Cela ne signifie pas que les 30 pouvoirs sont déjà jouables : le moteur de partie actuel ne distribue et ne résout encore que les rôles de base listés ci-dessus. Les écrans communautaires, la boutique, les signalements et la modération utilisent les tables et RPC Supabase ajoutés le 16 novembre 2026. Le classement est ordonné par lauriers.
 
 ## Base Supabase
 Projet : `bphfjhmmfwsnjnbnjkjl`
