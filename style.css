@@ -155,3 +155,20 @@
 
 .lobby-start-state{margin:14px 0;padding:11px 13px;border:1px solid #79648f66;border-radius:10px;background:#a77aff12;color:#e6d8f3;font-size:12px;line-height:1.5}
 #wolf-start:disabled{opacity:.38;cursor:not-allowed;filter:grayscale(1)}
+
+.admin-panel{grid-column:1/-1;margin-top:24px;border:1px solid #a77aff66;background:linear-gradient(145deg,#21182e,#12101a)}
+.admin-panel>h3{margin:4px 0 8px;font:700 22px 'Space Grotesk'}
+.admin-actions{display:flex;gap:9px;flex-wrap:wrap;margin:18px 0}
+.admin-stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:14px 0 22px}
+.admin-stat-grid>div{padding:13px;border:1px solid #604b7a;border-radius:11px;background:#ffffff08;display:grid;gap:4px}
+.admin-stat-grid strong{font:700 22px 'Space Grotesk';color:#e6d3ff}
+.admin-stat-grid small,.admin-room-card small{font-size:11px;color:#bcaecb}
+.admin-room-list{display:grid;gap:9px;margin-top:12px}
+.admin-room-card{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px;border:1px solid #4b3c5f;border-radius:11px;background:#0e0b14}
+.admin-room-card>div{display:grid;gap:4px;min-width:0}
+.admin-room-card strong{color:#f5edff}
+.admin-room-card small{overflow-wrap:anywhere}
+button.danger{flex:0 0 auto;padding:9px 12px;border:1px solid #a94c68;border-radius:9px;background:#8f233522;color:#ffb3c3;cursor:pointer}
+.admin-diagnostics{margin-top:16px;padding:13px;border-radius:10px;background:#7de2a00d;border:1px solid #5d987366;color:#c5f4d3;font-size:12px}
+.admin-diagnostics p{margin:6px 0}
+@media(max-width:680px){.admin-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-room-card{align-items:flex-start;flex-direction:column}}
