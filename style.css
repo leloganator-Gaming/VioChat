@@ -443,3 +443,24 @@ body{background:radial-gradient(ellipse at 50% -18%,#46305e 0,transparent 43%),r
  .composition-icon-card{min-height:98px}.composition-count{top:52px;width:30px;height:30px}.composition-count input{width:26px!important;height:26px!important;min-height:26px!important;font-size:12px!important}
 }
 @media(max-width:380px){.composition-icon-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.wolf-config-exit{display:none}}
+
+/* Mise en page plein écran du hub d'attente */
+.wolf-hub.waiting-mode{display:block;position:relative;min-height:850px;overflow:hidden;border-radius:22px;background:#102c22}
+.wolf-hub.waiting-mode>.hub-scene{display:block;width:100%;min-height:850px;padding:0;border:0;background:transparent}
+.wolf-hub.waiting-mode>.hub-panel{position:absolute;z-index:15;left:4%;right:4%;bottom:18px;min-height:0;padding:0;border:0;background:transparent;pointer-events:none}
+.wolf-hub.waiting-mode .hub-chat{min-height:0;padding:0;background:transparent;pointer-events:auto}
+.wolf-hub.waiting-mode .hub-tabs,.wolf-hub.waiting-mode .chat-heading{display:none}
+.wolf-hub.waiting-mode .hub-tab-content{display:block}
+.wolf-hub.waiting-mode .chat-messages{height:100px;max-height:16vh;overflow:auto;margin:0 0 8px;padding:10px;border:0;border-radius:17px;background:#050807e8}
+.wolf-hub.waiting-mode .chat-form{display:flex;gap:8px}
+.wolf-hub.waiting-mode .chat-form input{min-height:50px;border:0;border-radius:99px;background:#101d19;color:#fff}
+.wolf-hub.waiting-mode .chat-form button{width:50px;min-width:50px;height:50px;border-radius:50%;font-size:0}
+.wolf-hub.waiting-mode .chat-form button:after{content:'➤';font-size:20px}
+@media(max-width:700px){
+ .wolf-hub.waiting-mode{min-height:calc(100svh - 70px);margin:-8px -12px 0;border-radius:0}
+ .wolf-hub.waiting-mode>.hub-scene{min-height:calc(100svh - 70px)}
+ .wolf-hub.waiting-mode>.hub-panel{left:4%;right:4%;bottom:12px}
+ .wolf-hub.waiting-mode .chat-messages{height:82px;max-height:12svh}
+ .wolf-hub.waiting-mode .chat-form input{min-height:46px;font-size:12px}
+ .wolf-hub.waiting-mode .chat-form button{width:46px;min-width:46px;height:46px}
+}
