@@ -137,3 +137,5 @@
 .wallet-card small{margin:0;text-align:right}
 .alpha-benefits{margin:10px 0 16px;padding-left:20px;color:#e6d8f3;font-size:12px;line-height:1.9}
 @media(max-width:650px){.composition-fields{grid-template-columns:repeat(2,minmax(0,1fr))}.wallet-card{align-items:flex-start;flex-direction:column}.wallet-card small{text-align:left}}
+
+.empty-rooms{padding:22px;border:1px dashed #66537b;border-radius:14px;background:#ffffff05}.empty-rooms strong,.empty-rooms small{display:block}.empty-rooms small{margin-top:7px;color:var(--muted);line-height:1.6}
