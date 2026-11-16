@@ -67,7 +67,7 @@
     $('admin-refresh').addEventListener('click',loadAdminData);
     $('admin-test-hub').addEventListener('click',async()=>{
       const b=$('admin-test-hub');b.disabled=true;
-      const comp={wolf:1,seer:1,healer:1,villager:2};
+      const comp={wolf:1,seer:1,protector:1,villager:2};
       const r=await sb.rpc('create_game_room',{p_name:'[TEST ADMIN] Hub Wolfanator',p_max_players:5,p_display_name:pseudo(),p_composition:comp,p_visibility:'private'});
       b.disabled=false;
       if(r.error){toast('Création du salon de test impossible : '+r.error.message);return;}
