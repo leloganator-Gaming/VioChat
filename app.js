@@ -10,6 +10,9 @@
   const icons=Object.fromEntries(roleCatalog.map(r=>[r.key,r.icon]));
   const descriptions=Object.fromEntries(roleCatalog.map(r=>[r.key,r.description]));
   const roleKeys=roleCatalog.map(r=>r.key);
+  const wolfRoleKeys=['wolf','black_wolf','talkative_wolf','white_wolf','wolf_hood','literate_wolf'];
+  const seerRoleKeys=['seer','chatty_seer','aura_seer'];
+  const protectorRoleKeys=['healer','guard'];
 
   const auth=document.createElement('div'); auth.className='panel account-panel';
   auth.innerHTML='<div class="auth-tabs"><button type="button" class="auth-tab active" id="wolf-tab-login">Connexion</button><button type="button" class="auth-tab" id="wolf-tab-signup">Créer un compte</button></div><h3 id="wolf-auth-title">Ravi de vous revoir</h3><div class="field-grid auth-fields"><input id="wolf-email" type="email" autocomplete="email" placeholder="Adresse e-mail"><input id="wolf-password" type="password" autocomplete="current-password" placeholder="Mot de passe (6 caractères minimum)"><input id="wolf-pseudo" maxlength="20" minlength="3" placeholder="Pseudo (3 à 20 caractères)" hidden></div><div class="button-row"><button class="primary wide" id="wolf-login">Se connecter</button><button class="primary wide" id="wolf-signup" hidden>Créer mon compte</button><button class="ghost" id="wolf-logout" hidden>Déconnexion</button></div><small id="wolf-auth-status">Connectez-vous pour créer ou rejoindre un salon.</small>';
@@ -181,17 +184,17 @@
   function gameHTML(s){
     const players=s.players||[],alive=players.filter(p=>p.is_alive),role=s.my_role,night=s.phase==='night',day=s.phase==='day',done=s.status==='finished'||s.phase==='finished';
     let desc=night?({wolf:'Choisissez une cible avec les autres loups.',seer:'Choisissez un joueur à examiner.',healer:'Choisissez une personne à protéger.',guard:'Choisissez une personne à protéger (pas la même deux nuits de suite).',witch:'Vous pouvez sauver la cible des loups ou empoisonner un joueur. Chaque potion ne s’utilise qu’une fois.',ancient:'Vous avez deux vies. La première attaque des loups vous blesse ; la seconde peut vous éliminer.',villager:'Vous êtes à l’abri cette nuit. Attendez le matin.'}[role]):'Le village débat. Votez pour la personne que vous pensez être un loup.';
-    const canAct=!done&&s.my_alive&&(night&&['wolf','seer','healer','guard'].includes(role)||day),witchTurn=!done&&s.my_alive&&night&&role==='witch';
-    const targets=alive.filter(p=>p.user_id!==(day||role==='seer'||role==='wolf'||role==='witch'?currentUserId:''));
+    const canAct=!done&&s.my_alive&&(night&&[...wolfRoleKeys,...seerRoleKeys,...protectorRoleKeys].includes(role)||day),witchTurn=!done&&s.my_alive&&night&&role==='witch';
+    const targets=alive.filter(p=>p.user_id!==(day||seerRoleKeys.includes(role)||wolfRoleKeys.includes(role)||role==='witch'?currentUserId:''));
     const label=night?({wolf:'Désigner la cible',seer:'Examiner ce joueur',healer:'Protéger ce joueur',guard:'Protéger ce joueur'}[role]||''):'Voter contre ce joueur';
     const targetHTML=canAct?'<div class="target-grid">'+targets.map(p=>'<button class="target-button" data-target="'+p.user_id+'"><strong>'+esc(p.display_name)+'</strong><small>'+(p.is_host?'👑 Hôte':'Joueur')+' · '+label+'</small></button>').join('')+'</div>':'';
     const rows=players.map(p=>'<div class="player-chip '+(p.is_alive?'':'is-out')+'"><span>'+esc(p.display_name)+(p.is_host?' 👑':'')+'</span><small>'+(p.is_alive?'En jeu':'Éliminé'+(p.revealed_role?' · '+esc(roles[p.revealed_role]||p.revealed_role):''))+'</small></div>').join('');
-    const winner=s.winner==='village'?'Le village a gagné !':s.winner==='loups'?'Les loups-garous ont gagné !':'Partie terminée',personalWin=(role==='wolf'&&s.winner==='loups')||(role!=='wolf'&&s.winner==='village');
+    const winner=s.winner==='village'?'Le village a gagné !':s.winner==='loups'?'Les loups-garous ont gagné !':'Partie terminée',personalWin=(role==='wolf'&&s.winner==='loups')||(!wolfRoleKeys.includes(role)&&s.winner==='village');
     let html='<div class="game-status"><span class="phase-chip">'+(done?'🏁 Partie terminée':night?'🌙 Nuit':'☀️ Jour')+' · Manche '+s.round+'</span><span>'+alive.length+'/'+players.length+' encore en jeu</span></div>';
     html+='<div class="role-card"><div class="role-icon">'+(icons[role]||'🎭')+'</div><div><small>VOTRE RÔLE SECRET</small><h3>'+esc(roles[role]||'En attente')+'</h3><p>'+esc(descriptions[role]||'')+'</p></div></div>';
-    if(role==='wolf'&&s.wolf_team?.length)html+='<p class="team-note">Vos alliés : '+s.wolf_team.map(esc).join(', ')+'</p>';
+    if(wolfRoleKeys.includes(role)&&s.wolf_team?.length)html+='<p class="team-note">Vos alliés : '+s.wolf_team.map(esc).join(', ')+'</p>';
     if(s.last_event)html+='<div class="story-event">'+esc(s.last_event)+'</div>';
-    if(role==='seer'&&s.seer_result)html+='<div class="seer-result">🔮 Votre vision : '+esc(s.seer_result.name)+' est '+esc(roles[s.seer_result.role]||s.seer_result.role)+'.</div>';if(role==='ancient'&&s.my_alive)html+='<div class="seer-result">🧓 Vies restantes : '+Number(s.ancient_state?.lives_remaining||1)+'/2</div>';
+    if(seerRoleKeys.includes(role)&&s.seer_result)html+='<div class="seer-result">🔮 Votre vision : '+esc(s.seer_result.name)+' est '+esc(roles[s.seer_result.role]||s.seer_result.role)+'.</div>';if(role==='ancient'&&s.my_alive)html+='<div class="seer-result">🧓 Vies restantes : '+Number(s.ancient_state?.lives_remaining||1)+'/2</div>';
     if(done)html+='<div class="winner-card"><h3>'+winner+'</h3><p>Les rôles de tous les joueurs sont révélés.</p>'+(personalWin?'<strong class="win">🌙 Vous gagnez 1 Lune !</strong>':'<small>Pas de Lune cette fois. Une victoire vous rapporte 1 Lune.</small>')+'</div>';
     else{html+='<div class="action-area"><h3>'+(night?'Actions de la nuit':'Vote du village')+'</h3><p>'+esc(desc)+'</p>';
       if(canAct)html+='<p class="action-state">'+(s.my_action_submitted?'Votre choix est enregistré. Vous pouvez le modifier avant la fin de la phase.':'Vous n’avez pas encore envoyé votre choix.')+'</p>'+targetHTML;
@@ -229,7 +232,7 @@
       if(key==='discussion'){
         content.innerHTML='<div class="chat-heading"><div><p class="eyebrow">VILLAGE EN DIRECT</p><h3>Discussion de la partie</h3></div><small>Messages du salon</small></div><div class="chat-messages" id="wolf-chat-messages" aria-live="polite"><small>Chargement…</small></div><form class="chat-form" id="wolf-chat-form"><input id="wolf-chat-input" maxlength="500" autocomplete="off" placeholder="Écrire un message…" aria-label="Votre message" required><button class="primary" type="submit">Envoyer</button></form>';
         loadChat();$('wolf-chat-form').addEventListener('submit',sendChat);
-        if(context.state?.my_role==='wolf'&&context.state?.my_alive){
+        if(wolfRoleKeys.includes(context.state?.my_role)&&context.state?.my_alive){
           content.insertAdjacentHTML('beforeend','<section class="wolf-private-chat"><div class="chat-heading"><div><p class="eyebrow">CANAL CONFIDENTIEL</p><h3>🐺 Discussion des loups</h3></div><button type="button" class="ghost" id="wolf-private-refresh">Actualiser</button></div><div class="chat-messages private-messages" id="wolf-private-chat-messages"><small>Chargement…</small></div><form class="chat-form" id="wolf-private-chat-form"><input id="wolf-private-chat-input" maxlength="500" autocomplete="off" placeholder="Message réservé aux loups…" aria-label="Message privé aux loups" required><button class="primary" type="submit">Envoyer</button></form><small>Seuls les loups encore en jeu peuvent lire et envoyer ces messages.</small></section>');
           loadWolfChat();
           $('wolf-private-refresh').addEventListener('click',loadWolfChat);
