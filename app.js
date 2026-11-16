@@ -4,7 +4,7 @@
   const toast = s => { const el=$('toast'); el.textContent=s; el.classList.add('show'); clearTimeout(window.__wolfToast); window.__wolfToast=setTimeout(()=>el.classList.remove('show'),4200); };
   const cfg=window.WOLFANATOR_CONFIG||{}, configured=!!(cfg.supabaseUrl&&cfg.supabasePublishableKey&&window.supabase);
   const sb=configured?window.supabase.createClient(cfg.supabaseUrl,cfg.supabasePublishableKey):null;
-  let currentRoom=null,channel=null,profileName='',currentUserId='',refreshing=false;
+  let currentRoom=null,channel=null,profileName='',currentUserId='',refreshing=false,isAlpha=false;
   const roles={wolf:'Loup-garou',seer:'Voyante',healer:'Protecteur',villager:'Villageois'};
   const icons={wolf:'🐺',seer:'🔮',healer:'🛡️',villager:'🏡'};
   const descriptions={wolf:'Chaque nuit, choisissez une personne à éliminer. Les loups gagnent lorsqu’ils sont aussi nombreux que les autres joueurs encore en vie.',seer:'Chaque nuit, examinez un joueur pour découvrir secrètement son rôle. Aidez le village à trouver les loups.',healer:'Chaque nuit, choisissez une personne à protéger. Si les loups la ciblent, elle survit.',villager:'Vous n’avez pas de pouvoir nocturne. Le jour, discutez et votez pour éliminer les loups.'};
@@ -16,7 +16,7 @@
   profile.innerHTML='<p class="eyebrow">VOTRE IDENTITÉ</p><h3>Mon profil joueur</h3><div class="field-grid"><input id="wolf-profile-name" maxlength="20" minlength="3" placeholder="Votre pseudo"><select id="wolf-avatar" aria-label="Avatar"><option value="🐺">🐺 Loup</option><option value="🦊">🦊 Renard</option><option value="🦉">🦉 Hibou</option><option value="🐱">🐱 Chat</option><option value="🐻">🐻 Ours</option><option value="🦇">🦇 Chauve-souris</option><option value="👻">👻 Fantôme</option><option value="🧙">🧙 Mage</option></select><button class="secondary" id="wolf-save-profile">Enregistrer le profil</button></div><div class="profile-preview" id="wolf-profile-preview"><span>🐺</span><strong>Votre profil</strong></div><small>Votre pseudo et votre avatar seront affichés dans les salons.</small><div id="wolf-wallet" class="wallet-card"><strong>🌙 Chargement des Lunes…</strong></div><div id="wolf-stats" class="stats-panel"><small>Chargement des statistiques…</small></div>';
   $('lobby').appendChild(profile);
   const premium=document.createElement('div');premium.className='panel premium-panel';
-  premium.innerHTML='<p class="eyebrow">STATUT PREMIUM</p><h3>🐺 Loup Alpha</h3><div class="premium-price">10 🌙 <small>/ 30 jours</small></div><p>Les avantages Alpha de Wolfanator :</p><ul class="alpha-benefits"><li>Badge Loup Alpha sur votre profil</li><li>Avatars et apparences réservés aux Alpha</li><li>Accès prioritaire aux salons Alpha</li><li>Récompenses et événements Alpha exclusifs</li><li>Accès au rôle Loup Alpha lorsqu’il est activé dans une composition</li></ul><div id="wolf-premium-status" class="premium-status">Vérification de votre accès…</div>';
+  premium.innerHTML='<p class="eyebrow">STATUT PREMIUM</p><h3>🐺 Loup Alpha</h3><div class="premium-price">10 🌙 <small>/ 30 jours</small></div><p>Les avantages Alpha de Wolfanator :</p><ul class="alpha-benefits"><li>Badge Loup Alpha sur votre profil</li><li>Statut Alpha et date d’expiration visibles</li><li>Avantages et options Alpha ajoutés progressivement dans Wolfanator</li></ul><div id="wolf-premium-status" class="premium-status">Vérification de votre accès…</div>';
   $('lobby').appendChild(premium);
   const panel=document.createElement('div'); panel.className='panel room-panel';
   panel.innerHTML='<p class="eyebrow">SALONS EN LIGNE</p><h3>Salons disponibles</h3><div class="field-grid room-fields"><input id="wolf-room-name" maxlength="40" placeholder="Nom du salon"><select id="wolf-room-max"><option value="5">5 joueurs</option><option value="8">8 joueurs</option><option value="10">10 joueurs</option><option value="12" selected>12 joueurs</option><option value="15">15 joueurs</option><option value="20">20 joueurs</option></select><button class="secondary" id="wolf-create">Créer un salon</button></div><div class="field-grid room-fields"><input id="wolf-room-code" maxlength="8" placeholder="Code du salon" autocomplete="off"><button class="secondary" id="wolf-join">Rejoindre avec un code</button></div><div id="wolf-rooms" class="room-list"><small>Les salons apparaîtront ici.</small></div><div id="wolf-current-room" class="current-room"></div>';
@@ -43,7 +43,8 @@
     const box=$('wolf-premium-status');if(!box)return;
     const r=await sb.from('user_entitlements').select('entitlement_key,expires_at').eq('user_id',currentUserId).eq('entitlement_key','wolf_alpha').maybeSingle();
     if(r.error){box.textContent='Statut indisponible.';return;}
-    const active=!!r.data&&(!r.data.expires_at||new Date(r.data.expires_at)>new Date());
+    const active=!!r.data&&(!r.data.expires_at||new Date(r.data.expires_at)>new Date());isAlpha=active;
+    const preview=$('wolf-profile-preview');if(preview){const old=preview.querySelector('.alpha-badge');if(old)old.remove();if(active)preview.insertAdjacentHTML('beforeend','<small class="alpha-badge">🐺 LOUP ALPHA</small>');}
     box.innerHTML=active?'<strong class="premium-active">✓ Loup Alpha activé sur ce compte</strong><small>'+(r.data.expires_at?'Valable jusqu’au '+new Date(r.data.expires_at).toLocaleDateString('fr-FR'):'Accès administrateur permanent')+'</small>':'<strong>Débloquez les avantages Alpha</strong><button class="secondary wide" id="wolf-buy-alpha">Activer pour 10 Lunes</button><small>10 Lunes sont déduites de votre solde pour 30 jours.</small>';
     const buy=$('wolf-buy-alpha');if(buy)buy.addEventListener('click',async()=>{buy.disabled=true;const a=await sb.rpc('buy_wolf_alpha_with_moons');if(a.error){toast(a.error.message);buy.disabled=false;return;}toast('Loup Alpha activé pour 30 jours !');await loadProfile({id:currentUserId});await loadPremium();});
   }
@@ -67,7 +68,7 @@
     const u=await user();if(!u)return;const n=$('wolf-profile-name').value.trim();
     if(n.length<3||n.length>20)return toast('Le pseudo doit contenir entre 3 et 20 caractères.');
     const emoji=$('wolf-avatar').value;const r=await sb.from('profiles').upsert({id:u.id,username:n,avatar:{emoji}},{onConflict:'id'});
-    if(r.error)return toast(r.error.message);profileName=n;$('wolf-pseudo').value=n;$('wolf-profile-preview').innerHTML='<span>'+esc(emoji)+'</span><strong>'+esc(n)+'</strong>';toast('Profil enregistré.');
+    if(r.error)return toast(r.error.message);profileName=n;$('wolf-pseudo').value=n;$('wolf-profile-preview').innerHTML='<span>'+esc(emoji)+'</span><strong>'+esc(n)+'</strong>'+(isAlpha?'<small class="alpha-badge">🐺 LOUP ALPHA</small>':'');toast('Profil enregistré.');
   }
   async function loadRooms(){
     const r=await sb.from('game_rooms').select('id,room_code,name,status,max_players,room_players(count)').in('status',['waiting','playing']).order('created_at',{ascending:false}).limit(30);
