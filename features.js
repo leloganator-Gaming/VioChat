@@ -29,7 +29,7 @@
       const tab=e.target.closest('[data-wx-tab]');if(tab){active=tab.dataset.wxTab;render();}
       const action=e.target.closest('[data-wx-action]');if(action)handleAction(action.dataset.wxAction,action.dataset);
     });
-    $('#wolf-extra-app').addEventListener('submit',e=>{if(e.target.matches('[data-wx-form]')){e.preventDefault();handleForm(e.target);}});
+    $('#wolf-extra-app').addEventListener('submit',e=>{if(e.target.matches('[data-wx-form]')){e.preventDefault();if(e.target.dataset.wxForm==='report')handleReport(e.target);else handleForm(e.target);}});
     const syncSession=async(nextUser)=>{user=nextUser||null;profile=null;if(user){await loadProfile();await render();}else{profile=null;const balance=$('#wx-balance');if(balance)balance.textContent='🌙 Connectez-vous';const pane=$('#wx-content');if(pane)pane.innerHTML='<p>Connectez-vous pour accéder aux fonctions communautaires.</p>';}};db.auth.onAuthStateChange((_event,session)=>{setTimeout(()=>syncSession(session?.user||null),0);});db.auth.getUser().then(({data})=>syncSession(data.user));
   }
   async function loadProfile(){
@@ -85,6 +85,16 @@
   }
   function reportPane(pane){
     pane.innerHTML='<div class="wx-section-title"><div><h3>Signaler un comportement</h3><p>Transmets un signalement à l’administration Wolfanator.</p></div></div><form class="wx-form wx-bio-form" data-wx-form="report"><label for="wx-report-user">Pseudo du joueur</label><input id="wx-report-user" name="username" minlength="3" maxlength="20" placeholder="Pseudo exact" required><label for="wx-report-reason">Motif</label><select id="wx-report-reason" name="reason"><option value="harassment">Harcèlement</option><option value="spam">Spam</option><option value="cheating">Triche</option><option value="inappropriate_name">Pseudo inapproprié</option><option value="other">Autre</option></select><label for="wx-report-details">Détails (facultatif)</label><textarea id="wx-report-details" name="details" maxlength="1000" placeholder="Explique brièvement ce qui s’est passé…"></textarea><button class="wx-primary">Envoyer le signalement</button></form>';
+  }
+  async function handleReport(form){
+    const fd=new FormData(form),username=String(fd.get('username')||'').trim();
+    const found=await db.from('profiles').select('id').ilike('username',username).maybeSingle();
+    if(found.error||!found.data)return notify('Joueur introuvable.');
+    if(found.data.id===user.id)return notify('Vous ne pouvez pas vous signaler vous-même.');
+    const result=await db.from('wolfanator_reports').insert({reporter_id:user.id,reported_user_id:found.data.id,reason:String(fd.get('reason')||'other'),details:String(fd.get('details')||'').trim()});
+    if(result.error)return notify(result.error.message);
+    notify('Signalement transmis à la modération.');
+    form.reset();
   }
   async function shopPane(pane){
     const [{data:items,error},{data:owned}]=await Promise.all([
