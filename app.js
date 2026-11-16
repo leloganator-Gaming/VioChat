@@ -166,7 +166,7 @@
   }
   function gameHTML(s){
     const players=s.players||[],alive=players.filter(p=>p.is_alive),role=s.my_role,night=s.phase==='night',day=s.phase==='day',done=s.status==='finished'||s.phase==='finished';
-    let desc=night?({wolf:'Choisissez une cible avec les autres loups.',seer:'Choisissez un joueur à examiner.',healer:'Choisissez une personne à protéger.',witch:'Vous pouvez sauver la cible des loups ou empoisonner un joueur. Chaque potion ne s’utilise qu’une fois.',villager:'Vous êtes à l’abri cette nuit. Attendez le matin.'}[role]):'Le village débat. Votez pour la personne que vous pensez être un loup.';
+    let desc=night?({wolf:'Choisissez une cible avec les autres loups.',seer:'Choisissez un joueur à examiner.',healer:'Choisissez une personne à protéger.',witch:'Vous pouvez sauver la cible des loups ou empoisonner un joueur. Chaque potion ne s’utilise qu’une fois.',ancient:'Vous avez deux vies. La première attaque des loups vous blesse ; la seconde peut vous éliminer.',villager:'Vous êtes à l’abri cette nuit. Attendez le matin.'}[role]):'Le village débat. Votez pour la personne que vous pensez être un loup.';
     const canAct=!done&&s.my_alive&&(night&&['wolf','seer','healer'].includes(role)||day),witchTurn=!done&&s.my_alive&&night&&role==='witch'&&(s.witch_state?.heal_available||s.witch_state?.poison_available);
     const targets=alive.filter(p=>p.user_id!==(day||role==='seer'||role==='wolf'||role==='witch'?currentUserId:''));
     const label=night?({wolf:'Désigner la cible',seer:'Examiner ce joueur',healer:'Protéger ce joueur'}[role]||''):'Voter contre ce joueur';
@@ -177,7 +177,7 @@
     html+='<div class="role-card"><div class="role-icon">'+(icons[role]||'🎭')+'</div><div><small>VOTRE RÔLE SECRET</small><h3>'+esc(roles[role]||'En attente')+'</h3><p>'+esc(descriptions[role]||'')+'</p></div></div>';
     if(role==='wolf'&&s.wolf_team?.length)html+='<p class="team-note">Vos alliés : '+s.wolf_team.map(esc).join(', ')+'</p>';
     if(s.last_event)html+='<div class="story-event">'+esc(s.last_event)+'</div>';
-    if(role==='seer'&&s.seer_result)html+='<div class="seer-result">🔮 Votre vision : '+esc(s.seer_result.name)+' est '+esc(roles[s.seer_result.role]||s.seer_result.role)+'.</div>';
+    if(role==='seer'&&s.seer_result)html+='<div class="seer-result">🔮 Votre vision : '+esc(s.seer_result.name)+' est '+esc(roles[s.seer_result.role]||s.seer_result.role)+'.</div>';if(role==='ancient'&&s.my_alive)html+='<div class="seer-result">🧓 Vies restantes : '+Number(s.ancient_state?.lives_remaining||1)+'/2</div>';
     if(done)html+='<div class="winner-card"><h3>'+winner+'</h3><p>Les rôles de tous les joueurs sont révélés.</p>'+(personalWin?'<strong class="win">🌙 Vous gagnez 1 Lune !</strong>':'<small>Pas de Lune cette fois. Une victoire vous rapporte 1 Lune.</small>')+'</div>';
     else{html+='<div class="action-area"><h3>'+(night?'Actions de la nuit':'Vote du village')+'</h3><p>'+esc(desc)+'</p>';
       if(canAct)html+='<p class="action-state">'+(s.my_action_submitted?'Votre choix est enregistré. Vous pouvez le modifier avant la fin de la phase.':'Vous n’avez pas encore envoyé votre choix.')+'</p>'+targetHTML;
@@ -264,7 +264,7 @@
         $('wolf-start')?.addEventListener('click',async()=>{const r=await sb.rpc('start_game_room',{p_room_id:id});if(r.error)toast(r.error.message);else{toast('La partie commence. Les rôles ont été distribués.');await refreshRoom();}});
         $('wolf-leave')?.addEventListener('click',async()=>{const r=await sb.rpc('leave_game_room',{p_room_id:id});if(r.error)toast(r.error.message);else closeRoom();});
       }else{
-        const r=await sb.rpc('get_my_game_state',{p_room_id:id});if(r.error){box.textContent=r.error.message;return;}if(r.data.my_role==='witch'){const w=await sb.rpc('get_my_witch_state',{p_room_id:id});if(w.error){box.textContent=w.error.message;return;}r.data.witch_state=w.data||{};}
+        const r=await sb.rpc('get_my_game_state',{p_room_id:id});if(r.error){box.textContent=r.error.message;return;}if(r.data.my_role==='witch'){const w=await sb.rpc('get_my_witch_state',{p_room_id:id});if(w.error){box.textContent=w.error.message;return;}r.data.witch_state=w.data||{};}if(r.data.my_role==='ancient'){const an=await sb.rpc('get_my_ancient_state',{p_room_id:id});if(an.error){box.textContent=an.error.message;return;}r.data.ancient_state=an.data||{};}
         box.innerHTML='<div class="wolf-hub"><section class="hub-scene">'+gameHTML(r.data)+'</section><aside class="hub-panel" id="wolf-hub-panel"></aside></div>';attachChat($('wolf-hub-panel'),{waiting:false,state:r.data});if(r.data.status==='finished')await loadProfile(u);
         box.querySelectorAll('[data-target]').forEach(b=>b.addEventListener('click',async()=>{b.disabled=true;const a=await sb.rpc('submit_game_action',{p_room_id:id,p_target_id:b.dataset.target});if(a.error)toast(a.error.message);else{toast('Choix enregistré.');await refreshRoom();}}));
         box.querySelectorAll('[data-witch-action]').forEach(b=>b.addEventListener('click',async()=>{b.disabled=true;const a=await sb.rpc('submit_witch_action',{p_room_id:id,p_action:b.dataset.witchAction,p_target_id:null});if(a.error){toast(a.error.message);b.disabled=false;}else{toast(b.dataset.witchAction==='skip'?'Vous passez cette nuit.':'Potion utilisée.');await refreshRoom();}}));
