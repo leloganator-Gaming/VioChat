@@ -361,6 +361,8 @@
           Promise.resolve().then(async()=>{
             const botRun=await sb.rpc('admin_run_wolfanator_test_bots',{p_room_id:id});
             if(botRun.error){autoBotPhaseKey='';toast('Les bots n’ont pas pu jouer : '+botRun.error.message);return;}
+            const lupixTurn=await sb.functions.invoke('lupix-turn',{body:{room_id:id}});
+            if(lupixTurn.error)console.warn('Tour Lupix indisponible :',lupixTurn.error.message);
             await refreshRoom();
           });
         }
