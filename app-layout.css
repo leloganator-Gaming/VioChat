@@ -114,3 +114,82 @@ main{width:min(100%,var(--app-width));margin:0 auto;padding:0 22px}
   .target-grid{grid-template-columns:1fr}
   .wolf-config-title strong{font-size:13px}
 }
+
+/* Correctifs mobile dédiés aux listes de salons et à l'écran d'un salon */
+@media(max-width:700px){
+  #lobby{width:100%;min-width:0}
+  #lobby .room-panel{
+    width:100%;min-width:0;box-sizing:border-box;
+    margin:12px 0 24px;padding:12px;
+    overflow:hidden;border-radius:16px;
+  }
+  #lobby .room-panel>h3{font-size:19px;line-height:1.2;margin:4px 0 13px}
+  #lobby .room-panel>.room-fields:first-of-type{
+    display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    gap:8px;width:100%;min-width:0;
+  }
+  #lobby .room-panel>.room-fields:first-of-type>*{width:100%;min-width:0;max-width:100%;box-sizing:border-box}
+  #lobby .room-panel>.room-fields:first-of-type input{grid-column:1/-1}
+  #lobby .room-panel .composition-editor{
+    width:100%;min-width:0;box-sizing:border-box;
+    margin:12px 0;padding:11px;border-radius:13px;
+  }
+  #lobby .room-panel .composition-editor h4{font-size:15px;margin:0 0 6px}
+  #lobby .room-panel .composition-editor>p{font-size:11px;line-height:1.4;margin:0 0 10px}
+  #lobby .room-panel .composition-fields{width:100%;min-width:0;max-height:390px;overflow-y:auto;overscroll-behavior:contain;padding:2px 3px 8px}
+  #lobby .room-panel .composition-group{margin:9px 0}
+  #lobby .room-panel .composition-group h5{font-size:13px;margin:0 0 7px}
+  #lobby .room-panel .composition-icon-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
+  #lobby .room-panel .composition-icon-card{min-width:0;min-height:88px;padding:5px 2px!important;overflow:hidden}
+  #lobby .room-panel .composition-role-icon{width:48px;height:48px;font-size:25px}
+  #lobby .room-panel .composition-icon-card strong{font-size:9px;overflow-wrap:anywhere}
+  #lobby .room-panel .composition-count{top:42px;width:27px;height:27px}
+  #lobby .room-panel .composition-count input{width:23px!important;height:23px!important;min-height:23px!important;font-size:11px!important}
+  #lobby .room-panel .composition-total{position:sticky;bottom:0;z-index:3;padding:9px 7px;margin-top:5px;border-radius:9px;background:#211a2cf5;font-size:11px;text-align:center}
+  #lobby .room-panel>.button-row{display:grid;grid-template-columns:1fr;margin:10px 0}
+  #lobby .room-panel #wolf-create{width:100%;min-height:46px;white-space:normal;line-height:1.25}
+  #lobby .room-panel>.room-fields:nth-of-type(2){display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px;width:100%;min-width:0}
+  #lobby .room-panel>.room-fields:nth-of-type(2)>*{min-width:0;max-width:100%;box-sizing:border-box}
+  #wolf-rooms{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;width:100%;min-width:0;margin-top:12px}
+  #wolf-rooms .room-card{
+    display:flex;align-items:center;justify-content:space-between;gap:9px;
+    width:100%;min-width:0;box-sizing:border-box;padding:11px;
+    border-radius:12px;overflow:hidden;
+  }
+  #wolf-rooms .room-card>span{display:grid;gap:5px;flex:1;min-width:0}
+  #wolf-rooms .room-card strong{font-size:13px;overflow-wrap:anywhere}
+  #wolf-rooms .room-card small{font-size:10px;line-height:1.35;overflow-wrap:anywhere}
+  #wolf-rooms .room-card button{flex:0 0 auto;min-width:82px;min-height:40px;padding:8px;font-size:11px}
+  #wolf-current-room{width:100%;min-width:0;max-width:100%;box-sizing:border-box;margin-top:12px;padding-top:12px;overflow:hidden}
+  #wolf-current-room .room-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+  #wolf-current-room .room-heading h3{font-size:16px;margin:0}
+  #wolf-current-room .room-heading .button-row{display:flex;gap:6px;flex-wrap:wrap}
+  #wolf-current-room .room-heading button{min-height:38px;padding:7px 10px;font-size:10px}
+  #wolf-current-room #wolf-room-detail{width:100%;min-width:0;max-width:100%;overflow:hidden}
+  #wolf-current-room .wolf-hub{display:flex;flex-direction:column;gap:10px;width:100%;min-width:0}
+  #wolf-current-room .hub-scene,#wolf-current-room .hub-panel{width:100%;min-width:0;max-width:100%;box-sizing:border-box}
+  #wolf-current-room .hub-panel{position:static;max-height:none;overflow:visible}
+  #wolf-current-room .hub-chat{height:auto;min-height:0;max-height:none;padding:9px}
+  #wolf-current-room .hub-tabs{display:flex;gap:5px;overflow-x:auto;white-space:nowrap;scrollbar-width:none}
+  #wolf-current-room .hub-tabs>*{flex:0 0 auto;min-height:38px;padding:8px 10px;font-size:10px}
+  #wolf-current-room .hub-tab-content{min-width:0;overflow:visible}
+  #wolf-current-room .hub-tab-content .chat-messages{width:100%;min-width:0;height:clamp(150px,28svh,230px);min-height:150px;box-sizing:border-box}
+  #wolf-current-room .chat-form{display:flex;gap:7px;position:sticky;bottom:calc(68px + env(safe-area-inset-bottom));padding:7px 0;background:#171321}
+  #wolf-current-room .chat-form input{flex:1;min-width:0;min-height:44px;font-size:13px}
+  #wolf-current-room .chat-form button{flex:0 0 auto;min-height:44px;padding:8px 11px;font-size:11px}
+  #wolf-current-room .wolf-landscape-scene{height:clamp(320px,48svh,430px);min-height:320px}
+  #wolf-current-room .wolf-scene-bottom{margin:0;padding:10px}
+  #wolf-current-room .wolf-scene-buttons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+  #wolf-current-room .wolf-scene-buttons button{min-width:0;min-height:40px;white-space:normal}
+  #wolf-current-room .wolf-scene-invite{overflow-wrap:anywhere}
+  #wolf-current-room .game-player-stage{min-height:330px}
+}
+@media(max-width:390px){
+  #lobby .room-panel>.room-fields:first-of-type{grid-template-columns:1fr}
+  #lobby .room-panel>.room-fields:first-of-type input{grid-column:auto}
+  #lobby .room-panel>.room-fields:nth-of-type(2){grid-template-columns:1fr}
+  #lobby .room-panel .composition-icon-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  #wolf-rooms .room-card{align-items:stretch;flex-direction:column}
+  #wolf-rooms .room-card button{width:100%}
+  #wolf-current-room .wolf-scene-buttons{grid-template-columns:1fr}
+}
