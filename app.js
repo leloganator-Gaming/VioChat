@@ -354,9 +354,9 @@
       }else{
         const r=await sb.rpc('get_my_game_state',{p_room_id:id});if(r.error){box.textContent=r.error.message;return;}
         box.innerHTML='<div class="wolf-hub"><section class="hub-scene">'+gameHTML(r.data)+'</section><aside class="hub-panel" id="wolf-hub-panel"></aside></div>';attachChat($('wolf-hub-panel'),{waiting:false,state:r.data});if(r.data.status==='finished')await loadProfile(u);box.querySelector('#wolf-run-bots')?.addEventListener('click',async()=>{const b=$('wolf-run-bots');b.disabled=true;const result=await sb.rpc('admin_run_wolfanator_test_bots',{p_room_id:id});b.disabled=false;if(result.error){toast('Erreur des bots : '+result.error.message);return;}toast(result.data?.message||'Les bots ont joué.');await refreshRoom();});
-        const botMatch=String(r.data.room_name||'').startsWith('[SOLO]')||String(r.data.room_name||'').startsWith('[TEST ADMIN]')||Number(r.data.settings?.lupix_count||0)>0;
+        const hasLupix=(r.data.players||[]).some(p=>String(p.display_name||'').startsWith('Bot Lupix'));const botMatch=String(r.data.room_name||'').startsWith('[SOLO]')||String(r.data.room_name||'').startsWith('[TEST ADMIN]')||hasLupix;
         const botPhaseKey=id+':'+r.data.phase+':'+r.data.round;
-        if(botMatch&&r.data.status==='playing'&&context.room?.host_id===currentUserId&&autoBotPhaseKey!==botPhaseKey){
+        if(botMatch&&r.data.status==='playing'&&r.data.is_host===true&&autoBotPhaseKey!==botPhaseKey){
           autoBotPhaseKey=botPhaseKey;
           Promise.resolve().then(async()=>{
             const botRun=await sb.rpc('admin_run_wolfanator_test_bots',{p_room_id:id});
