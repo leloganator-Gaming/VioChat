@@ -464,3 +464,68 @@ body{background:radial-gradient(ellipse at 50% -18%,#46305e 0,transparent 43%),r
  .wolf-hub.waiting-mode .chat-form input{min-height:46px;font-size:12px}
  .wolf-hub.waiting-mode .chat-form button{width:46px;min-width:46px;height:46px}
 }
+
+/* Chat compact : ne doit jamais absorber la hauteur du hub */
+#wolf-current-room .hub-panel,
+#wolf-current-room .hub-chat,
+#wolf-current-room .hub-tab-content,
+#wolf-current-room .wolf-private-chat{
+  min-height:0!important;
+  height:auto!important;
+  max-height:none!important;
+  flex:0 0 auto!important;
+}
+#wolf-current-room .hub-chat{display:flex!important;flex-direction:column!important}
+#wolf-current-room .hub-tab-content .chat-messages,
+#wolf-current-room .chat-messages{
+  display:flex!important;
+  flex:0 0 auto!important;
+  height:clamp(105px,19svh,165px)!important;
+  min-height:105px!important;
+  max-height:165px!important;
+  overflow-y:auto!important;
+  overscroll-behavior:contain;
+  margin:8px 0!important;
+  padding:9px!important;
+  border-radius:12px!important;
+  background:#11131bd9!important;
+  border:1px solid #ffffff16!important;
+}
+#wolf-current-room .chat-heading{margin:5px 0!important}
+#wolf-current-room .chat-heading h3{font-size:15px!important}
+#wolf-current-room .chat-form{
+  position:relative!important;
+  bottom:auto!important;
+  flex:0 0 auto!important;
+  margin:0!important;
+  padding:5px 0!important;
+  background:transparent!important;
+}
+#wolf-current-room .chat-form input{min-height:42px!important}
+#wolf-current-room .wolf-private-chat{
+  margin-top:12px!important;
+  padding:10px!important;
+  border-radius:12px!important;
+  background:#171321!important;
+}
+#wolf-current-room .wolf-private-chat .chat-messages{
+  height:100px!important;
+  min-height:80px!important;
+  max-height:110px!important;
+}
+@media(max-width:700px){
+  #wolf-current-room .hub-tabs{position:relative!important;top:auto!important}
+  #wolf-current-room .hub-tab-content .chat-messages,
+  #wolf-current-room .chat-messages{
+    height:clamp(90px,16svh,125px)!important;
+    min-height:90px!important;
+    max-height:125px!important;
+    margin:6px 0!important;
+    padding:7px!important;
+  }
+  #wolf-current-room .chat-message{max-width:92%;padding:7px 9px;font-size:12px}
+  #wolf-current-room .chat-message p{font-size:12px;overflow-wrap:anywhere}
+  #wolf-current-room .chat-heading small{font-size:9px}
+  #wolf-current-room .chat-form{display:flex!important;flex-direction:row!important;gap:6px!important}
+  #wolf-current-room .chat-form button{width:auto!important;min-width:68px!important;min-height:40px!important}
+}
