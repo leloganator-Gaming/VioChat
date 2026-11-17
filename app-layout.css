@@ -210,3 +210,47 @@ main{width:min(100%,var(--app-width));margin:0 auto;padding:0 22px}
 #wolf-run-bots{border:1px solid #6c5be8;background:linear-gradient(135deg,#30265c,#5140a0);color:#fff;font-weight:800}
 #wolf-run-bots:disabled{opacity:.55;cursor:wait}
 @media(max-width:700px){.host-controls{display:grid;grid-template-columns:1fr;width:100%}.host-controls button{width:100%;min-height:44px}}
+
+
+/* Hub Wolfanator : largeur complète sur ordinateur et espace lisible sur mobile */
+@media (min-width: 901px){
+  main{width:100%;max-width:none;padding-left:clamp(22px,2.5vw,48px);padding-right:clamp(22px,2.5vw,48px)}
+  #lobby{width:100%;max-width:none}
+  #lobby .room-panel{width:100%;max-width:none}
+  #wolf-current-room{width:100%;max-width:none}
+  #wolf-current-room .wolf-hub{width:100%;grid-template-columns:minmax(0,1.65fr) minmax(360px,.8fr);gap:20px}
+  #wolf-current-room .hub-scene,#wolf-current-room .hub-panel{min-width:0}
+  #wolf-current-room .hub-chat{min-height:calc(100svh - 150px);height:auto;max-height:none}
+  #wolf-current-room .hub-tab-content .chat-messages{min-height:320px;max-height:52svh}
+}
+@media (max-width:700px){
+  #lobby{width:100%;max-width:none;padding-left:8px;padding-right:8px}
+  #lobby .room-panel,#wolf-current-room{width:100%;max-width:none}
+  #wolf-current-room .wolf-hub{width:100%;gap:12px}
+  #wolf-current-room .wolf-hub.waiting-mode{min-height:calc(100svh - 58px);margin:-8px -8px 0}
+  #wolf-current-room .wolf-hub.waiting-mode>.hub-scene{min-height:calc(100svh - 58px)}
+  #wolf-current-room .wolf-hub.waiting-mode>.hub-panel,
+  #wolf-current-room .wolf-hub:not(.waiting-mode)>.hub-panel{
+    width:94%!important;max-width:none!important;left:3%!important;right:3%!important;
+    bottom:12px!important;box-sizing:border-box!important
+  }
+  #wolf-current-room .wolf-hub:not(.waiting-mode)>.hub-panel{position:relative!important;left:auto!important;right:auto!important;bottom:auto!important}
+  #wolf-current-room .wolf-hub .hub-chat{width:100%;min-height:0}
+  #wolf-current-room .wolf-hub .chat-messages,
+  #wolf-current-room .wolf-hub .hub-tab-content .chat-messages{
+    width:100%!important;height:clamp(240px,38svh,360px)!important;
+    min-height:220px!important;max-height:42svh!important
+  }
+  #wolf-current-room .wolf-hub.waiting-mode .chat-messages{
+    height:clamp(150px,25svh,230px)!important;max-height:30svh!important
+  }
+  #wolf-current-room .wolf-hub .chat-form{width:100%;gap:8px}
+  #wolf-current-room .wolf-hub .chat-form input{min-height:46px!important;font-size:14px!important}
+  #wolf-current-room .wolf-hub .chat-form button{min-height:46px!important;flex-basis:46px!important;width:46px!important;min-width:46px!important}
+}
+@media(max-width:390px){
+  #wolf-current-room .wolf-hub.waiting-mode>.hub-panel,
+  #wolf-current-room .wolf-hub:not(.waiting-mode)>.hub-panel{
+    width:94%!important;left:3%!important;right:3%!important;bottom:10px!important
+  }
+}
