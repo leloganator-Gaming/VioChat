@@ -707,3 +707,43 @@ body{background:radial-gradient(ellipse at 50% -18%,#46305e 0,transparent 43%),r
   }
   #wolf-current-room .wolf-hub .chat-form{position:relative!important;bottom:auto!important;background:transparent!important}
 }
+
+
+/* Fixe le chat flottant dans la zone de jeu, y compris pendant le jour */
+#wolf-current-room .wolf-hub:not(.waiting-mode){
+  position:relative!important;
+  min-height:720px!important;
+  overflow:hidden!important;
+}
+#wolf-current-room .wolf-hub:not(.waiting-mode)>.hub-panel{
+  top:30%!important;
+  right:18px!important;
+  bottom:22px!important;
+  width:min(340px,29%)!important;
+  max-height:62%!important;
+  z-index:30!important;
+  display:block!important;
+  visibility:visible!important;
+  opacity:1!important;
+}
+#wolf-current-room .wolf-hub:not(.waiting-mode) .hub-chat,
+#wolf-current-room .wolf-hub:not(.waiting-mode) .hub-tab-content{
+  display:flex!important;
+  visibility:visible!important;
+  opacity:1!important;
+}
+#wolf-current-room .wolf-hub:not(.waiting-mode) .hub-tab-content{display:block!important}
+@media(max-width:700px){
+  #wolf-current-room .wolf-hub:not(.waiting-mode){
+    min-height:680px!important;
+    overflow:hidden!important;
+  }
+  #wolf-current-room .wolf-hub:not(.waiting-mode)>.hub-panel{
+    top:auto!important;
+    right:8px!important;
+    bottom:112px!important;
+    left:auto!important;
+    width:min(43%,190px)!important;
+    max-height:34%!important;
+  }
+}
