@@ -234,7 +234,7 @@ main{width:min(100%,var(--app-width));margin:0 auto;padding:0 22px}
     width:94%!important;max-width:none!important;left:3%!important;right:3%!important;
     bottom:12px!important;box-sizing:border-box!important
   }
-  #wolf-current-room .wolf-hub:not(.waiting-mode)>.hub-panel{position:relative!important;left:auto!important;right:auto!important;bottom:auto!important}
+  #wolf-current-room .wolf-hub:not(.waiting-mode)>.hub-panel{position:relative!important;left:auto!important;right:auto!important;bottom:auto!important;width:100%!important}
   #wolf-current-room .wolf-hub .hub-chat{width:100%;min-height:0}
   #wolf-current-room .wolf-hub .chat-messages,
   #wolf-current-room .wolf-hub .hub-tab-content .chat-messages{
@@ -249,8 +249,8 @@ main{width:min(100%,var(--app-width));margin:0 auto;padding:0 22px}
   #wolf-current-room .wolf-hub .chat-form button{min-height:46px!important;flex-basis:46px!important;width:46px!important;min-width:46px!important}
 }
 @media(max-width:390px){
-  #wolf-current-room .wolf-hub.waiting-mode>.hub-panel,
-  #wolf-current-room .wolf-hub:not(.waiting-mode)>.hub-panel{
+  #wolf-current-room .wolf-hub.waiting-mode>.hub-panel{
     width:94%!important;left:3%!important;right:3%!important;bottom:10px!important
   }
+  #wolf-current-room .wolf-hub:not(.waiting-mode)>.hub-panel{width:100%!important}
 }
