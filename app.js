@@ -33,8 +33,22 @@
     const box=$('wolf-composition-fields');if(!box)return;
     const classic=['villager','wolf'];
     const groups=[['Rôles classiques',classic],['Rôles spéciaux',roleKeys.filter(k=>!classic.includes(k))]];
-    box.innerHTML=groups.map(([heading,keys])=>'<div class="composition-group"><h5>'+heading+'</h5><div class="composition-icon-grid">'+keys.map(key=>{const r=roleCatalog.find(x=>x.key===key);return '<label class="composition-icon-card" title="'+esc(r.name)+'"><span class="composition-role-icon">'+r.icon+'</span><strong>'+esc(r.name)+'</strong>'+(r.alphaOnly?'<small>🔒 Alpha</small>':'')+'<span class="composition-count"><input aria-label="Nombre de '+esc(r.name)+'" type="number" id="wolf-comp-'+r.key+'" min="0" max="19" step="1" value="'+Number(comp[r.key]||0)+'" data-role-count="'+r.key+'"></span></label>';}).join('')+'</div></div>').join('');
-    box.querySelectorAll('[data-role-count]').forEach(input=>input.addEventListener('input',updateCompositionTotal));
+    box.innerHTML=groups.map(([heading,keys])=>'<div class="composition-group"><h5>'+heading+'</h5><div class="composition-icon-grid">'+keys.map(key=>{
+      const r=roleCatalog.find(x=>x.key===key),count=Math.max(0,Number(comp[key]||0)),multiple=key==='wolf'||key==='villager';
+      return '<div class="composition-icon-card" title="'+esc(r.name)+'"><span class="composition-role-icon">'+r.icon+'</span><strong>'+esc(r.name)+'</strong>'+(r.alphaOnly?'<small>🔒 Alpha</small>':'')+'<div class="composition-stepper"><button type="button" data-role-minus="'+key+'" aria-label="Retirer '+esc(r.name)+'" '+(count===0?'disabled':'')+'>−</button><output id="wolf-comp-value-'+key+'">'+count+'</output><button type="button" data-role-plus="'+key+'" aria-label="Ajouter '+esc(r.name)+'" '+((multiple?count>=20:count>=1)?'disabled':'')+'>+</button></div><input type="hidden" id="wolf-comp-'+key+'" value="'+count+'" data-role-count="'+key+'"></div>';
+    }).join('')+'</div></div>').join('');
+    box.querySelectorAll('[data-role-minus]').forEach(btn=>btn.addEventListener('click',()=>changeCompositionCount(btn.dataset.roleMinus,-1)));
+    box.querySelectorAll('[data-role-plus]').forEach(btn=>btn.addEventListener('click',()=>changeCompositionCount(btn.dataset.rolePlus,1)));
+  }
+  function changeCompositionCount(key,delta){
+    const input=$('wolf-comp-'+key);if(!input)return;
+    const multiple=key==='wolf'||key==='villager',max=multiple?20:1;
+    input.value=String(Math.max(0,Math.min(max,Number(input.value||0)+delta)));
+    const value=$('wolf-comp-value-'+key);if(value)value.textContent=input.value;
+    const minus=document.querySelector('[data-role-minus="'+key+'"]'),plus=document.querySelector('[data-role-plus="'+key+'"]');
+    if(minus)minus.disabled=Number(input.value)===0;
+    if(plus)plus.disabled=Number(input.value)>=max;
+    updateCompositionTotal();
   }
   renderCompositionFields({wolf:3,seer:1,protector:1,villager:7});
   const status=s=>$('wolf-auth-status').textContent=s;
@@ -75,9 +89,11 @@
       const b=$('admin-test-hub');b.disabled=true;
       const comp={wolf:1,seer:1,protector:1,villager:2};
       const r=await sb.rpc('create_game_room',{p_name:'[TEST ADMIN] Hub Wolfanator',p_max_players:5,p_display_name:pseudo(),p_composition:comp,p_visibility:'private'});
+      if(r.error){b.disabled=false;toast('Création du salon de test impossible : '+r.error.message);return;}
+      const bots=await sb.rpc('admin_fill_wolfanator_test_bots',{p_room_id:r.data[0].room_id});
       b.disabled=false;
-      if(r.error){toast('Création du salon de test impossible : '+r.error.message);return;}
-      toast('Salon de test créé. Vous pouvez inspecter le hub et ses réglages.');
+      if(bots.error){toast('Salon créé, mais ajout des bots impossible : '+bots.error.message);await openRoom(r.data[0].room_id,r.data[0].room_code);return;}
+      toast(Number(bots.data||0)+' bots de test ajoutés. Tu peux démarrer la partie.');
       await openRoom(r.data[0].room_id,r.data[0].room_code);
       await loadAdminData();
     });
