@@ -27,7 +27,7 @@
   premium.innerHTML='<p class="eyebrow">STATUT PREMIUM</p><h3>🐺 Loup Alpha</h3><div class="premium-price">10 🌙 <small>/ 30 jours</small></div><p>Les avantages Alpha de Wolfanator :</p><ul class="alpha-benefits"><li>Badge Loup Alpha sur votre profil</li><li>Statut Alpha et date d’expiration visibles</li><li>Avantages et options Alpha ajoutés progressivement dans Wolfanator</li></ul><div id="wolf-premium-status" class="premium-status">Vérification de votre accès…</div>';
   $('lobby').appendChild(premium);
   const panel=document.createElement('div'); panel.className='panel room-panel';
-  panel.innerHTML='<p class="eyebrow">SALONS EN LIGNE</p><h3>Salons disponibles</h3><div class="field-grid room-fields"><input id="wolf-room-name" maxlength="40" placeholder="Nom du salon"><select id="wolf-room-max"><option value="5">5 joueurs</option><option value="8">8 joueurs</option><option value="10">10 joueurs</option><option value="12" selected>12 joueurs</option><option value="15">15 joueurs</option><option value="20">20 joueurs</option></select><select id="wolf-room-visibility" aria-label="Visibilité du salon"><option value="public">🌐 Public</option><option value="private">🔒 Privé (code)</option></select><label>Ajouter Lupix à la partie<select id="wolf-lupix-count" aria-label="Nombre de Lupix"><option value="0">Non</option><option value="1">1 Lupix</option><option value="2">2 Lupix</option><option value="3">3 Lupix maximum</option></select></label></div><div class="composition-editor"><h4>Choisissez les rôles de votre partie</h4><p>Le total des rôles doit correspondre au nombre de places. Les Lupix occupent chacun une place et reçoivent un rôle au hasard au lancement.</p><div class="composition-fields" id="wolf-composition-fields"></div><div class="composition-total" id="wolf-comp-total">Total : 12 / 12 joueurs</div></div><div class="button-row"><button class="primary" id="wolf-create">Créer le salon avec cette composition</button></div><div class="button-row"><button class="secondary wide" id="wolf-solo-create">🤖 Jouer seul contre des bots</button></div><div class="field-grid room-fields"><input id="wolf-room-code" maxlength="8" placeholder="Code du salon" autocomplete="off"><button class="secondary" id="wolf-join">Rejoindre avec un code</button></div><div id="wolf-rooms" class="room-list"><small>Les salons apparaîtront ici.</small></div><div id="wolf-current-room" class="current-room"></div>';
+  panel.innerHTML='<p class="eyebrow">SALONS EN LIGNE</p><h3>Salons disponibles</h3><div class="field-grid room-fields"><input id="wolf-room-name" maxlength="40" placeholder="Nom du salon"><select id="wolf-room-max"><option value="5">5 joueurs</option><option value="8">8 joueurs</option><option value="10">10 joueurs</option><option value="12" selected>12 joueurs</option><option value="15">15 joueurs</option><option value="20">20 joueurs</option></select><select id="wolf-room-visibility" aria-label="Visibilité du salon"><option value="public">🌐 Public</option><option value="private">🔒 Privé (code)</option></select><label>Ajouter Lupix à la partie<select id="wolf-lupix-count" aria-label="Nombre de Lupix"><option value="0">Non</option><option value="1">1 Lupix</option><option value="2">2 Lupix</option><option value="3">3 Lupix maximum</option></select></label></div><div class="composition-editor"><h4>Choisissez les rôles de votre partie</h4><p>Le total des rôles doit correspondre au nombre de places. Les Lupix occupent chacun une place et reçoivent un rôle au hasard au lancement.</p><div class="composition-fields" id="wolf-composition-fields"></div><div class="composition-total" id="wolf-comp-total">Total : 12 / 12 joueurs</div></div><div class="button-row"><button class="primary" id="wolf-create">Créer le salon avec cette composition</button></div><div class="button-row"><button class="secondary wide" id="wolf-solo-create">🐺 Jouer seul contre les Lupix</button></div><div class="field-grid room-fields"><input id="wolf-room-code" maxlength="8" placeholder="Code du salon" autocomplete="off"><button class="secondary" id="wolf-join">Rejoindre avec un code</button></div><div id="wolf-rooms" class="room-list"><small>Les salons apparaîtront ici.</small></div><div id="wolf-current-room" class="current-room"></div>';
   $('lobby').appendChild(panel);
   function renderCompositionFields(comp={}){
     const box=$('wolf-composition-fields');if(!box)return;
@@ -92,9 +92,9 @@
       if(r.error){b.disabled=false;toast('Création du salon de test impossible : '+r.error.message);return;}
       const bots=await sb.rpc('admin_fill_wolfanator_test_bots',{p_room_id:r.data[0].room_id});
       b.disabled=false;
-      if(bots.error){toast('Salon créé, mais ajout des bots impossible : '+bots.error.message);await openRoom(r.data[0].room_id,r.data[0].room_code);return;}
+      if(bots.error){toast('Salon créé, mais ajout des Lupix impossible : '+bots.error.message);await openRoom(r.data[0].room_id,r.data[0].room_code);return;}
       if(Number(bots.data||0)<4){toast('Attention : seuls '+Number(bots.data||0)+' bots ont été ajoutés. Actualise le salon avant de lancer.');}
-      else toast('4 bots ajoutés et automatiquement prêts. Tu peux démarrer la partie.');
+      else toast('4 Lupix ajoutés et automatiquement prêts. Tu peux démarrer la partie.');
       await openRoom(r.data[0].room_id,r.data[0].room_code);
       await loadAdminData();
     });
@@ -193,7 +193,7 @@
     const b=$('wolf-solo-create');if(b)b.disabled=true;
     const r=await sb.rpc('create_solo_game_room',{p_max_players:max,p_display_name:pseudo(),p_composition:comp});
     if(b)b.disabled=false;if(r.error)return toast('Impossible de créer la partie solo : '+r.error.message);
-    autoBotPhaseKey='';toast('Partie solo créée : les bots sont prêts.');await openRoom(r.data[0].room_id,r.data[0].room_code);
+    autoBotPhaseKey='';toast('Partie solo créée : les Lupix sont prêts.');await openRoom(r.data[0].room_id,r.data[0].room_code);
   }
   async function joinRoom(code){
     const u=await user();if(!u)return;const c=String(code||'').trim().toUpperCase();if(!/^[A-Z0-9]{8}$/.test(c))return toast('Le code doit contenir 8 caractères.');
@@ -358,14 +358,14 @@
         $('wolf-leave')?.addEventListener('click',async()=>{const r=await sb.rpc('leave_game_room',{p_room_id:id});if(r.error)toast(r.error.message);else closeRoom();});
       }else{
         const r=await sb.rpc('get_my_game_state',{p_room_id:id});if(r.error){box.textContent=r.error.message;return;}
-        box.innerHTML='<div class="wolf-hub"><section class="hub-scene">'+gameHTML(r.data)+'</section><aside class="hub-panel" id="wolf-hub-panel"></aside></div>';attachChat($('wolf-hub-panel'),{waiting:false,state:r.data});if(r.data.status==='finished')await loadProfile(u);box.querySelector('#wolf-run-bots')?.addEventListener('click',async()=>{const b=$('wolf-run-bots');b.disabled=true;const result=await sb.rpc('admin_run_wolfanator_test_bots',{p_room_id:id});b.disabled=false;if(result.error){toast('Erreur des bots : '+result.error.message);return;}toast(result.data?.message||'Les bots ont joué.');await refreshRoom();});
+        box.innerHTML='<div class="wolf-hub"><section class="hub-scene">'+gameHTML(r.data)+'</section><aside class="hub-panel" id="wolf-hub-panel"></aside></div>';attachChat($('wolf-hub-panel'),{waiting:false,state:r.data});if(r.data.status==='finished')await loadProfile(u);box.querySelector('#wolf-run-bots')?.addEventListener('click',async()=>{const b=$('wolf-run-bots');b.disabled=true;const result=await sb.rpc('admin_run_wolfanator_test_bots',{p_room_id:id});b.disabled=false;if(result.error){toast('Erreur des bots : '+result.error.message);return;}toast(result.data?.message||'Les Lupix ont joué.');await refreshRoom();});
         const hasLupix=(r.data.players||[]).some(p=>String(p.display_name||'').startsWith('Bot Lupix'));const botMatch=String(r.data.room_name||'').startsWith('[SOLO]')||String(r.data.room_name||'').startsWith('[TEST ADMIN]')||hasLupix;
         const botPhaseKey=id+':'+r.data.phase+':'+r.data.round;
         if(botMatch&&r.data.status==='playing'&&r.data.is_host===true&&autoBotPhaseKey!==botPhaseKey){
           autoBotPhaseKey=botPhaseKey;
           Promise.resolve().then(async()=>{
             const botRun=await sb.rpc('admin_run_wolfanator_test_bots',{p_room_id:id});
-            if(botRun.error){autoBotPhaseKey='';toast('Les bots n’ont pas pu jouer : '+botRun.error.message);return;}
+            if(botRun.error){autoBotPhaseKey='';toast('Les Lupix n’ont pas pu jouer : '+botRun.error.message);return;}
             const lupixTurn=await sb.functions.invoke('lupix-turn',{body:{room_id:id}});
             if(lupixTurn.error)console.warn('Tour Lupix indisponible :',lupixTurn.error.message);
             await refreshRoom();
