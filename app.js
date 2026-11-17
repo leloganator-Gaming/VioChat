@@ -93,7 +93,8 @@
       const bots=await sb.rpc('admin_fill_wolfanator_test_bots',{p_room_id:r.data[0].room_id});
       b.disabled=false;
       if(bots.error){toast('Salon créé, mais ajout des bots impossible : '+bots.error.message);await openRoom(r.data[0].room_id,r.data[0].room_code);return;}
-      toast(Number(bots.data||0)+' bots de test ajoutés. Tu peux démarrer la partie.');
+      if(Number(bots.data||0)<4){toast('Attention : seuls '+Number(bots.data||0)+' bots ont été ajoutés. Actualise le salon avant de lancer.');}
+      else toast('4 bots ajoutés et automatiquement prêts. Tu peux démarrer la partie.');
       await openRoom(r.data[0].room_id,r.data[0].room_code);
       await loadAdminData();
     });
@@ -201,7 +202,7 @@
     const me=players.find(p=>p.user_id===u.id),comp=room.settings?.composition||{};
     const compTotal=Object.values(comp).reduce((n,v)=>n+Number(v||0),0);
     const isTestRoom=String(room.name||'').startsWith('[TEST ADMIN]');
-    const isReadyPlayer=p=>p.user_id===room.host_id||p.is_ready||(isTestRoom&&String(p.display_name||'').startsWith('Bot '));
+    const isReadyPlayer=p=>p.user_id===room.host_id||p.is_ready||((isTestRoom||isAdmin)&&String(p.display_name||'').startsWith('Bot '));
     const allReady=players.every(isReadyPlayer);
     const full=players.length===room.max_players,valid=compTotal===players.length;
     const canStart=full&&valid&&allReady;
