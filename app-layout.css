@@ -205,3 +205,8 @@ main{width:min(100%,var(--app-width));margin:0 auto;padding:0 22px}
  .composition-stepper output{min-width:15px;font-size:12px}
  #lobby .room-panel .composition-icon-card{min-height:108px}
 }
+
+/* Commande de simulation des bots dans les parties de test */
+#wolf-run-bots{border:1px solid #6c5be8;background:linear-gradient(135deg,#30265c,#5140a0);color:#fff;font-weight:800}
+#wolf-run-bots:disabled{opacity:.55;cursor:wait}
+@media(max-width:700px){.host-controls{display:grid;grid-template-columns:1fr;width:100%}.host-controls button{width:100%;min-height:44px}}
