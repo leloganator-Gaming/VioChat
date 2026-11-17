@@ -330,8 +330,13 @@
     const sendChat=async e=>{
       e.preventDefault();const input=$('wolf-chat-input'),body=input?.value.trim();if(!body||!currentRoom)return;
       const roomId=currentRoom;input.disabled=true;
-      const r=await sb.from('room_messages').insert({room_id:roomId,user_id:currentUserId,display_name:(profileName||'Joueur').slice(0,24),body});
+      const r=await sb.from('room_messages').insert({room_id:roomId,user_id:currentUserId,display_name:(profileName||'Joueur').slice(0,24),body}).select('id').single();
       input.disabled=false;if(r.error){toast(r.error.message);return;}input.value='';await loadChat();input.focus();
+      if(/[?]|\b(?:lupix|bot\s*lupix)\b/i.test(body)){
+        sb.functions.invoke('lupix-turn',{body:{room_id:roomId,mode:'reply',message_id:r.data.id}})
+          .then(x=>{if(x.error)console.warn('Réponse Lupix indisponible :',x.error.message);})
+          .catch(e=>console.warn('Réponse Lupix indisponible :',e));
+      }
     };
     tabs.forEach(t=>t.addEventListener('click',()=>showTab(t.dataset.hubTab)));
     showTab('discussion');
