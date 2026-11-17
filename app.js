@@ -200,13 +200,15 @@
   function waitingHTML(room,players,u){
     const me=players.find(p=>p.user_id===u.id),comp=room.settings?.composition||{};
     const compTotal=Object.values(comp).reduce((n,v)=>n+Number(v||0),0);
-    const allReady=players.every(p=>p.user_id===room.host_id||p.is_ready);
+    const isTestRoom=String(room.name||'').startsWith('[TEST ADMIN]');
+    const isReadyPlayer=p=>p.user_id===room.host_id||p.is_ready||(isTestRoom&&String(p.display_name||'').startsWith('Bot '));
+    const allReady=players.every(isReadyPlayer);
     const full=players.length===room.max_players,valid=compTotal===players.length;
     const canStart=full&&valid&&allReady;
     const reason=!full?'En attente de '+(room.max_players-players.length)+' joueur(s)…':!valid?'La composition doit correspondre au nombre de joueurs.':!allReady?'Certains joueurs ne sont pas encore prêts.':'Tout le monde est prêt : vous pouvez lancer la partie !';
     const avatars=['🧑🏽‍🌾','🧝🏻‍♀️','🧔🏽','👩🏼‍🦰','🧙🏻‍♂️','🧑🏻‍🚀','👩🏽‍🌾','🧑🏼‍🎤','🧑🏿‍🦱','👨🏻‍🌾','🧑🏻‍🦰','👩🏾‍🦱'];
     const seats=Array.from({length:room.max_players},(_,i)=>{
-      const p=players[i],host=p?.user_id===room.host_id,ready=!!p&&(host||p.is_ready);
+      const p=players[i],host=p?.user_id===room.host_id,ready=!!p&&isReadyPlayer(p);
       if(!p)return '<div class="wolf-scene-player empty"><span class="scene-avatar">＋</span><span class="scene-name">Place libre</span></div>';
       return '<div class="wolf-scene-player '+(ready?'ready':'')+'"><span class="scene-name">'+esc(p.display_name)+(host?' 👑':'')+'</span><span class="scene-avatar">'+avatars[i%avatars.length]+'</span><small>'+(host?'Créateur':ready?'Prêt':'En attente')+'</small>'+(room.host_id===u.id&&!host?'<button type="button" class="kick-player" data-kick="'+p.user_id+'">Retirer</button>':'')+'</div>';
     }).join('');
