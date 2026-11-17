@@ -4,7 +4,8 @@
   const toast = s => { const el=$('toast'); el.textContent=s; el.classList.add('show'); clearTimeout(window.__wolfToast); window.__wolfToast=setTimeout(()=>el.classList.remove('show'),4200); };
   const cfg=window.WOLFANATOR_CONFIG||{}, configured=!!(cfg.supabaseUrl&&cfg.supabasePublishableKey&&window.supabase);
   const sb=configured?window.supabase.createClient(cfg.supabaseUrl,cfg.supabasePublishableKey):null;
-  let currentRoom=null,channel=null,profileName='',currentUserId='',refreshing=false,isAlpha=false,isAdmin=false,adminPanel=null,autoBotPhaseKey='';
+  let currentRoom=null,channel=null,profileName='',currentUserId='',refreshing=false,isAlpha=false,isAdmin=false,adminPanel=null,autoBotPhaseKey='',isRoomHost=false,ambientLupixAt=0;
+  const ambientLupixTimer=setInterval(()=>{if(!currentRoom||!isRoomHost||!sb||Date.now()-ambientLupixAt<30000)return;ambientLupixAt=Date.now();const roomId=currentRoom;sb.functions.invoke('lupix-turn',{body:{room_id:roomId,mode:'ambient'}}).then(x=>{if(x.error)console.warn('Discussion spontanée Lupix indisponible :',x.error.message);}).catch(e=>console.warn('Discussion spontanée Lupix indisponible :',e));},30000);
   const roleCatalog=[["wolf","Loup-garou","🐺","loups","La meute choisit une cible chaque nuit."],["black_wolf","Loup Noir","🌑","loups","Peut infecter une cible une fois."],["talkative_wolf","Loup Bavard","🐺","loups","Doit placer un mot secret dans ses messages."],["white_wolf","Loup Blanc","🐺","solitaire","Joue avec les loups mais poursuit une victoire solitaire."],["mercenary","Mercenaire","🎯","solitaire","Reçoit une cible et vise une victoire individuelle."],["rumplestiltskin","Nain Tracassin","🧩","solitaire","Devine le rôle d'un joueur chaque nuit."],["sick_rat","Rat Malade","🐀","solitaire","Propage une contamination."],["villager","Simple Villageois","🏡","village","Débat et vote avec le village."],["seer","Voyante","🔮","village","Découvre le rôle d'un joueur chaque nuit."],["witch","Sorcière","🧙","village","Possède une potion de vie et une potion de mort."],["little_girl","Petite Fille","👧","village","Peut espionner les échanges nocturnes des loups."],["hunter","Chasseur","🏹","village","Peut entraîner un joueur dans son élimination."],["guard","Garde","🛡️","village","Protège un joueur chaque nuit sans répéter la cible."],["cupid","Cupidon","💘","village","Lie deux joueurs au début de la partie."],["mentalist","Mentaliste","🧠","village","Reçoit un indice sur le camp visé par le vote."],["necromancer","Nécromancien","💀","village","Accède aux échanges des joueurs éliminés."],["gravedigger","Fossoyeur","⚰️","village","Déclenche une information à son élimination."],["dictator","Dictateur","👑","village","Peut une fois déclencher un vote décisif."],["red_riding_hood","Chaperon Rouge","🧺","village","Protégé des loups tant que le Chasseur vit."],["pyromaniac","Pyromancien","🔥","village","Prépare une attaque spéciale."],["heir","Héritier","🧬","village","Peut hériter du rôle de son modèle éliminé."],["blue_hood","Chaperon Bleu","🩵","village","Protégé tant qu'un Villageois est en vie."],["pink_hood","Chaperon Rose","🩷","village","Protégé tant que les amoureux sont en vie."],["wolf_hood","Chaperon Loup","🐺","loups","Rejoint la meute."],["raider","Pillard","🗡️","village","Hérite du rôle du premier joueur éliminé."],["literate_wolf","Loup Lettré","📖","loups","Respecte une contrainte de lettre dans ses messages."],["healer","Guérisseuse","💚","village","Dispose d'une potion de soin à usage unique."],["poisoner","Empoisonneuse","☠️","village","Dispose d'une potion de poison à usage unique."],["chatty_seer","Voyante Bavarde","🔮","village","Révèle publiquement son résultat au matin."],["aura_seer","Voyante d'Aura","✨","village","Découvre si l'aura est claire ou obscure."],["ancient","Ancien","🧓","village","Résiste à la première attaque des loups."],["protector","Protecteur","🛡️","village","Protège une personne chaque nuit contre l’attaque des loups, sans répéter la cible deux nuits de suite."]].map(([key,name,icon,camp,description])=>({key,name,icon,camp,description}));
   const roles=Object.fromEntries(roleCatalog.map(r=>[r.key,r.name]));
   const icons=Object.fromEntries(roleCatalog.map(r=>[r.key,r.icon]));
@@ -200,12 +201,12 @@
     const r=await sb.rpc('join_game_room',{p_room_code:c,p_display_name:pseudo()});if(r.error)return toast(r.error.message);await openRoom(r.data,c);
   }
   async function openRoom(id,code){
-    currentRoom=id;if(channel)await sb.removeChannel(channel);
+    currentRoom=id;isRoomHost=false;ambientLupixAt=0;if(channel)await sb.removeChannel(channel);
     channel=sb.channel('wolf-room-'+id).on('postgres_changes',{event:'*',schema:'public',table:'room_players',filter:'room_id=eq.'+id},refreshRoom).on('postgres_changes',{event:'UPDATE',schema:'public',table:'game_rooms',filter:'id=eq.'+id},refreshRoom).on('postgres_changes',{event:'INSERT',schema:'public',table:'room_messages',filter:'room_id=eq.'+id},loadChat).subscribe();
     $('wolf-current-room').innerHTML='<div class="room-heading"><h3>Salon '+esc(code)+'</h3><div class="button-row"><button class="secondary" id="wolf-copy-code">Copier le code</button><button class="ghost" id="wolf-close-room">Fermer</button></div></div><div id="wolf-room-detail">Chargement…</div>';
     $('wolf-close-room').addEventListener('click',closeRoom);$('wolf-copy-code').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(String(code));toast('Code du salon copié.');}catch(e){toast('Copie automatique indisponible : '+code);}});await refreshRoom();
   }
-  function closeRoom(){currentRoom=null;if(channel&&sb)sb.removeChannel(channel);channel=null;$('wolf-current-room').innerHTML='';loadRooms();}
+  function closeRoom(){currentRoom=null;isRoomHost=false;ambientLupixAt=0;if(channel&&sb)sb.removeChannel(channel);channel=null;$('wolf-current-room').innerHTML='';loadRooms();}
   function waitingHTML(room,players,u){
     const me=players.find(p=>p.user_id===u.id),comp=room.settings?.composition||{};
     const compTotal=Object.values(comp).reduce((n,v)=>n+Number(v||0),0);
@@ -332,11 +333,9 @@
       const roomId=currentRoom;input.disabled=true;
       const r=await sb.from('room_messages').insert({room_id:roomId,user_id:currentUserId,display_name:(profileName||'Joueur').slice(0,24),body}).select('id').single();
       input.disabled=false;if(r.error){toast(r.error.message);return;}input.value='';await loadChat();input.focus();
-      if(/[?]|\b(?:lupix|bot\s*lupix)\b/i.test(body)){
-        sb.functions.invoke('lupix-turn',{body:{room_id:roomId,mode:'reply',message_id:r.data.id}})
-          .then(x=>{if(x.error)console.warn('Réponse Lupix indisponible :',x.error.message);})
-          .catch(e=>console.warn('Réponse Lupix indisponible :',e));
-      }
+      sb.functions.invoke('lupix-turn',{body:{room_id:roomId,mode:'reply',message_id:r.data.id}})
+        .then(x=>{if(x.error)console.warn('Réponse Lupix indisponible :',x.error.message);})
+        .catch(e=>console.warn('Réponse Lupix indisponible :',e));
     };
     tabs.forEach(t=>t.addEventListener('click',()=>showTab(t.dataset.hubTab)));
     showTab('discussion');
@@ -346,7 +345,7 @@
     try{
       const values=await Promise.all([sb.from('game_rooms').select('*').eq('id',id).single(),sb.from('room_players').select('user_id,display_name,is_ready,is_alive,revealed_role').eq('room_id',id).order('joined_at'),sb.auth.getUser()]);
       if(currentRoom!==id)return;const box=$('wolf-room-detail');if(!box)return;
-      const room=values[0].data,players=values[1].data,u=values[2].data.user;
+      const room=values[0].data,players=values[1].data,u=values[2].data.user;isRoomHost=!!u?.id&&room?.host_id===u.id;
       if(values[0].error||values[1].error){box.textContent=(values[0].error||values[1].error).message;return;}
       currentUserId=u.id;
       if(room.status==='waiting'){
