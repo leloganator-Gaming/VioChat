@@ -635,3 +635,8 @@ body.wolf-game-mode #lobby>.room-panel.room-storage.room-open{display:block!impo
 
 /* Keep one clear navigation bar; admin is injected into the main bar for admins only. */
 #lobby>.wolfy-hub-nav{display:none!important}
+
+#lobby .wolf-public-box .wolf-public-featured{display:flex!important;flex-direction:column!important;align-items:stretch!important;justify-content:center!important;padding:15px!important;margin:0 0 14px!important;min-height:155px!important;background:#29263e!important;border:1px solid #514879!important;border-radius:12px!important}
+#lobby .wolf-public-box .wolf-public-featured h3{font-size:21px!important;margin:4px 0!important}
+#lobby .wolf-public-box .wolf-public-featured p{font-size:11px!important}
+#lobby .wolf-public-box .wolf-public-featured .primary{width:100%!important;min-height:48px!important;font-size:14px!important}
