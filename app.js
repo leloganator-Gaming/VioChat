@@ -406,7 +406,7 @@
   }
 
   const friendsPanel=document.createElement('section');friendsPanel.className='panel friends-panel';friendsPanel.id='wolf-friends-panel';
-  friendsPanel.innerHTML='<p class="eyebrow">COMMUNAUTÉ WOLFANATOR</p><h3>👥 Mes amis</h3><div class="friends-tabs"><button type="button" class="active" data-friends-tab="friends">Amis</button><button type="button" data-friends-tab="requests">Demandes</button><button type="button" data-friends-tab="search">Ajouter</button></div><div id="wolf-friends-content"><small>Chargement…</small></div><div id="wolf-friend-chat" class="friend-chat" hidden></div>';
+  friendsPanel.innerHTML='<p class="eyebrow">COMMUNAUTÉ WOLFANATOR</p><h3>👥 Mes amis</h3><div class="friends-tabs"><button type="button" class="active" data-friends-tab="friends">Amis</button><button type="button" data-friends-tab="requests">Demandes</button><button type="button" data-friends-tab="search">Ajouter</button><button type="button" data-friends-tab="lupix" hidden>🤖 Mes Lupix</button></div><div id="wolf-friends-content"><small>Chargement…</small></div><div id="wolf-friend-chat" class="friend-chat" hidden></div>';
   $('lobby').appendChild(friendsPanel);
   let activeFriend=null,activeFriendRequest=null;
   async function loadPasskeys(){
@@ -432,8 +432,14 @@
   }
   const friendTabButtons=()=>friendsPanel.querySelectorAll('[data-friends-tab]');
   async function showFriendsTab(tab='friends'){
-    friendTabButtons().forEach(b=>b.classList.toggle('active',b.dataset.friendsTab===tab));
+    friendTabButtons().forEach(b=>{b.classList.toggle('active',b.dataset.friendsTab===tab);if(b.dataset.friendsTab==='lupix')b.hidden=!isAlpha;});
     const box=$('wolf-friends-content');$('wolf-friend-chat').hidden=true;box.hidden=false;
+    if(tab==='lupix'){
+      if(!isAlpha){toast('Les discussions avec les Lupix sont réservées aux membres Loup Alpha.');return;}
+      box.innerHTML='<h4>🤖 Vos compagnons Lupix</h4><p class="muted-note">Choisissez un Lupix pour ouvrir une conversation privée et retrouver vos anciens messages.</p><div class="lupix-friend-list"><button type="button" class="friend-row friend-open" data-lupix-chat="lupix-1"><span class="friend-avatar">🐺</span><strong>Lupix 1</strong><small>Analyste prudent</small><span>💬 Discuter</span></button><button type="button" class="friend-row friend-open" data-lupix-chat="lupix-2"><span class="friend-avatar">🦊</span><strong>Lupix 2</strong><small>Diplomate sociable</small><span>💬 Discuter</span></button><button type="button" class="friend-row friend-open" data-lupix-chat="lupix-3"><span class="friend-avatar">🦉</span><strong>Lupix 3</strong><small>Joueur audacieux</small><span>💬 Discuter</span></button></div>';
+      box.querySelectorAll('[data-lupix-chat]').forEach(b=>b.addEventListener('click',()=>openLupixFriendChat(b.dataset.lupixChat)));
+      return;
+    }
     if(tab==='search'){
       box.innerHTML='<div class="friend-search"><input id="wolf-friend-search" maxlength="20" placeholder="Rechercher un pseudo…"><button class="secondary" id="wolf-friend-search-btn">Rechercher</button></div><div id="wolf-friend-search-results"></div>';
       const run=async()=>{const q=$('wolf-friend-search').value.trim();if(q.length<3){$('wolf-friend-search-results').textContent='Saisissez au moins 3 caractères.';return;}
@@ -460,6 +466,35 @@
       box.innerHTML=accepted.map(f=>{const id=f.requester_id===currentUserId?f.recipient_id:f.requester_id,p=byId[id];return '<button type="button" class="friend-row friend-open" data-friend-chat="'+f.id+'" data-friend-user="'+id+'"><span class="friend-avatar">'+esc(p?.avatar?.emoji||'🐺')+'</span><strong>'+esc(p?.username||'Joueur')+'</strong><span>💬 Discuter</span></button>';}).join('')||'<small>Pas encore d’amis. Utilisez « Ajouter » pour rechercher un joueur.</small>';
       box.querySelectorAll('[data-friend-chat]').forEach(b=>b.addEventListener('click',()=>openFriendChat(b.dataset.friendChat,b.dataset.friendUser,byId[b.dataset.friendUser]?.username||'Ami')));
     }
+  }
+  async function openLupixFriendChat(key){
+    if(!isAlpha){toast('Cette fonction est réservée aux membres Loup Alpha.');return;}
+    const names={'lupix-1':'Lupix 1','lupix-2':'Lupix 2','lupix-3':'Lupix 3'};
+    const avatars={'lupix-1':'🐺','lupix-2':'🦊','lupix-3':'🦉'};
+    const name=names[key];if(!name)return;
+    activeFriendRequest='private-'+key;
+    const chat=$('wolf-friend-chat');$('wolf-friends-content').hidden=true;chat.hidden=false;
+    chat.innerHTML='<div class="friend-chat-head"><button type="button" class="ghost" id="wolf-friend-chat-back">← Mes Lupix</button><span class="friend-avatar">'+avatars[key]+'</span><strong>Discussion avec '+name+'</strong><small>Alpha</small></div><div class="friend-chat-messages" id="wolf-friend-messages">Chargement…</div><form class="friend-chat-form" id="wolf-friend-form"><input id="wolf-friend-input" maxlength="1000" placeholder="Écrire à '+name+'…" required><button class="primary" type="submit">Envoyer</button></form>';
+    $('wolf-friend-chat-back').addEventListener('click',()=>showFriendsTab('lupix'));
+    const load=async()=>{
+      if(activeFriendRequest!=='private-'+key)return;
+      const m=await sb.from('lupix_private_messages').select('id,sender,body,created_at').eq('user_id',currentUserId).eq('lupix_key',key).order('created_at',{ascending:true}).limit(100);
+      const el=$('wolf-friend-messages');if(!el)return;
+      if(m.error){el.textContent=m.error.message;return;}
+      el.innerHTML=(m.data||[]).map(x=>'<div class="friend-message '+(x.sender==='user'?'mine':'')+'"><p>'+esc(x.body)+'</p><small>'+new Date(x.created_at).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})+'</small></div>').join('')||'<small>Dis bonjour à '+name+' pour commencer.</small>';
+      el.scrollTop=el.scrollHeight;
+    };
+    $('wolf-friend-form').addEventListener('submit',async e=>{
+      e.preventDefault();const input=$('wolf-friend-input'),body=input.value.trim();if(!body)return;
+      input.disabled=true;const button=e.submitter;if(button)button.disabled=true;
+      const result=await sb.functions.invoke('lupix-friend-chat',{body:{lupix_key:key,message:body}});
+      input.disabled=false;if(button)button.disabled=false;
+      if(result.error){toast(result.error.message||'Le Lupix ne répond pas pour le moment.');return;}
+      if(result.data?.error){toast(result.data.error);return;}
+      input.value='';await load();input.focus();
+    });
+    await load();const old=window.__wolfFriendChatTimer;if(old)clearInterval(old);
+    window.__wolfFriendChatTimer=setInterval(load,3000);
   }
   async function openFriendChat(friendshipId,friendId,name){
     activeFriend=friendId;activeFriendRequest=friendshipId;const chat=$('wolf-friend-chat');$('wolf-friends-content').hidden=true;chat.hidden=false;
