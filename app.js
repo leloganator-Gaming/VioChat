@@ -37,10 +37,10 @@
     const box=$('wolf-composition-fields');if(!box)return;
     const classic=['villager','wolf'];
     const groups=[['Rôles classiques',classic],['Rôles spéciaux',roleKeys.filter(k=>!classic.includes(k))]];
-    box.innerHTML=groups.map(([heading,keys])=>'<div class="composition-group"><h5>'+heading+'</h5><div class="composition-icon-grid">'+keys.map(key=>{
+    box.innerHTML=groups.map(([heading,keys],index)=>'<details class="composition-group" '+(index===0?'open':'')+'><summary><span>'+heading+'</span><small>'+keys.length+' rôles · '+(index===0?'Essentiels':'Afficher les options')+'</small></summary><div class="composition-icon-grid">'+keys.map(key=>{
       const r=roleCatalog.find(x=>x.key===key),count=Math.max(0,Number(comp[key]||0)),multiple=key==='wolf'||key==='villager';
       return '<div class="composition-icon-card" title="'+esc(r.name)+'"><span class="composition-role-icon">'+r.icon+'</span><strong>'+esc(r.name)+'</strong>'+(r.alphaOnly?'<small>🔒 Alpha</small>':'')+'<div class="composition-stepper"><button type="button" data-role-minus="'+key+'" aria-label="Retirer '+esc(r.name)+'" '+(count===0?'disabled':'')+'>−</button><output id="wolf-comp-value-'+key+'">'+count+'</output><button type="button" data-role-plus="'+key+'" aria-label="Ajouter '+esc(r.name)+'" '+((multiple?count>=20:count>=1)?'disabled':'')+'>+</button></div><input type="hidden" id="wolf-comp-'+key+'" value="'+count+'" data-role-count="'+key+'"></div>';
-    }).join('')+'</div></div>').join('');
+    }).join('')+'</div></details>').join('');
     box.querySelectorAll('[data-role-minus]').forEach(btn=>btn.addEventListener('click',()=>changeCompositionCount(btn.dataset.roleMinus,-1)));
     box.querySelectorAll('[data-role-plus]').forEach(btn=>btn.addEventListener('click',()=>changeCompositionCount(btn.dataset.rolePlus,1)));
   }
