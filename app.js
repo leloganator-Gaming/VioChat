@@ -58,7 +58,7 @@
   const extrasPage=document.createElement('section');extrasPage.className='wolf-main-page';extrasPage.dataset.mainPage='extras';
   const adminPage=document.createElement('section');adminPage.className='wolf-main-page';adminPage.dataset.mainPage='admin';
   const mainNav=document.createElement('nav');mainNav.className='wolf-main-nav';mainNav.setAttribute('aria-label','Navigation principale');
-  mainNav.innerHTML='<button class="active" data-main-tab="home">🏡 Accueil</button><button data-main-tab="create">🏰 Créer</button><button data-main-tab="friends">👥 Amis</button><button data-main-tab="profile">🪪 Profil</button><button data-main-tab="extras">🛍 Boutique & classement</button>';
+  mainNav.innerHTML='<button class="active" data-main-tab="home">🏡 Accueil</button><button data-main-tab="create">🏰 Créer un salon</button><button data-main-tab="friends">👥 Amis</button><button data-main-tab="profile">🪪 Profil</button><button data-main-tab="extras">🛍 Boutique & classement</button>';
   lobby.insertBefore(mainNav,hubNav);
   lobby.insertBefore(homePage,hubNav);
   lobby.insertBefore(createPage,hubNav);
@@ -113,7 +113,7 @@
     if(name==='friends')lobby.querySelector('#wolf-extra-app [data-wx-tab="friends"]')?.click();
     if(name==='profile')lobby.querySelector('#wolf-extra-app [data-wx-tab="profile"]')?.click();
     if(name==='extras')lobby.querySelector('#wolf-extra-app [data-wx-tab="shop"]')?.click();
-    if(name==='create')$('wolf-room-name')?.focus({preventScroll:true});
+    if(name==='create'){const field=$('wolf-room-name');field?.focus({preventScroll:true});document.querySelector('.wolf-create-box')?.scrollIntoView({behavior:'smooth',block:'start'});}
     window.scrollTo({top:0,behavior:'smooth'});
   };
   mainNav.addEventListener('click',e=>{const b=e.target.closest('[data-main-tab]');if(b)setMainPage(b.dataset.mainTab);});
