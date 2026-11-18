@@ -184,8 +184,8 @@
     if(!adminPanel){adminPanel=document.createElement('section');adminPanel.className='panel admin-panel';adminPanel.id='wolf-admin-panel';const adminPage=document.querySelector('.wolf-main-page[data-main-page="admin"]');(adminPage||$('lobby')).appendChild(adminPanel);}
     adminPanel.hidden=false;
     adminPanel.setAttribute('aria-label','Onglet Administration Wolfanator');
-    const nav=document.querySelector('.wolfy-hub-nav');
-    if(nav&&!nav.querySelector('[data-wolf-admin-tab]'))nav.insertAdjacentHTML('beforeend','<button type="button" data-wolf-admin-tab>⚙️ Administration</button>');
+    const nav=document.querySelector('.wolf-main-nav');
+    if(nav&&!nav.querySelector('[data-main-tab="admin"]'))nav.insertAdjacentHTML('beforeend','<button type="button" data-main-tab="admin">⚙️ Administration</button>');
     adminPanel.innerHTML='<p class="eyebrow">CONSOLE PRIVILÉGIÉE</p><h3>🛠️ Administration Wolfanator</h3><p class="muted-note">Outils réservés au compte administrateur permanent.</p><div class="admin-actions"><button class="secondary" id="admin-refresh">Actualiser les données</button><button class="secondary" id="admin-test-hub">🧪 Tester le hub</button><button class="ghost" id="admin-cleanup">Nettoyer les salons en attente de plus de 24 h</button></div><div id="admin-stats" class="admin-stats">Chargement des indicateurs…</div><h4>Gestion de tous les salons</h4><div id="admin-room-list" class="admin-room-list">Chargement…</div><div id="admin-diagnostics" class="admin-diagnostics"></div><h4>Journal des actions administrateur</h4><div id="admin-audit-list" class="admin-audit-list">Chargement…</div><h4>Signalements des joueurs</h4><div id="admin-report-list" class="admin-audit-list">Chargement…</div>';
     $('admin-refresh').addEventListener('click',loadAdminData);
     $('admin-test-hub').addEventListener('click',async()=>{
