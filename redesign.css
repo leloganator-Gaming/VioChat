@@ -583,3 +583,10 @@ body.wolf-game-mode #wolf-current-room .game-status{position:sticky!important;to
 .passkey-row{display:flex;justify-content:space-between;align-items:center;gap:8px}
 #wolf-passkey-login{margin-top:8px}
 @media(max-width:700px){.friends-panel{grid-column:1}.friend-chat{height:55vh;max-height:55vh}.friend-search{flex-direction:column;align-items:stretch}.friend-row{flex-wrap:wrap}}
+
+
+/* Alpha: Lupix dans la liste d'amis */
+.lupix-friend-list{display:grid;gap:8px;margin-top:12px}
+.lupix-friend-list .friend-row{border:1px solid #ffffff18;border-radius:14px;padding:13px;background:#171421}
+.lupix-friend-list .friend-row small{opacity:.72}
+.friends-tabs button[data-friends-tab="lupix"]{border-color:#9c75e8;color:#d9c5ff}
