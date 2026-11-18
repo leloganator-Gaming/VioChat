@@ -263,3 +263,157 @@ main{width:100%;max-width:1600px;padding:0 clamp(16px,2.5vw,38px)}
 #wolf-current-room .wolf-hub:has(.game-status[data-game-phase="day"]) .game-player-stage{
   background-image:url('https://assets.wolfy.fr/scenejour_wolfy.png')!important
 }
+
+
+/* ===== Référence visuelle Wolfanator : hub + scène de jeu =====
+   Réglages de composition inspirés des captures fournies.
+   Les composants et actions restent ceux de Wolfanator. */
+:root{
+  --wolf-ui-bg:#191927;
+  --wolf-ui-panel:#222233;
+  --wolf-ui-panel-2:#2a2a40;
+  --wolf-ui-line:#39394f;
+  --wolf-ui-purple:#6554d9;
+  --wolf-ui-yellow:#f4b52e;
+}
+html,body{background:#191927}
+body{color:#f5f3fb}
+.topbar{
+  min-height:58px;padding:7px clamp(14px,2.2vw,34px);
+  background:#1b1a29;border-bottom:1px solid #ffffff12;
+}
+.topbar .brand .logo{width:34px;height:34px;border-radius:50%}
+.desktop-nav{gap:4px;margin-left:18px;margin-right:auto}
+.desktop-nav a{padding:9px 13px;font-size:11px}
+.topbar-play,.primary{background:#f3b52f;color:#211b12;border:0;box-shadow:none;border-radius:22px}
+main{width:min(100%,1600px);padding:0 clamp(12px,2vw,28px)}
+#lobby{
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,.85fr);
+  grid-template-areas:"head head" "quick quick" "rooms rooms" "profile premium" "community community" "account account" "admin admin";
+  gap:13px;padding:18px 0 36px;
+}
+#lobby>.section-head{grid-area:head}
+#lobby>.lobby-grid{grid-area:quick;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+#lobby>.lobby-grid .panel{min-height:0;padding:15px 17px;border-radius:13px;background:#222233;border:1px solid #39394f}
+#lobby>.lobby-grid .panel-icon{font-size:20px;margin:0 0 5px}
+#lobby>.lobby-grid .panel h3{font-size:16px;margin:4px 0}
+#lobby>.lobby-grid .panel p{font-size:11px;line-height:1.45;margin:4px 0;flex:1}
+#lobby>.lobby-grid .panel button{margin-top:9px}
+#lobby>.room-panel{grid-area:rooms}
+#lobby>.profile-panel{grid-area:profile}
+#lobby>.premium-panel{grid-area:premium}
+#lobby>.account-panel{grid-area:account}
+#lobby>#wolf-extra-app{grid-area:community}
+#lobby>.admin-panel{grid-area:admin}
+#lobby .panel,#lobby .profile-panel,#lobby .premium-panel,#lobby .account-panel,#lobby .room-panel,#wolf-extra-app{
+  background:#222233;border:1px solid #39394f;border-radius:14px;box-shadow:none
+}
+#lobby .room-panel{padding:16px}
+#lobby .room-panel>h3{font-size:19px;margin:3px 0 12px}
+#lobby .room-list{grid-template-columns:repeat(2,minmax(0,1fr))}
+#lobby .room-card{background:#29293e;border:1px solid #41415a;border-radius:11px}
+#lobby .composition-editor{margin:12px 0;padding:12px;background:#1b1b2a;border:1px solid #39394f;border-radius:12px}
+#lobby .composition-icon-grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:7px}
+#lobby .composition-icon-card{min-height:96px;padding:7px 4px!important}
+#lobby .composition-role-icon{width:54px;height:54px;font-size:28px}
+#lobby .composition-icon-card strong{font-size:9px}
+#lobby .composition-total{position:sticky;bottom:8px;z-index:5;padding:10px;background:#302c50;border:1px solid #554a8e;border-radius:10px}
+#wolf-current-room{margin-top:10px}
+#wolf-current-room .wolf-hub,
+#wolf-current-room .wolf-hub.waiting-mode,
+#wolf-current-room .wolf-hub:not(.waiting-mode){
+  display:grid!important;grid-template-columns:minmax(0,1fr) minmax(300px,32%)!important;
+  grid-template-areas:"scene chat"!important;gap:12px!important;align-items:stretch!important;
+  position:relative!important;min-height:0!important;height:auto!important;overflow:visible!important;
+  padding:0!important;background:transparent!important;border-radius:0!important
+}
+#wolf-current-room .wolf-hub>.hub-scene{
+  grid-area:scene!important;position:relative!important;min-width:0!important;min-height:650px!important;
+  padding:0!important;overflow:hidden!important;border:1px solid #3b3b52!important;
+  border-radius:13px!important;background:#202033!important
+}
+#wolf-current-room .wolf-hub>.hub-panel{
+  grid-area:chat!important;position:relative!important;top:auto!important;right:auto!important;bottom:auto!important;left:auto!important;
+  width:100%!important;max-width:none!important;min-width:0!important;max-height:calc(100svh - 82px)!important;
+  overflow:hidden!important;padding:11px!important;border:1px solid #393950!important;
+  border-radius:13px!important;background:#222233!important;box-shadow:none!important;
+  visibility:visible!important;opacity:1!important;pointer-events:auto!important
+}
+#wolf-current-room .wolf-hub .hub-chat{height:100%!important;min-height:0!important;max-height:none!important}
+#wolf-current-room .wolf-hub .hub-tabs{display:flex!important;gap:5px!important;flex-wrap:wrap!important;padding:5px!important;background:#191927!important;border:1px solid #39394f!important;border-radius:10px!important}
+#wolf-current-room .wolf-hub .hub-tabs>*{flex:1 1 auto!important;padding:9px 5px!important;border-radius:8px!important;font-size:10px!important}
+#wolf-current-room .wolf-hub .hub-tabs .active{background:#6554d9!important;color:#fff!important}
+#wolf-current-room .wolf-hub .chat-messages,
+#wolf-current-room .wolf-hub .hub-tab-content .chat-messages{
+  height:clamp(300px,55svh,620px)!important;min-height:240px!important;max-height:none!important;
+  overflow:auto!important;background:#1a1a29!important;border:1px solid #33334a!important;border-radius:10px!important;
+  padding:9px!important;margin:8px 0!important
+}
+#wolf-current-room .wolf-hub .chat-message{background:#2a2a40!important;border:1px solid #3c3c55!important;border-radius:10px!important}
+#wolf-current-room .wolf-hub .chat-message.mine{background:#403777!important}
+#wolf-current-room .wolf-hub .chat-form{position:relative!important;bottom:auto!important;padding:5px 0!important;background:transparent!important}
+#wolf-current-room .wolf-hub .chat-form input{min-height:42px!important;border-radius:22px!important;background:#191927!important}
+#wolf-current-room .wolf-hub .chat-form button{min-height:42px!important;border-radius:22px!important}
+#wolf-current-room .wolf-hub .game-status{background:#1b1a29!important;border-bottom:1px solid #ffffff12!important;padding:12px 15px!important}
+#wolf-current-room .wolf-hub .role-card{background:#25253a!important;border:1px solid #41415a!important;border-radius:12px!important}
+#wolf-current-room .wolf-hub .action-area{background:#1b1b2a!important;border:1px solid #3b3b52!important;border-radius:12px!important}
+#wolf-current-room .wolf-hub .target-button{background:#292940!important;border:1px solid #454560!important;border-radius:10px!important}
+#wolf-current-room .wolf-hub .wolf-landscape-scene,
+#wolf-current-room .wolf-hub .game-player-stage{
+  background-size:cover!important;background-position:center 54%!important;
+}
+#wolf-current-room .wolf-hub .wolf-landscape-scene{height:clamp(530px,55vw,700px)!important;min-height:530px!important}
+#wolf-current-room .wolf-hub .wolf-scene-bottom{background:#1b1a29!important}
+@media(max-width:900px) and (min-width:701px){
+  #wolf-current-room .wolf-hub,#wolf-current-room .wolf-hub.waiting-mode,#wolf-current-room .wolf-hub:not(.waiting-mode){
+    grid-template-columns:minmax(0,1fr) minmax(270px,34%)!important
+  }
+  #wolf-current-room .wolf-hub>.hub-scene{min-height:600px!important}
+}
+@media(max-width:700px){
+  body{padding-bottom:0!important}
+  .topbar{min-height:52px;padding:6px 10px}
+  .topbar .brand{font-size:12px}
+  .topbar .brand .logo{width:30px;height:30px}
+  .topbar-play{min-height:33px;padding:7px 12px}
+  main{padding:0 8px}
+  #lobby{grid-template-columns:minmax(0,1fr);grid-template-areas:"head" "quick" "rooms" "profile" "premium" "community" "account" "admin";gap:9px;padding:12px 0 25px}
+  #lobby>.lobby-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  #lobby>.lobby-grid .panel{padding:11px}
+  #lobby>.lobby-grid .panel:last-child{grid-column:1/-1}
+  #lobby .room-list{grid-template-columns:1fr}
+  #lobby .composition-icon-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+  #wolf-current-room .wolf-hub,
+  #wolf-current-room .wolf-hub.waiting-mode,
+  #wolf-current-room .wolf-hub:not(.waiting-mode){
+    display:block!important;position:relative!important;min-height:0!important;height:auto!important;
+    overflow:visible!important;padding:0!important
+  }
+  #wolf-current-room .wolf-hub>.hub-scene{
+    display:block!important;position:relative!important;min-height:0!important;height:auto!important;
+    width:100%!important;border:0!important;border-radius:0!important;overflow:visible!important
+  }
+  #wolf-current-room .wolf-hub>.hub-panel{
+    display:block!important;position:relative!important;inset:auto!important;width:100%!important;
+    max-height:none!important;min-height:0!important;margin:0!important;padding:9px!important;
+    border-radius:12px!important;background:#222233!important;overflow:visible!important
+  }
+  #wolf-current-room .wolf-hub .hub-tabs{position:sticky!important;top:0!important;z-index:15!important}
+  #wolf-current-room .wolf-hub .hub-tabs>*{font-size:9px!important;padding:8px 4px!important}
+  #wolf-current-room .wolf-hub .chat-messages,
+  #wolf-current-room .wolf-hub .hub-tab-content .chat-messages{
+    height:clamp(180px,27svh,260px)!important;min-height:150px!important;max-height:260px!important
+  }
+  #wolf-current-room .wolf-hub .wolf-landscape-scene{height:clamp(400px,58svh,520px)!important;min-height:400px!important}
+  #wolf-current-room .wolf-hub .game-player-stage{min-height:420px!important}
+  #wolf-current-room .wolf-hub .game-seat-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:5px!important}
+  #wolf-current-room .wolf-hub .player-avatar{width:40px!important;height:40px!important;font-size:21px!important}
+  #wolf-current-room .wolf-hub .player-chip-info strong{font-size:8px!important}
+  #wolf-current-room .wolf-hub .wolf-scene-player{min-width:43px!important}
+  #wolf-current-room .wolf-hub .scene-avatar{width:38px!important;height:46px!important;font-size:30px!important}
+  #wolf-current-room .wolf-hub .scene-name{font-size:8px!important;padding:3px 5px!important}
+  #wolf-current-room .wolf-hub .wolf-scene-bottom{padding:9px!important}
+  #wolf-current-room .wolf-hub .wolf-scene-buttons{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  #wolf-current-room .wolf-hub .wolf-scene-buttons button{min-width:0!important;font-size:10px!important}
+  .mobile-dock{display:none!important}
+}
