@@ -53,7 +53,7 @@
     const b=e.target.closest('[data-wx-tab]');if(!b)return;
     document.querySelector('#lobby')?.classList.remove('admin-tab-open');
     const target=document.querySelector('#wolf-extra-app [data-wx-tab="'+b.dataset.wxTab+'"]');
-    if(target){target.click();document.querySelector('#wolf-extra-app')?.scrollIntoView({behavior:'smooth',block:'start');}
+    if(target){target.click();document.querySelector('#wolf-extra-app')?.scrollIntoView({behavior:'smooth',block:'start'});}
     else toast('Connectez-vous pour accéder à cette rubrique.');
   });
   function renderCompositionFields(comp={}){
