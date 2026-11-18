@@ -114,3 +114,29 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 body.wolf-game-mode #lobby{display:block!important;padding:10px!important}
 body.wolf-game-mode #lobby>.room-panel{display:block!important}
 @media(max-width:700px){body.wolf-game-mode #lobby{padding:5px!important}}
+
+/* Composition des rôles : compacte, lisible et repliable */
+#lobby .room-panel .composition-editor{padding:18px;margin:14px 0}
+#lobby .room-panel .composition-group{margin:10px 0;border:1px solid #393248;border-radius:13px;background:#100e18;overflow:hidden}
+#lobby .room-panel .composition-group>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 15px;cursor:pointer;list-style:none;color:#f5f1fc;font-weight:700}
+#lobby .room-panel .composition-group>summary::-webkit-details-marker{display:none}
+#lobby .room-panel .composition-group>summary:after{content:"＋";color:#b99aff;font-size:18px}
+#lobby .room-panel .composition-group[open]>summary:after{content:"−"}
+#lobby .room-panel .composition-group>summary small{margin-left:auto;color:#aaa2ba;font-size:10px;font-weight:500}
+#lobby .room-panel .composition-icon-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;padding:4px 12px 13px}
+#lobby .room-panel .composition-icon-card{min-width:0;min-height:96px;padding:9px 5px!important;gap:5px;border:1px solid #373047!important;border-radius:11px;background:#191624!important}
+#lobby .room-panel .composition-role-icon{font-size:22px;line-height:1.2}
+#lobby .room-panel .composition-icon-card strong{font-size:11px;line-height:1.2;min-height:25px;display:flex;align-items:center;justify-content:center}
+#lobby .room-panel .composition-icon-card>small{font-size:9px}
+#lobby .room-panel .composition-stepper{display:flex;align-items:center;justify-content:center;gap:8px}
+#lobby .room-panel .composition-stepper button{width:25px;height:25px;min-width:25px;padding:0;border-radius:7px}
+#lobby .room-panel .composition-stepper output{min-width:14px;text-align:center;font-weight:800;font-size:12px}
+#lobby .room-panel .composition-total{position:sticky;bottom:8px;z-index:2;margin-top:10px;padding:12px 14px;border:1px solid #4a3b60;border-radius:11px;background:#211a2e}
+@media(max-width:900px){#lobby .room-panel .composition-icon-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:600px){
+ #lobby .room-panel .composition-editor{padding:12px}
+ #lobby .room-panel .composition-group>summary{padding:12px}
+ #lobby .room-panel .composition-icon-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:4px 8px 10px}
+ #lobby .room-panel .composition-icon-card{min-height:88px}
+ #lobby .room-panel .composition-icon-card strong{font-size:10px}
+}
