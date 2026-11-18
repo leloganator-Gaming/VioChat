@@ -86,7 +86,7 @@
     createButtons.forEach(el=>createBox.appendChild(el));
     createPage.appendChild(createBox);
     const publicBox=document.createElement('div');publicBox.className='wolf-public-box';
-    publicBox.innerHTML='<div class="wolf-public-heading"><div><p class="eyebrow">REJOINDRE UNE PARTIE</p><h2>Parties publiques</h2><p>Choisissez un salon ouvert et entrez directement dans la partie.</p></div><span class="wolf-public-live">● EN DIRECT</span></div>';
+    publicBox.innerHTML='<div class="wolf-public-heading"><div><p class="eyebrow">REJOINDRE UNE PARTIE</p><h2>Parties publiques</h2><p>Choisissez un salon ouvert et rejoignez les joueurs.</p><strong id="wolf-public-count" class="wolf-public-count">Chargement des salons…</strong></div><span class="wolf-public-live">● SALONS OUVERTS</span></div><button type="button" class="public-refresh-button" id="wolf-public-refresh">↻ Actualiser la liste</button>';
     const codeFields=roomPanel.querySelector('.room-fields');
     if(codeFields)publicBox.appendChild(codeFields);
     const rooms=roomPanel.querySelector('#wolf-rooms');
@@ -95,6 +95,7 @@
     if(featured){featured.classList.add('wolf-public-featured');publicBox.insertBefore(featured,publicBox.children[1]||null);}
     if(grid&&!grid.children.length)grid.remove();
     homePage.appendChild(publicBox);
+    publicBox.querySelector('#wolf-public-refresh')?.addEventListener('click',loadRooms);
     const current=roomPanel.querySelector('#wolf-current-room');
     if(current)roomPanel.appendChild(current);
     roomPanel.classList.add('room-storage');
@@ -267,21 +268,25 @@
     if(r.error)return toast(r.error.message);profileName=n;$('wolf-pseudo').value=n;$('wolf-profile-preview').innerHTML='<span>'+esc(emoji)+'</span><strong>'+esc(n)+'</strong>'+(isAlpha?'<small class="alpha-badge">🐺 LOUP ALPHA</small>':'');toast('Profil enregistré.');
   }
   async function loadRooms(){
-    const mine=await sb.from('room_players').select('room_id').eq('user_id',currentUserId);
-    if(mine.error){$('wolf-rooms').textContent=mine.error.message;return;}
-    const ids=(mine.data||[]).map(x=>x.room_id);
-    const [waiting,playing]=await Promise.all([
-      sb.from('game_rooms').select('id,room_code,name,status,max_players,created_at,settings,room_players(count)').eq('status','waiting').order('created_at',{ascending:false}).limit(30),
-      ids.length?sb.from('game_rooms').select('id,room_code,name,status,max_players,created_at,room_players(count)').in('id',ids).eq('status','playing').order('created_at',{ascending:false}):Promise.resolve({data:[],error:null})
-    ]);
-    if(waiting.error||playing.error){$('wolf-rooms').textContent=(waiting.error||playing.error).message;return;}
-    const open=(waiting.data||[]).filter(x=>(x.settings?.visibility!=='private'||ids.includes(x.id))&&(x.room_players?.[0]?.count||0)<x.max_players);
-    const active=playing.data||[];
-    const cards=[...active,...open].map(x=>{const count=x.room_players?.[0]?.count||0,when=new Date(x.created_at).toLocaleString('fr-FR',{dateStyle:'short',timeStyle:'short'});return '<div class="room-card"><span><strong>'+esc(x.name)+'</strong><small>'+(x.status==='playing'?'🎮 Partie en cours · réservée aux participants':'🏰 Salon ouvert · '+(x.max_players-count)+' place(s) disponible(s)')+' · '+count+'/'+x.max_players+' joueurs · Créé le '+when+'</small><small>Code : '+esc(x.room_code)+'</small></span>'+(x.status==='playing'?'<button class="secondary" data-resume="'+x.id+'" data-code="'+esc(x.room_code)+'">Reprendre</button>':'<button class="secondary" data-enter="'+esc(x.room_code)+'">Rejoindre</button>')+'</div>';}).join('');
-    $('wolf-rooms').innerHTML=cards||'<div class="empty-rooms"><strong>Aucune partie à afficher</strong><small>Les salons ouverts apparaîtront ici. Créez-en un pour commencer ou rejoignez un ami avec son code.</small></div>';
-    $('wolf-rooms').querySelectorAll('[data-enter]').forEach(b=>b.addEventListener('click',()=>joinRoom(b.dataset.enter)));
-    $('wolf-rooms').querySelectorAll('[data-resume]').forEach(b=>b.addEventListener('click',()=>openRoom(b.dataset.resume,b.dataset.code)));
+    const box=$('wolf-rooms');if(!box||!sb)return;
+    box.innerHTML='<div class="public-rooms-loading">Recherche des salons publics…</div>';
+    const r=await sb.from('game_rooms')
+      .select('id,room_code,name,status,max_players,created_at,settings,room_players(count)')
+      .eq('status','waiting')
+      .order('created_at',{ascending:false})
+      .limit(60);
+    if(r.error){box.innerHTML='<div class="empty-rooms"><strong>Impossible de charger les parties publiques</strong><small>'+esc(r.error.message)+'</small></div>';return;}
+    // La liste d’accueil ne montre que les salons explicitement publics (les anciens salons sans réglage restent publics).
+    const rooms=(r.data||[]).filter(x=>(x.settings?.visibility||'public')==='public'&&(x.room_players?.[0]?.count||0)<Number(x.max_players));
+    const count=rooms.length;
+    const heading=$('wolf-public-count');if(heading)heading.textContent=count+' salon'+(count>1?'s':'')+' public'+(count>1?'s':'')+' disponible'+(count>1?'s':'');
+    box.innerHTML=rooms.length?rooms.map(x=>{
+      const players=x.room_players?.[0]?.count||0,free=Number(x.max_players)-players;
+      return '<article class="public-room-card"><div class="public-room-card-top"><span class="public-room-status"><i></i> EN ATTENTE</span><span class="public-room-spaces">'+free+' place'+(free>1?'s':'')+'</span></div><h3>'+esc(x.name||'Salon Wolfanator')+'</h3><div class="public-room-meta"><span>👥 '+players+' / '+x.max_players+' joueurs</span><span>🌐 Public</span></div><button class="primary public-room-join" data-enter="'+esc(x.room_code)+'">Rejoindre la partie <span>→</span></button></article>';
+    }).join(''):'<div class="empty-rooms"><strong>Aucune partie publique pour le moment</strong><small>Les salons publics apparaîtront ici dès qu’un joueur en créera un. Revenez dans quelques instants.</small></div>';
+    box.querySelectorAll('[data-enter]').forEach(b=>b.addEventListener('click',()=>joinRoom(b.dataset.enter)));
   }
+
   function getComposition(){return Object.fromEntries(roleKeys.map(k=>[k,Number($('wolf-comp-'+k)?.value||0)]));}
   function updateCompositionTotal(){const c=getComposition(),sum=Object.values(c).reduce((n,v)=>n+v,0),max=Number($('wolf-room-max').value),valid=Object.values(c).every(n=>Number.isInteger(n)&&n>=0)&&wolfCount(c)>=1&&sum===max;$('wolf-comp-total').textContent='Total : '+sum+' / '+max+' joueurs'+(valid?' · Composition valide':' · Ajustez les rôles');$('wolf-create').disabled=!valid;if($('wolf-solo-create'))$('wolf-solo-create').disabled=!valid;}
 
