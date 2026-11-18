@@ -91,8 +91,9 @@
     if(codeFields)publicBox.appendChild(codeFields);
     const rooms=roomPanel.querySelector('#wolf-rooms');
     if(rooms)publicBox.appendChild(rooms);
-    const quick=grid?.querySelector('#quick-join');
-    if(quick){quick.classList.add('wolf-public-quick');publicBox.insertBefore(quick,publicBox.children[1]||null);}
+    const featured=grid?.querySelector('.panel.featured');
+    if(featured){featured.classList.add('wolf-public-featured');publicBox.insertBefore(featured,publicBox.children[1]||null);}
+    if(grid&&!grid.children.length)grid.remove();
     homePage.appendChild(publicBox);
     const current=roomPanel.querySelector('#wolf-current-room');
     if(current)roomPanel.appendChild(current);
