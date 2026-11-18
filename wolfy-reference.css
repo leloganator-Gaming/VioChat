@@ -531,3 +531,28 @@ body.wolf-game-mode #lobby>.section-head{display:none!important}
 
 /* Preserve application visibility states despite the strong hub layout selectors. */
 #home.hidden,#lobby.hidden,#auth-screen.hidden,#how.hidden{display:none!important}
+
+/* Friends occupy the community position; administration is only shown from its tab. */
+#lobby>.admin-panel{display:none!important;grid-area:admin!important}
+#lobby.admin-tab-open{
+ grid-template-columns:minmax(245px,285px) minmax(360px,1fr) minmax(290px,340px)!important;
+ grid-template-areas:"head head head" "nav nav nav" "admin admin admin"!important;
+}
+#lobby.admin-tab-open>.admin-panel{display:block!important;grid-area:admin!important;min-width:0!important}
+#lobby.admin-tab-open>.wolfy-hub-visual,
+#lobby.admin-tab-open>.wolfy-hub-nav~.lobby-grid,
+#lobby.admin-tab-open>.room-panel,
+#lobby.admin-tab-open>#wolf-extra-app,
+#lobby.admin-tab-open>.profile-panel,
+#lobby.admin-tab-open>.premium-panel,
+#lobby.admin-tab-open>.account-panel{display:none!important}
+#lobby.admin-tab-open>.wolfy-hub-nav{display:flex!important}
+#lobby>.wolfy-hub-nav [data-wolf-admin-tab]{margin-left:auto!important;background:#302b4b!important;color:#eee!important;border:1px solid #514779!important}
+#lobby>.wolfy-hub-nav [data-wx-tab="friends"]{background:#6554d9!important;color:#fff!important}
+@media(max-width:1050px) and (min-width:701px){
+ #lobby.admin-tab-open{grid-template-columns:minmax(0,1fr)!important;grid-template-areas:"head" "nav" "admin"!important}
+}
+@media(max-width:700px){
+ #lobby.admin-tab-open{grid-template-columns:minmax(0,1fr)!important;grid-template-areas:"head" "nav" "admin"!important}
+ #lobby>.wolfy-hub-nav [data-wolf-admin-tab]{margin-left:0!important}
+}
