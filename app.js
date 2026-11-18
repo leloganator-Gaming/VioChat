@@ -72,7 +72,7 @@
     $('wolf-logout').hidden=!session;$('wolf-logout-lobby').hidden=!session;$('wolf-login').hidden=!!session;$('wolf-signup').hidden=!!session;$('wolf-pseudo').hidden=!!session;
     profile.hidden=!session;panel.hidden=!session;premium.hidden=!session;
     if(session){currentUserId=session.user.id;$('auth-screen').classList.add('hidden');$('lobby').classList.remove('hidden');status('Connecté : '+(session.user.email||'joueur'));await loadProfile(session.user);await loadPremium();await loadRooms();await renderAdminPanel();if(location.hash.startsWith('#/game/'))await handleGameRoute();}
-    else{currentUserId='';profileName='';isAdmin=false;if(adminPanel)adminPanel.hidden=true;status('Non connecté.');$('wolf-rooms').innerHTML='<small>Connectez-vous pour afficher les salons.</small>';}
+    else{currentUserId='';profileName='';isAdmin=false;if(adminPanel)adminPanel.hidden=true;status('Non connecté.');$('wolf-rooms').innerHTML='<small>Connectez-vous pour afficher les salons.</small>';if(location.hash.startsWith('#/game/'))showAuth();}
   }
   async function loadPremium(){
     isAdmin=false;const box=$('wolf-premium-status');if(!box)return;
@@ -220,8 +220,8 @@
   async function openRoom(id,code){
     currentRoom=id;isRoomHost=false;ambientLupixAt=0;const roomHash='#/game/'+encodeURIComponent(id)+'/'+encodeURIComponent(String(code||'').toUpperCase());if(location.hash!==roomHash)history.replaceState(null,'',location.pathname+location.search+roomHash);if(channel)await sb.removeChannel(channel);
     channel=sb.channel('wolf-room-'+id).on('postgres_changes',{event:'*',schema:'public',table:'room_players',filter:'room_id=eq.'+id},refreshRoom).on('postgres_changes',{event:'UPDATE',schema:'public',table:'game_rooms',filter:'id=eq.'+id},refreshRoom).on('postgres_changes',{event:'INSERT',schema:'public',table:'room_messages',filter:'room_id=eq.'+id},loadChat).subscribe();
-    $('wolf-current-room').innerHTML='<div class="room-heading"><h3>Salon '+esc(code)+'</h3><div class="button-row"><button class="secondary" id="wolf-copy-code">Copier le code</button><button class="ghost" id="wolf-close-room">Fermer</button></div></div><div id="wolf-room-detail">Chargement…</div>';
-    $('wolf-close-room').addEventListener('click',closeRoom);$('wolf-copy-code').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(String(code));toast('Code du salon copié.');}catch(e){toast('Copie automatique indisponible : '+code);}});await refreshRoom();
+    $('wolf-current-room').innerHTML='<div class="room-heading"><h3>Salon '+esc(code)+'</h3><div class="button-row"><button class="secondary" id="wolf-copy-code">Copier le lien</button><button class="ghost" id="wolf-close-room">Fermer</button></div></div><div id="wolf-room-detail">Chargement…</div>';
+    $('wolf-close-room').addEventListener('click',closeRoom);$('wolf-copy-code').addEventListener('click',()=>copyGameRoomLink(id,code));await refreshRoom();
   }
   function closeRoom(){currentRoom=null;isRoomHost=false;ambientLupixAt=0;if(channel&&sb)sb.removeChannel(channel);channel=null;if(location.hash.startsWith('#/game/'))history.replaceState(null,'',location.pathname+location.search+'#lobby');$('wolf-current-room').innerHTML='';loadRooms();}
   function waitingHTML(room,players,u){
