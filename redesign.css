@@ -557,3 +557,29 @@ body.wolf-game-mode #wolf-current-room .game-status{position:sticky!important;to
  body.wolf-game-mode #wolf-current-room .wolf-hub.waiting-mode .wolf-landscape-scene{height:auto!important;min-height:270px!important}
  body.wolf-game-mode #wolf-current-room .wolf-hub:not(.waiting-mode) .game-status{top:0!important}
 }
+
+
+/* Friends, private DMs and passkeys */
+.friends-panel{grid-column:1/-1;margin-top:18px}
+.friends-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+.friends-tabs button{border:1px solid var(--line,#393047);border-radius:12px;padding:9px 14px;background:transparent;color:inherit}
+.friends-tabs button.active{background:#7955d9;color:#fff;border-color:#7955d9}
+.friend-search{display:flex;gap:8px;align-items:center}
+.friend-search input,.friend-chat-form input{flex:1;min-width:0}
+.friend-row{display:flex;align-items:center;gap:10px;padding:11px 8px;border-bottom:1px solid #ffffff16;color:inherit;width:100%;text-align:left;background:transparent}
+.friend-row strong{flex:1}
+.friend-avatar{font-size:1.35rem}
+.friend-open{cursor:pointer}
+.friend-chat{display:flex;flex-direction:column;min-height:320px;height:430px;max-height:65vh;border:1px solid #ffffff20;border-radius:16px;padding:12px;gap:10px}
+.friend-chat-head{display:flex;align-items:center;gap:10px}
+.friend-chat-head strong{flex:1}
+.friend-chat-messages{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:8px}
+.friend-message{max-width:82%;align-self:flex-start;padding:9px 12px;border-radius:14px;background:#292438;overflow-wrap:anywhere}
+.friend-message.mine{align-self:flex-end;background:#6545b9}
+.friend-message p{margin:0}
+.friend-message small{display:block;text-align:right;opacity:.7;font-size:.72rem;margin-top:3px}
+.friend-chat-form{display:flex;gap:8px}
+.passkey-list{display:grid;gap:6px;margin:8px 0}
+.passkey-row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+#wolf-passkey-login{margin-top:8px}
+@media(max-width:700px){.friends-panel{grid-column:1}.friend-chat{height:55vh;max-height:55vh}.friend-search{flex-direction:column;align-items:stretch}.friend-row{flex-wrap:wrap}}
