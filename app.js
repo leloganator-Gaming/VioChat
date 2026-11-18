@@ -46,7 +46,79 @@
 
   // Les onglets sociaux restent gérés par features.js ; ces raccourcis ouvrent leurs vrais onglets.
   const hubNav=document.createElement('nav');hubNav.className='wolfy-hub-nav';hubNav.innerHTML='<button data-wx-tab="shop">🛍 Boutique</button><button data-wx-tab="ranking">🏆 Classement</button><button data-wx-tab="friends">👥 Amis</button><button data-wx-tab="profile">🪪 Mon skin</button>';
+
   $('lobby').insertBefore(hubNav,wolfyHub);
+
+  // Navigation principale : l'accueil met les parties publiques au premier plan.
+  const lobby=$('lobby');
+  const homePage=document.createElement('section');homePage.className='wolf-main-page active';homePage.dataset.mainPage='home';
+  const createPage=document.createElement('section');createPage.className='wolf-main-page';createPage.dataset.mainPage='create';
+  const friendsPage=document.createElement('section');friendsPage.className='wolf-main-page';friendsPage.dataset.mainPage='friends';
+  const profilePage=document.createElement('section');profilePage.className='wolf-main-page';profilePage.dataset.mainPage='profile';
+  const extrasPage=document.createElement('section');extrasPage.className='wolf-main-page';extrasPage.dataset.mainPage='extras';
+  const adminPage=document.createElement('section');adminPage.className='wolf-main-page';adminPage.dataset.mainPage='admin';
+  const mainNav=document.createElement('nav');mainNav.className='wolf-main-nav';mainNav.setAttribute('aria-label','Navigation principale');
+  mainNav.innerHTML='<button class="active" data-main-tab="home">🏡 Accueil</button><button data-main-tab="create">🏰 Créer</button><button data-main-tab="friends">👥 Amis</button><button data-main-tab="profile">🪪 Profil</button><button data-main-tab="extras">🛍 Boutique & classement</button>';
+  lobby.insertBefore(mainNav,hubNav);
+  lobby.insertBefore(homePage,hubNav);
+  lobby.insertBefore(createPage,hubNav);
+  lobby.insertBefore(friendsPage,hubNav);
+  lobby.insertBefore(profilePage,hubNav);
+  lobby.insertBefore(extrasPage,hubNav);
+  lobby.insertBefore(adminPage,hubNav);
+  homePage.appendChild(wolfyHub);
+  const grid=$('lobby').querySelector('.lobby-grid');
+  if(grid){
+    homePage.appendChild(grid);
+    const cards=[...grid.children];
+    if(cards[1])createPage.appendChild(cards[1]);
+    if(cards[2])profilePage.appendChild(cards[2]);
+  }
+  const roomPanel=$('lobby').querySelector('.room-panel');
+  if(roomPanel){
+    const createFields=roomPanel.querySelector('.room-fields');
+    const composition=roomPanel.querySelector('.composition-editor');
+    const createButtons=[...roomPanel.querySelectorAll('.button-row')];
+    const createBox=document.createElement('div');createBox.className='wolf-create-box';
+    createBox.innerHTML='<p class="eyebrow">PERSONNALISER VOTRE PARTIE</p><h2>Créer un salon</h2><p>Choisissez le nom, la visibilité, les rôles et les joueurs Lupix.</p>';
+    if(createFields)createBox.appendChild(createFields);
+    if(composition)createBox.appendChild(composition);
+    createButtons.forEach(el=>createBox.appendChild(el));
+    createPage.appendChild(createBox);
+    const publicBox=document.createElement('div');publicBox.className='wolf-public-box';
+    publicBox.innerHTML='<div class="wolf-public-heading"><div><p class="eyebrow">REJOINDRE UNE PARTIE</p><h2>Parties publiques</h2><p>Choisissez un salon ouvert et entrez directement dans la partie.</p></div><span class="wolf-public-live">● EN DIRECT</span></div>';
+    const codeFields=roomPanel.querySelector('.room-fields');
+    if(codeFields)publicBox.appendChild(codeFields);
+    const rooms=roomPanel.querySelector('#wolf-rooms');
+    if(rooms)publicBox.appendChild(rooms);
+    const quick=grid?.querySelector('#quick-join');
+    if(quick){quick.classList.add('wolf-public-quick');publicBox.insertBefore(quick,publicBox.children[1]||null);}
+    homePage.appendChild(publicBox);
+    const current=roomPanel.querySelector('#wolf-current-room');
+    if(current)roomPanel.appendChild(current);
+    roomPanel.hidden=true;
+  }
+  const profilePanel=lobby.querySelector('.profile-panel');if(profilePanel)profilePage.appendChild(profilePanel);
+  const premiumPanel=lobby.querySelector('.premium-panel');if(premiumPanel)extrasPage.appendChild(premiumPanel);
+  const accountPanel=lobby.querySelector('.account-panel');if(accountPanel)profilePage.appendChild(accountPanel);
+  const extraApp=lobby.querySelector('#wolf-extra-app');if(extraApp)friendsPage.appendChild(extraApp);
+  if(adminPanel)adminPage.appendChild(adminPanel);
+  const setMainPage=(name)=>{
+    lobby.dataset.mainView=name;
+    lobby.querySelectorAll('.wolf-main-page').forEach(p=>p.classList.toggle('active',p.dataset.mainPage===name));
+    mainNav.querySelectorAll('[data-main-tab]').forEach(b=>b.classList.toggle('active',b.dataset.mainTab===name));
+    lobby.classList.toggle('admin-tab-open',name==='admin');
+    if(name==='friends')lobby.querySelector('#wolf-extra-app [data-wx-tab="friends"]')?.click();
+    if(name==='profile')lobby.querySelector('#wolf-extra-app [data-wx-tab="profile"]')?.click();
+    if(name==='extras')lobby.querySelector('#wolf-extra-app [data-wx-tab="shop"]')?.click();
+    if(name==='create')$('wolf-room-name')?.focus({preventScroll:true});
+    window.scrollTo({top:0,behavior:'smooth'});
+  };
+  mainNav.addEventListener('click',e=>{const b=e.target.closest('[data-main-tab]');if(b)setMainPage(b.dataset.mainTab);});
+  hubNav.querySelector('[data-wolf-admin-tab]')?.addEventListener('click',()=>setMainPage('admin'));
+  hubNav.querySelectorAll('[data-wx-tab]').forEach(b=>b.addEventListener('click',()=>{const key=b.dataset.wxTab;setMainPage(key==='friends'?'friends':key==='profile'?'profile':'extras');}));
+  lobby.querySelector('[data-hub-action="create"]')?.addEventListener('click',()=>setMainPage('create'));
+  lobby.querySelector('[data-hub-action="play"]')?.addEventListener('click',()=>setMainPage('home'));
   hubNav.addEventListener('click',e=>{
     const adminButton=e.target.closest('[data-wolf-admin-tab]');
     if(adminButton){document.querySelector('#lobby')?.classList.add('admin-tab-open');adminPanel?.scrollIntoView({behavior:'smooth',block:'start'});return;}
