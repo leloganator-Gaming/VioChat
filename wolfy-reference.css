@@ -556,3 +556,79 @@ body.wolf-game-mode #lobby>.section-head{display:none!important}
  #lobby.admin-tab-open{grid-template-columns:minmax(0,1fr)!important;grid-template-areas:"head" "nav" "admin"!important}
  #lobby>.wolfy-hub-nav [data-wolf-admin-tab]{margin-left:0!important}
 }
+
+
+/* ===== Main navigation: public games first, every other feature in tabs ===== */
+#lobby{display:block!important;max-width:1480px!important;padding:14px 18px 40px!important}
+#lobby>.section-head{margin:0 0 12px!important}
+#lobby>.wolf-main-nav{display:flex!important;align-items:center!important;gap:7px!important;flex-wrap:wrap!important;margin:0 0 12px!important;padding:8px!important;background:#1c1c2b!important;border:1px solid #39394f!important;border-radius:13px!important}
+.wolf-main-nav button{border:0!important;border-radius:9px!important;padding:10px 15px!important;background:transparent!important;color:#d6d3e7!important;font-size:12px!important;font-weight:800!important;cursor:pointer!important}
+.wolf-main-nav button.active{background:#6754dc!important;color:white!important;box-shadow:0 4px 14px #5745ce55!important}
+.wolf-main-nav button:hover{background:#ffffff14!important}
+#lobby>.wolf-main-page{display:none!important;min-width:0!important}
+#lobby>.wolf-main-page.active{display:block!important}
+#lobby>.wolf-main-page[data-main-page="home"]{display:none!important}
+#lobby>.wolf-main-page[data-main-page="home"].active{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(350px,460px)!important;grid-template-areas:"hero hero" "quick public"!important;gap:14px!important;align-items:start!important}
+#lobby .wolfy-hub-visual{grid-area:hero!important}
+#lobby .wolfy-hub-scene{height:225px!important;min-height:225px!important;border-radius:14px!important;background-position:center 53%!important}
+#lobby .wolfy-hub-avatar{top:43%!important;font-size:80px!important}
+#lobby .wolfy-hub-moon{width:52px!important;height:52px!important;top:10%!important}
+#lobby .wolfy-hub-pedestal{top:65%!important;width:140px!important}
+#lobby .wolfy-hub-name{top:70%!important}
+#lobby .wolfy-hub-name strong{font-size:14px!important}
+#lobby .wolfy-hub-pet{top:62%!important}
+#lobby .wolfy-hub-quick{display:none!important}
+#lobby .wolfy-hub-nav{display:flex!important;margin:0 0 12px!important}
+#lobby .lobby-grid{grid-area:quick!important;display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:10px!important;margin:0!important}
+#lobby .lobby-grid>.panel{padding:20px!important;min-height:185px!important}
+#lobby .lobby-grid>.panel:not(.featured){display:none!important}
+#lobby .lobby-grid>.panel.featured{display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:flex-start!important}
+#lobby .lobby-grid>.panel.featured h3{font-size:25px!important}
+#lobby .lobby-grid>.panel.featured p{font-size:13px!important}
+#lobby .lobby-grid>.panel.featured .primary{width:100%!important;min-height:52px!important;font-size:16px!important}
+#lobby .wolf-public-box{grid-area:public!important;min-width:0!important;padding:18px!important;background:#1d1d2c!important;border:1px solid #3a3950!important;border-radius:15px!important;box-shadow:0 12px 28px #09091244!important}
+.wolf-public-heading{display:flex!important;align-items:flex-start!important;justify-content:space-between!important;gap:12px!important;margin-bottom:14px!important}
+.wolf-public-heading h2{font-size:22px!important;margin:3px 0!important}
+.wolf-public-heading p:not(.eyebrow){font-size:11px!important;color:#aaa8bf!important;margin:5px 0!important}
+.wolf-public-live{white-space:nowrap!important;color:#7be0ae!important;font-size:9px!important;font-weight:900!important;letter-spacing:1px!important}
+#lobby .wolf-public-box .room-fields{display:flex!important;gap:8px!important;margin:0 0 12px!important}
+#lobby .wolf-public-box .room-fields input{min-width:0!important;flex:1!important}
+#lobby .wolf-public-box #quick-join{width:100%!important;min-height:46px!important;margin:0 0 12px!important;font-size:14px!important}
+#lobby .wolf-public-box .room-list{max-height:520px!important;overflow:auto!important}
+#lobby .wolf-public-box .room-list>*{margin-bottom:8px!important}
+#lobby>.wolf-main-page[data-main-page="create"].active{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(250px,320px)!important;gap:14px!important;align-items:start!important}
+#lobby>.wolf-main-page[data-main-page="create"] .wolf-create-box,
+#lobby>.wolf-main-page[data-main-page="create"]>.panel{padding:20px!important;background:#1d1d2c!important;border:1px solid #39394f!important;border-radius:14px!important}
+#lobby>.wolf-main-page[data-main-page="create"] .wolf-create-box{grid-column:1/-1!important}
+#lobby>.wolf-main-page[data-main-page="create"] .room-fields{margin:12px 0!important}
+#lobby>.wolf-main-page[data-main-page="create"] .composition-editor{margin:12px 0!important}
+#lobby>.wolf-main-page[data-main-page="friends"].active,
+#lobby>.wolf-main-page[data-main-page="profile"].active,
+#lobby>.wolf-main-page[data-main-page="extras"].active,
+#lobby>.wolf-main-page[data-main-page="admin"].active{max-width:1180px!important;margin:0 auto!important}
+#lobby>.room-panel.room-storage{display:none!important}
+#lobby>.room-panel.room-storage.room-open{display:block!important}
+body.wolf-game-mode #lobby>.wolf-main-nav,
+body.wolf-game-mode #lobby>.wolf-main-page{display:none!important}
+body.wolf-game-mode #lobby>.room-panel.room-storage.room-open{display:block!important}
+@media(max-width:900px){
+ #lobby>.wolf-main-page[data-main-page="home"].active{grid-template-columns:minmax(0,1fr)!important;grid-template-areas:"hero" "quick" "public"!important}
+ #lobby .wolfy-hub-scene{height:190px!important;min-height:190px!important}
+ #lobby .wolf-public-box{padding:14px!important}
+ #lobby .wolf-public-heading h2{font-size:19px!important}
+}
+@media(max-width:700px){
+ #lobby{padding:8px 9px 90px!important}
+ #lobby>.wolf-main-nav{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:5px!important;padding:6px!important}
+ .wolf-main-nav button{padding:10px 5px!important;font-size:10px!important}
+ #lobby>.wolf-main-page[data-main-page="home"].active{gap:9px!important}
+ #lobby .wolfy-hub-scene{height:165px!important;min-height:165px!important}
+ #lobby .wolfy-hub-avatar{font-size:65px!important}
+ #lobby .wolfy-hub-name{top:71%!important}
+ #lobby .lobby-grid>.panel{min-height:155px!important;padding:15px!important}
+ #lobby .lobby-grid>.panel.featured h3{font-size:21px!important}
+ #lobby .wolf-public-box .room-fields{flex-direction:column!important}
+ #lobby .wolf-public-box .room-list{max-height:430px!important}
+ #lobby>.wolf-main-page[data-main-page="create"].active{grid-template-columns:minmax(0,1fr)!important}
+ #lobby>.wolf-main-page[data-main-page="create"] .wolf-create-box{padding:13px!important}
+}
