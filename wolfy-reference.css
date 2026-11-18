@@ -253,3 +253,13 @@ main{width:100%;max-width:1600px;padding:0 clamp(16px,2.5vw,38px)}
   #lobby>.lobby-grid .panel:last-child{grid-column:auto}
   #wolf-current-room .wolf-hub .game-seat-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
 }
+
+/* La scène passe réellement du décor du jour à celui de la nuit selon la phase. */
+#wolf-current-room .wolf-hub:has(.game-status[data-game-phase="night"]) .game-player-stage,
+#wolf-current-room .wolf-hub:has(.game-status[data-game-phase="night"]) .wolf-landscape-scene{
+  background-image:url('https://assets.wolfy.fr/scenenuit_wolfy.png')!important;
+  background-size:cover!important;background-position:center 52%!important
+}
+#wolf-current-room .wolf-hub:has(.game-status[data-game-phase="day"]) .game-player-stage{
+  background-image:url('https://assets.wolfy.fr/scenejour_wolfy.png')!important
+}
