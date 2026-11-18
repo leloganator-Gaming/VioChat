@@ -3,7 +3,7 @@
   const esc = s => String(s ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const toast = s => { const el=$('toast'); el.textContent=s; el.classList.add('show'); clearTimeout(window.__wolfToast); window.__wolfToast=setTimeout(()=>el.classList.remove('show'),4200); };
   const cfg=window.WOLFANATOR_CONFIG||{}, configured=!!(cfg.supabaseUrl&&cfg.supabasePublishableKey&&window.supabase);
-  const sb=configured?window.supabase.createClient(cfg.supabaseUrl,cfg.supabasePublishableKey):null;
+  const sb=configured?window.supabase.createClient(cfg.supabaseUrl,cfg.supabasePublishableKey,{auth:{experimental:{passkey:true}}}):null;
   let currentRoom=null,channel=null,profileName='',currentUserId='',refreshing=false,isAlpha=false,isAdmin=false,adminPanel=null,autoBotPhaseKey='',isRoomHost=false,ambientLupixAt=0;
   let autoPhaseKey='',phaseResolveBusy=false;
   setInterval(()=>{const el=$('wolf-phase-timer');if(!el||!currentRoom||!sb)return;const phase=el.dataset.phase,start=Date.parse(el.dataset.startedAt),duration=phase==='day'?90:45,remaining=Math.max(0,duration-Math.floor((Date.now()-start)/1000));el.textContent='⏱️ '+Math.floor(remaining/60)+':'+String(remaining%60).padStart(2,'0');if(remaining===0&&el.dataset.host==='true'&&!phaseResolveBusy){const key=currentRoom+':'+phase+':'+el.dataset.startedAt;if(autoPhaseKey!==key){autoPhaseKey=key;phaseResolveBusy=true;const roomId=currentRoom;sb.rpc('resolve_game_phase',{p_room_id:roomId}).then(async result=>{if(result.error){console.warn('Fin automatique de phase :',result.error.message);autoPhaseKey='';}else if(currentRoom===roomId){toast('Temps écoulé : passage à la phase suivante.');await refreshRoom();}}).finally(()=>{phaseResolveBusy=false;});}}},1000);
@@ -22,10 +22,10 @@
   const protectorRoleKeys=['protector','guard'];
 
   const auth=document.createElement('div'); auth.className='panel account-panel';
-  auth.innerHTML='<div class="auth-tabs"><button type="button" class="auth-tab active" id="wolf-tab-login">Connexion</button><button type="button" class="auth-tab" id="wolf-tab-signup">Créer un compte</button></div><h3 id="wolf-auth-title">Ravi de vous revoir</h3><div class="field-grid auth-fields"><input id="wolf-email" type="email" autocomplete="email" placeholder="Adresse e-mail"><input id="wolf-password" type="password" autocomplete="current-password" placeholder="Mot de passe (6 caractères minimum)"><input id="wolf-pseudo" maxlength="20" minlength="3" placeholder="Pseudo (3 à 20 caractères)" hidden></div><div class="button-row"><button class="primary wide" id="wolf-login">Se connecter</button><button class="primary wide" id="wolf-signup" hidden>Créer mon compte</button><button class="ghost" id="wolf-logout" hidden>Déconnexion</button></div><small id="wolf-auth-status">Connectez-vous pour créer ou rejoindre un salon.</small>';
+  auth.innerHTML='<div class="auth-tabs"><button type="button" class="auth-tab active" id="wolf-tab-login">Connexion</button><button type="button" class="auth-tab" id="wolf-tab-signup">Créer un compte</button></div><h3 id="wolf-auth-title">Ravi de vous revoir</h3><div class="field-grid auth-fields"><input id="wolf-email" type="email" autocomplete="email" placeholder="Adresse e-mail"><input id="wolf-password" type="password" autocomplete="current-password" placeholder="Mot de passe (6 caractères minimum)"><input id="wolf-pseudo" maxlength="20" minlength="3" placeholder="Pseudo (3 à 20 caractères)" hidden></div><div class="button-row"><button class="primary wide" id="wolf-login">Se connecter</button><button class="secondary wide" id="wolf-passkey-login" type="button">🔑 Se connecter avec une clé d’accès</button><button class="primary wide" id="wolf-signup" hidden>Créer mon compte</button><button class="ghost" id="wolf-logout" hidden>Déconnexion</button></div><small id="wolf-auth-status">Connectez-vous pour créer ou rejoindre un salon.</small>';
   $('auth-mount').appendChild(auth);
   const profile=document.createElement('div'); profile.className='panel profile-panel';
-  profile.innerHTML='<p class="eyebrow">VOTRE IDENTITÉ</p><h3>Mon profil joueur</h3><div class="field-grid"><input id="wolf-profile-name" maxlength="20" minlength="3" placeholder="Votre pseudo"><select id="wolf-avatar" aria-label="Avatar"><option value="🐺">🐺 Loup</option><option value="🦊">🦊 Renard</option><option value="🦉">🦉 Hibou</option><option value="🐱">🐱 Chat</option><option value="🐻">🐻 Ours</option><option value="🦇">🦇 Chauve-souris</option><option value="👻">👻 Fantôme</option><option value="🧙">🧙 Mage</option></select><button class="secondary" id="wolf-save-profile">Enregistrer le profil</button></div><div class="profile-preview" id="wolf-profile-preview"><span>🐺</span><strong>Votre profil</strong></div><small>Votre pseudo et votre avatar seront affichés dans les salons.</small><div id="wolf-wallet" class="wallet-card"><strong>🌙 Chargement des Lunes…</strong></div><div id="wolf-stats" class="stats-panel"><small>Chargement des statistiques…</small></div><div id="wolf-leaderboard" class="leaderboard-panel"><small>Chargement du classement…</small></div>';
+  profile.innerHTML='<p class="eyebrow">VOTRE IDENTITÉ</p><h3>Mon profil joueur</h3><div class="field-grid"><input id="wolf-profile-name" maxlength="20" minlength="3" placeholder="Votre pseudo"><select id="wolf-avatar" aria-label="Avatar"><option value="🐺">🐺 Loup</option><option value="🦊">🦊 Renard</option><option value="🦉">🦉 Hibou</option><option value="🐱">🐱 Chat</option><option value="🐻">🐻 Ours</option><option value="🦇">🦇 Chauve-souris</option><option value="👻">👻 Fantôme</option><option value="🧙">🧙 Mage</option></select><button class="secondary" id="wolf-save-profile">Enregistrer le profil</button></div><div class="profile-preview" id="wolf-profile-preview"><span>🐺</span><strong>Votre profil</strong></div><small>Votre pseudo et votre avatar seront affichés dans les salons.</small><button class="secondary wide" id="wolf-passkey-register" type="button">🔐 Ajouter une clé d’accès à ce compte</button><div id="wolf-passkey-list" class="passkey-list"></div><div id="wolf-wallet" class="wallet-card"><strong>🌙 Chargement des Lunes…</strong></div><div id="wolf-stats" class="stats-panel"><small>Chargement des statistiques…</small></div><div id="wolf-leaderboard" class="leaderboard-panel"><small>Chargement du classement…</small></div>';
   $('lobby').appendChild(profile);
   const premium=document.createElement('div');premium.className='panel premium-panel';
   premium.innerHTML='<p class="eyebrow">STATUT PREMIUM</p><h3>🐺 Loup Alpha</h3><div class="premium-price">10 🌙 <small>/ 30 jours</small></div><p>Les avantages Alpha de Wolfanator :</p><ul class="alpha-benefits"><li>Badge Loup Alpha sur votre profil</li><li>Statut Alpha et date d’expiration visibles</li><li>Avantages et options Alpha ajoutés progressivement dans Wolfanator</li></ul><div id="wolf-premium-status" class="premium-status">Vérification de votre accès…</div>';
@@ -71,7 +71,7 @@
     if(!sb)return;const r=await sb.auth.getSession(),session=r.data.session;
     $('wolf-logout').hidden=!session;$('wolf-logout-lobby').hidden=!session;$('wolf-login').hidden=!!session;$('wolf-signup').hidden=!!session;$('wolf-pseudo').hidden=!!session;
     profile.hidden=!session;panel.hidden=!session;premium.hidden=!session;
-    if(session){currentUserId=session.user.id;$('auth-screen').classList.add('hidden');$('lobby').classList.remove('hidden');status('Connecté : '+(session.user.email||'joueur'));await loadProfile(session.user);await loadPremium();await loadRooms();await renderAdminPanel();if(location.hash.startsWith('#/game/'))await handleGameRoute();}
+    if(session){currentUserId=session.user.id;$('auth-screen').classList.add('hidden');$('lobby').classList.remove('hidden');status('Connecté : '+(session.user.email||'joueur'));await loadProfile(session.user);await loadPasskeys();await loadFriends();await loadPremium();await loadRooms();await renderAdminPanel();if(location.hash.startsWith('#/game/'))await handleGameRoute();}
     else{currentUserId='';profileName='';isAdmin=false;if(adminPanel)adminPanel.hidden=true;status('Non connecté.');$('wolf-rooms').innerHTML='<small>Connectez-vous pour afficher les salons.</small>';if(location.hash.startsWith('#/game/'))showAuth();}
   }
   async function loadPremium(){
@@ -404,6 +404,74 @@
       }
     }finally{refreshing=false;}
   }
+
+  const friendsPanel=document.createElement('section');friendsPanel.className='panel friends-panel';friendsPanel.id='wolf-friends-panel';
+  friendsPanel.innerHTML='<p class="eyebrow">COMMUNAUTÉ WOLFANATOR</p><h3>👥 Mes amis</h3><div class="friends-tabs"><button type="button" class="active" data-friends-tab="friends">Amis</button><button type="button" data-friends-tab="requests">Demandes</button><button type="button" data-friends-tab="search">Ajouter</button></div><div id="wolf-friends-content"><small>Chargement…</small></div><div id="wolf-friend-chat" class="friend-chat" hidden></div>';
+  $('lobby').appendChild(friendsPanel);
+  let activeFriend=null,activeFriendRequest=null;
+  async function loadPasskeys(){
+    const box=$('wolf-passkey-list');if(!box||!sb)return;
+    if(!sb.auth.passkey?.list){box.textContent='Les clés d’accès ne sont pas disponibles dans cette version.';return;}
+    const r=await sb.auth.passkey.list();
+    if(r.error){box.textContent='Impossible de charger les clés d’accès.';return;}
+    box.innerHTML=(r.data||[]).map(k=>'<div class="passkey-row"><span>🔑 '+esc(k.friendly_name||'Clé d’accès')+'</span><button type="button" class="ghost" data-passkey-delete="'+k.id+'">Supprimer</button></div>').join('')||'<small>Aucune clé enregistrée sur ce compte.</small>';
+    box.querySelectorAll('[data-passkey-delete]').forEach(b=>b.addEventListener('click',async()=>{if(!confirm('Supprimer cette clé d’accès ?'))return;const x=await sb.auth.passkey.delete({passkeyId:b.dataset.passkeyDelete});if(x.error)toast(x.error.message);else{toast('Clé d’accès supprimée.');loadPasskeys();}}));
+  }
+  async function registerPasskey(){
+    if(!sb?.auth.registerPasskey)return toast('Les clés d’accès ne sont pas disponibles. Vérifiez la configuration Supabase.');
+    const name=prompt('Donnez un nom à cette clé (ex. Téléphone) :')||'';
+    const r=await sb.auth.registerPasskey();
+    if(r.error){toast(r.error.message);return;}
+    if(name.trim()&&sb.auth.passkey?.update){const u=await sb.auth.passkey.update({passkeyId:r.data.id,friendlyName:name.trim().slice(0,120)});if(u.error)console.warn(u.error);}
+    toast('Clé d’accès ajoutée à votre compte.');await loadPasskeys();
+  }
+  async function loginPasskey(){
+    if(!sb?.auth.signInWithPasskey)return toast('Les clés d’accès ne sont pas disponibles. Vérifiez la configuration Supabase.');
+    const r=await sb.auth.signInWithPasskey();if(r.error){toast(r.error.message);return;}
+    toast('Connexion par clé d’accès réussie.');await refreshAuth();
+  }
+  const friendTabButtons=()=>friendsPanel.querySelectorAll('[data-friends-tab]');
+  async function showFriendsTab(tab='friends'){
+    friendTabButtons().forEach(b=>b.classList.toggle('active',b.dataset.friendsTab===tab));
+    const box=$('wolf-friends-content');$('wolf-friend-chat').hidden=true;box.hidden=false;
+    if(tab==='search'){
+      box.innerHTML='<div class="friend-search"><input id="wolf-friend-search" maxlength="20" placeholder="Rechercher un pseudo…"><button class="secondary" id="wolf-friend-search-btn">Rechercher</button></div><div id="wolf-friend-search-results"></div>';
+      const run=async()=>{const q=$('wolf-friend-search').value.trim();if(q.length<3){$('wolf-friend-search-results').textContent='Saisissez au moins 3 caractères.';return;}
+        const r=await sb.from('profiles').select('id,username,avatar').ilike('username','%'+q.replace(/[%_]/g,'')+'%').neq('id',currentUserId).limit(12);
+        if(r.error){$('wolf-friend-search-results').textContent=r.error.message;return;}
+        const ids=(r.data||[]).map(x=>x.id);let existing=[];
+        if(ids.length){const x=await sb.from('friend_requests').select('requester_id,recipient_id,status').or('requester_id.eq.'+currentUserId+',recipient_id.eq.'+currentUserId);existing=x.data||[];}
+        $('wolf-friend-search-results').innerHTML=(r.data||[]).map(p=>{const rel=existing.find(f=>(f.requester_id===p.id&&f.recipient_id===currentUserId)||(f.requester_id===currentUserId&&f.recipient_id===p.id));const label=rel?.status==='accepted'?'Déjà ami':rel?.status==='pending'?'Demande en cours':'Ajouter';return '<div class="friend-row"><span class="friend-avatar">'+esc(p.avatar?.emoji||'🐺')+'</span><strong>'+esc(p.username)+'</strong><button type="button" class="secondary" data-friend-add="'+p.id+'" '+(rel?'disabled':'')+'>'+label+'</button></div>';}).join('')||'<small>Aucun joueur trouvé.</small>';
+        $('wolf-friend-search-results').querySelectorAll('[data-friend-add]').forEach(b=>b.addEventListener('click',async()=>{b.disabled=true;const x=await sb.from('friend_requests').insert({requester_id:currentUserId,recipient_id:b.dataset.friendAdd});if(x.error){toast(x.error.message);b.disabled=false;}else{toast('Demande envoyée.');b.textContent='Envoyée';showFriendsTab('requests');}}));
+      };
+      $('wolf-friend-search-btn').addEventListener('click',run);$('wolf-friend-search').addEventListener('keydown',e=>{if(e.key==='Enter')run();});
+      return;
+    }
+    const r=await sb.from('friend_requests').select('id,requester_id,recipient_id,status,created_at').or('requester_id.eq.'+currentUserId+',recipient_id.eq.'+currentUserId).order('created_at',{ascending:false});
+    if(r.error){box.textContent=r.error.message;return;}
+    const rows=r.data||[],accepted=rows.filter(x=>x.status==='accepted'),incoming=rows.filter(x=>x.status==='pending'&&x.recipient_id===currentUserId),outgoing=rows.filter(x=>x.status==='pending'&&x.requester_id===currentUserId);
+    const ids=[...new Set((tab==='friends'?accepted.map(x=>x.requester_id===currentUserId?x.recipient_id:x.requester_id):incoming.map(x=>x.requester_id)))];
+    const profiles=ids.length?await sb.from('profiles').select('id,username,avatar').in('id',ids):{data:[],error:null};
+    const byId=Object.fromEntries((profiles.data||[]).map(p=>[p.id,p]));
+    if(tab==='requests'){
+      box.innerHTML='<h4>Demandes reçues</h4>'+(incoming.map(f=>{const p=byId[f.requester_id];return '<div class="friend-row"><span>🐺</span><strong>'+esc(p?.username||'Joueur')+'</strong><button class="secondary" data-friend-accept="'+f.id+'">Accepter</button><button class="ghost" data-friend-reject="'+f.id+'">Refuser</button></div>';}).join('')||'<small>Aucune demande reçue.</small>')+'<h4>Demandes envoyées</h4>'+(outgoing.map(f=>'<div class="friend-row"><strong>En attente de réponse</strong></div>').join('')||'<small>Aucune demande envoyée.</small>');
+      box.querySelectorAll('[data-friend-accept],[data-friend-reject]').forEach(b=>b.addEventListener('click',async()=>{const id=b.dataset.friendAccept||b.dataset.friendReject,status=b.dataset.friendAccept?'accepted':'rejected';const x=await sb.from('friend_requests').update({status,updated_at:new Date().toISOString()}).eq('id',id);if(x.error)toast(x.error.message);else{toast(status==='accepted'?'Ami ajouté.':'Demande refusée.');showFriendsTab('requests');}}));
+    }else{
+      box.innerHTML=accepted.map(f=>{const id=f.requester_id===currentUserId?f.recipient_id:f.requester_id,p=byId[id];return '<button type="button" class="friend-row friend-open" data-friend-chat="'+f.id+'" data-friend-user="'+id+'"><span class="friend-avatar">'+esc(p?.avatar?.emoji||'🐺')+'</span><strong>'+esc(p?.username||'Joueur')+'</strong><span>💬 Discuter</span></button>';}).join('')||'<small>Pas encore d’amis. Utilisez « Ajouter » pour rechercher un joueur.</small>';
+      box.querySelectorAll('[data-friend-chat]').forEach(b=>b.addEventListener('click',()=>openFriendChat(b.dataset.friendChat,b.dataset.friendUser,byId[b.dataset.friendUser]?.username||'Ami')));
+    }
+  }
+  async function openFriendChat(friendshipId,friendId,name){
+    activeFriend=friendId;activeFriendRequest=friendshipId;const chat=$('wolf-friend-chat');$('wolf-friends-content').hidden=true;chat.hidden=false;
+    chat.innerHTML='<div class="friend-chat-head"><button type="button" class="ghost" id="wolf-friend-chat-back">← Amis</button><strong>Discussion avec '+esc(name)+'</strong></div><div class="friend-chat-messages" id="wolf-friend-messages">Chargement…</div><form class="friend-chat-form" id="wolf-friend-form"><input id="wolf-friend-input" maxlength="2000" placeholder="Écrire un message privé…" required><button class="primary" type="submit">Envoyer</button></form>';
+    $('wolf-friend-chat-back').addEventListener('click',()=>showFriendsTab('friends'));
+    const load=async()=>{if(activeFriendRequest!==friendshipId)return;const m=await sb.from('friend_messages').select('id,sender_id,body,created_at').eq('friendship_id',friendshipId).order('created_at',{ascending:true}).limit(100);const el=$('wolf-friend-messages');if(!el)return;el.innerHTML=(m.data||[]).map(x=>'<div class="friend-message '+(x.sender_id===currentUserId?'mine':'')+'"><p>'+esc(x.body)+'</p><small>'+new Date(x.created_at).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})+'</small></div>').join('')||'<small>Commencez la conversation.</small>';el.scrollTop=el.scrollHeight;};
+    $('wolf-friend-form').addEventListener('submit',async e=>{e.preventDefault();const input=$('wolf-friend-input'),body=input.value.trim();if(!body)return;input.disabled=true;const x=await sb.from('friend_messages').insert({friendship_id:friendshipId,sender_id:currentUserId,body});input.disabled=false;if(x.error){toast(x.error.message);return;}input.value='';await load();input.focus();});
+    await load();const old=window.__wolfFriendChatTimer;if(old)clearInterval(old);window.__wolfFriendChatTimer=setInterval(load,3000);
+  }
+  friendsPanel.querySelectorAll('[data-friends-tab]').forEach(b=>b.addEventListener('click',()=>showFriendsTab(b.dataset.friendsTab)));
+  async function loadFriends(){if(currentUserId)await showFriendsTab('friends');}
+
   let authMode='login';
   function setAuthMode(mode){
     authMode=mode;const signup=mode==='signup';
@@ -417,7 +485,7 @@
   window.addEventListener('hashchange',()=>{if(location.hash.startsWith('#/game/'))handleGameRoute();});
   $('wolf-tab-login').addEventListener('click',()=>setAuthMode('login'));
   $('wolf-tab-signup').addEventListener('click',()=>setAuthMode('signup'));
-  $('wolf-login').addEventListener('click',()=>authAction('login'));
+  $('wolf-login').addEventListener('click',()=>authAction('login'));$('wolf-passkey-login').addEventListener('click',loginPasskey);$('wolf-passkey-register').addEventListener('click',registerPasskey);
   $('wolf-signup').addEventListener('click',()=>authAction('signup'));
   const logout=async()=>{await sb.auth.signOut();closeRoom();await refreshAuth();showAuth();};
   $('wolf-logout').addEventListener('click',logout);
