@@ -96,7 +96,7 @@
     homePage.appendChild(publicBox);
     const current=roomPanel.querySelector('#wolf-current-room');
     if(current)roomPanel.appendChild(current);
-    roomPanel.hidden=true;
+    roomPanel.classList.add('room-storage');
   }
   const profilePanel=lobby.querySelector('.profile-panel');if(profilePanel)profilePage.appendChild(profilePanel);
   const premiumPanel=lobby.querySelector('.premium-panel');if(premiumPanel)extrasPage.appendChild(premiumPanel);
