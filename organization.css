@@ -1,0 +1,116 @@
+/* Wolfanator — organisation générale v1
+   Couche visuelle uniquement : aucune logique JavaScript ni règle métier modifiée. */
+:root{
+  --org-bg:#0b0a12;--org-surface:#151321;--org-surface-2:#1c192b;
+  --org-line:#302b42;--org-text:#f5f1fc;--org-muted:#aaa2ba;
+  --org-accent:#9b78ef;--org-accent-2:#7654ca;--org-gold:#e8c987;
+  --org-radius:18px;--org-shadow:0 16px 42px #0003;
+}
+html{scroll-padding-top:90px}
+body{background:radial-gradient(ellipse at 12% -5%,#342044 0,transparent 34%),radial-gradient(ellipse at 100% 22%,#1b1730 0,transparent 30%),var(--org-bg);color:var(--org-text)}
+.topbar{min-height:72px;padding:10px clamp(16px,4vw,56px);gap:18px;background:#0d0b14ed;border-bottom:1px solid var(--org-line);box-shadow:0 8px 30px #0002}
+.brand{flex-shrink:0}.desktop-nav{margin-left:auto;margin-right:8px;gap:5px}
+.desktop-nav a{padding:10px 13px;border:1px solid transparent;border-radius:10px}
+.desktop-nav a:hover,.desktop-nav a:focus-visible{background:#211b30;border-color:#413456;color:#fff}
+.topbar-right{gap:14px}.status{white-space:nowrap}
+main{width:min(100%,1480px);padding:0 clamp(14px,3vw,42px)}
+.hero{min-height:520px;padding:48px 10px 54px;gap:clamp(24px,4vw,64px)}
+.hero-copy{max-width:660px}.hero h1{max-width:700px}
+.hero-art{border:1px solid #ffffff18;box-shadow:var(--org-shadow)}
+.how{max-width:none;margin:14px 10px 58px;padding:30px 0 0;border-top:1px solid var(--org-line)}
+.rule-grid{gap:14px}.rule-grid article{border-radius:var(--org-radius);box-shadow:0 10px 28px #0002}
+#lobby{
+ display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+ grid-template-areas:"head head" "quick quick" "profile premium" "account account" "rooms rooms" "community community" "admin admin";
+ align-items:start;gap:16px;width:100%;max-width:none;margin:0 auto 48px;padding:28px 10px 46px;
+}
+#lobby>.section-head{grid-area:head;display:flex;align-items:center;gap:16px;margin:0;padding:0 0 16px;border-bottom:1px solid var(--org-line)}
+#lobby>.lobby-grid{grid-area:quick;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:0}
+#lobby>.profile-panel{grid-area:profile;display:block;min-width:0;margin:0;padding:22px}
+#lobby>.premium-panel{grid-area:premium;min-width:0;margin:0;padding:22px}
+#lobby>.account-panel{grid-area:account;min-width:0;margin:0;padding:22px}
+#lobby>.room-panel{grid-area:rooms;min-width:0;margin:0;padding:22px}
+#lobby>#wolf-extra-app{grid-area:community;min-width:0}
+#lobby>.admin-panel{grid-area:admin;min-width:0}
+#lobby .panel,#lobby .profile-panel,#lobby .premium-panel,#lobby .account-panel,#lobby .room-panel,#wolf-extra-app{
+ border:1px solid var(--org-line);border-radius:var(--org-radius);
+ background:linear-gradient(150deg,#1b1828,#12101b);box-shadow:var(--org-shadow)
+}
+#lobby .lobby-grid .panel{min-height:218px;padding:21px;display:flex;flex-direction:column;align-items:flex-start}
+#lobby .lobby-grid .panel p{flex:1}
+#lobby .lobby-grid .panel button{margin-top:16px}
+#lobby .room-panel>h3{font-size:23px;margin:4px 0 18px}
+#lobby .section-head h2{margin:6px 0 0}
+.section-head .button-row{margin:0}
+.button-row{gap:9px}
+.primary,.secondary,.ghost,.topbar-play{min-height:43px;border-radius:11px}
+.primary{background:linear-gradient(120deg,#ad8aff,#7953c7);box-shadow:0 8px 24px #7654ca33}
+.secondary{background:#ffffff0b;border:1px solid #ffffff20}
+.ghost{background:#ffffff08;border-color:#ffffff20}
+input,select,textarea{accent-color:var(--org-accent)}
+#lobby input,#lobby select,#lobby textarea,#wolf-current-room input,#wolf-current-room select,#wolf-current-room textarea{
+ max-width:100%;border-radius:10px;border:1px solid #403852;background:#100e18;color:var(--org-text)
+}
+#lobby .room-list{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+#lobby .room-card{min-width:0;border-radius:12px;background:#ffffff06;border-color:#393248}
+#lobby .composition-editor{border-radius:14px}
+#wolf-current-room{min-width:0}
+#wolf-current-room .wolf-hub{gap:16px}
+#wolf-current-room .hub-scene,#wolf-current-room .hub-panel{border-radius:16px;border-color:#393248;box-shadow:var(--org-shadow)}
+#wolf-current-room .hub-panel{background:#151321}
+#wolf-current-room .hub-tabs{border:1px solid #302b42;border-radius:11px}
+#wolf-current-room .chat-messages{border:1px solid #302b42;border-radius:12px}
+#wolf-extra-app{padding:22px!important}
+.wx-shell{border:0!important;background:transparent!important;box-shadow:none!important;padding:0!important}
+.wx-nav{gap:7px;border-radius:12px}
+.wx-content{padding-top:14px}
+.friends-panel{min-width:0}
+footer{max-width:1480px;padding:24px clamp(16px,3vw,42px) 32px;border-color:var(--org-line)}
+button,a,input,select,textarea{transition:border-color .18s ease,background-color .18s ease,transform .18s ease}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #b79aff;outline-offset:2px}
+@media(max-width:900px){
+ #lobby{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;padding:18px 4px 34px}
+ #lobby>.lobby-grid{gap:10px}
+ #lobby .lobby-grid .panel{padding:16px;min-height:205px}
+ #lobby .room-list{grid-template-columns:1fr}
+}
+@media(max-width:700px){
+ body{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+ .topbar{min-height:58px;padding:7px 13px}
+ .brand{font-size:15px;letter-spacing:1px;gap:9px}.brand .logo{width:38px;height:38px}
+ .topbar-right{gap:8px}.status{font-size:9px}.topbar-play{min-height:38px;padding:8px 11px}
+ .desktop-nav{display:none}
+ main{padding:0 12px}
+ .hero{padding:28px 0 32px;gap:16px}
+ .hero-art{height:235px;min-height:235px;border-radius:18px}
+ .hero h1{font-size:clamp(40px,10vw,58px);letter-spacing:-2px}
+ .how{margin:8px 0 30px;padding-top:22px}
+ #lobby{display:grid;grid-template-columns:minmax(0,1fr);grid-template-areas:"head" "quick" "profile" "premium" "account" "rooms" "community" "admin";gap:11px;padding:14px 0 28px}
+ #lobby>.section-head{align-items:flex-start;flex-wrap:wrap;padding:0 0 12px}
+ #lobby>.section-head h2{font-size:25px}
+ #lobby>.lobby-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+ #lobby>.lobby-grid .panel{min-height:0;padding:13px;border-radius:14px}
+ #lobby>.lobby-grid .panel:last-child{grid-column:1/-1}
+ #lobby>.profile-panel,#lobby>.premium-panel,#lobby>.account-panel,#lobby>.room-panel{padding:14px;border-radius:15px}
+ #lobby .room-panel>h3{font-size:19px}
+ #lobby .room-list{grid-template-columns:minmax(0,1fr)}
+ #lobby .room-card{align-items:flex-start;flex-direction:column}
+ #lobby .room-card button{width:100%;min-height:42px}
+ #wolf-extra-app{padding:14px!important;border-radius:15px!important}
+ .wx-nav{display:flex;flex-wrap:nowrap;overflow-x:auto;white-space:nowrap;scrollbar-width:thin}
+ .wx-nav button{flex:0 0 auto}
+ #wolf-current-room .wolf-hub{gap:11px}
+ #wolf-current-room .hub-scene,#wolf-current-room .hub-panel{border-radius:13px}
+ .mobile-dock{display:grid;z-index:120;background:#100d18f5;border-top:1px solid var(--org-line);backdrop-filter:blur(16px)}
+ .mobile-dock button{font-size:10px}
+ footer{padding:18px 12px 24px}
+}
+@media(max-width:390px){
+ #lobby>.lobby-grid{grid-template-columns:minmax(0,1fr)}
+ #lobby>.lobby-grid .panel:last-child{grid-column:auto}
+ .topbar-right .status{display:none}
+}
+/* Le mode partie conserve son plein écran et ses dimensions dédiées. */
+body.wolf-game-mode #lobby{display:block!important;padding:10px!important}
+body.wolf-game-mode #lobby>.room-panel{display:block!important}
+@media(max-width:700px){body.wolf-game-mode #lobby{padding:5px!important}}
