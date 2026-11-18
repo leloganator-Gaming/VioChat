@@ -206,8 +206,8 @@
   function gameRoomUrl(id,code){return location.origin+location.pathname+'#/game/'+encodeURIComponent(id)+'/'+encodeURIComponent(String(code||'').toUpperCase());}
   async function copyGameRoomLink(id,code){const url=gameRoomUrl(id,code);try{await navigator.clipboard.writeText(url);toast('Lien de la partie copié.');}catch(e){toast('Lien à partager : '+url);}}
   async function handleGameRoute(){
-    const match=location.hash.match(/^#\\/game\\/([^/]+)\\/([A-Z0-9]{8})$/i);if(!match||!sb)return;
-    const id=decodeURIComponent(match[1]),code=decodeURIComponent(match[2]).toUpperCase();if(currentRoom===id)return;
+    const parts=location.hash.split('/');if(parts.length!==4||parts[0]!=='#'||parts[1]!=='game'||! /^[A-Z0-9]{8}$/i.test(parts[3])||!sb)return;
+    const id=decodeURIComponent(parts[2]),code=decodeURIComponent(parts[3]).toUpperCase();if(currentRoom===id)return;
     const session=await sb.auth.getSession();if(!session.data.session){showAuth();return;}
     const member=await sb.from('room_players').select('room_id').eq('room_id',id).eq('user_id',session.data.session.user.id).maybeSingle();
     if(member.error){toast('Impossible de vérifier votre accès à cette partie.');return;}
