@@ -101,11 +101,11 @@
   const profilePanel=lobby.querySelector('.profile-panel');if(profilePanel)profilePage.appendChild(profilePanel);
   const premiumPanel=lobby.querySelector('.premium-panel');if(premiumPanel)extrasPage.appendChild(premiumPanel);
   const accountPanel=lobby.querySelector('.account-panel');if(accountPanel)profilePage.appendChild(accountPanel);
-  const extraApp=lobby.querySelector('#wolf-extra-app');if(extraApp)friendsPage.appendChild(extraApp);
+  const extraApp=lobby.querySelector('#wolf-extra-app');if(extraApp)extrasPage.appendChild(extraApp);
   if(adminPanel)adminPage.appendChild(adminPanel);
   const setMainPage=(name)=>{
     lobby.dataset.mainView=name;
-    lobby.querySelectorAll('.wolf-main-page').forEach(p=>p.classList.toggle('active',p.dataset.mainPage===name));
+    const visiblePage=['friends','profile','extras'].includes(name)?'extras':name;\n    lobby.querySelectorAll('.wolf-main-page').forEach(p=>p.classList.toggle('active',p.dataset.mainPage===visiblePage));
     mainNav.querySelectorAll('[data-main-tab]').forEach(b=>b.classList.toggle('active',b.dataset.mainTab===name));
     lobby.classList.toggle('admin-tab-open',name==='admin');
     if(name==='friends')lobby.querySelector('#wolf-extra-app [data-wx-tab="friends"]')?.click();
@@ -121,7 +121,7 @@
   lobby.querySelector('[data-hub-action="play"]')?.addEventListener('click',()=>setMainPage('home'));
   hubNav.addEventListener('click',e=>{
     const adminButton=e.target.closest('[data-wolf-admin-tab]');
-    if(adminButton){document.querySelector('#lobby')?.classList.add('admin-tab-open');adminPanel?.scrollIntoView({behavior:'smooth',block:'start'});return;}
+    if(adminButton){setMainPage('admin');adminPanel?.scrollIntoView({behavior:'smooth',block:'start'});return;}
     const b=e.target.closest('[data-wx-tab]');if(!b)return;
     document.querySelector('#lobby')?.classList.remove('admin-tab-open');
     const target=document.querySelector('#wolf-extra-app [data-wx-tab="'+b.dataset.wxTab+'"]');
@@ -180,7 +180,7 @@
   }
   async function renderAdminPanel(){
     if(!isAdmin){if(adminPanel)adminPanel.hidden=true;return;}
-    if(!adminPanel){adminPanel=document.createElement('section');adminPanel.className='panel admin-panel';adminPanel.id='wolf-admin-panel';$('lobby').appendChild(adminPanel);}
+    if(!adminPanel){adminPanel=document.createElement('section');adminPanel.className='panel admin-panel';adminPanel.id='wolf-admin-panel';const adminPage=document.querySelector('.wolf-main-page[data-main-page="admin"]');(adminPage||$('lobby')).appendChild(adminPanel);}
     adminPanel.hidden=false;
     adminPanel.setAttribute('aria-label','Onglet Administration Wolfanator');
     const nav=document.querySelector('.wolfy-hub-nav');
