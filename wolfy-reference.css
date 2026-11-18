@@ -528,3 +528,6 @@ body.wolf-game-mode #lobby>.section-head{display:none!important}
  body.wolf-game-mode #lobby{padding:4px!important}
  #wolf-current-room .wolf-hub .wolf-landscape-scene{background-position:center!important}
 }
+
+/* Preserve application visibility states despite the strong hub layout selectors. */
+#home.hidden,#lobby.hidden,#auth-screen.hidden,#how.hidden{display:none!important}
