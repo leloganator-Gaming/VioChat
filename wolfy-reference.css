@@ -417,3 +417,22 @@ main{width:min(100%,1600px);padding:0 clamp(12px,2vw,28px)}
   #wolf-current-room .wolf-hub .wolf-scene-buttons button{min-width:0!important;font-size:10px!important}
   .mobile-dock{display:none!important}
 }
+
+/* Room focus: hide the creator form while a room is open. */
+.room-panel.room-open{padding:0!important;background:transparent!important;border:0!important;box-shadow:none!important}
+.room-panel.room-open>:not(#wolf-current-room){display:none!important}
+.room-panel.room-open>#wolf-current-room{display:block!important;width:100%!important;margin:0!important;scroll-margin-top:76px}
+#wolf-current-room>.room-heading{
+  display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important;
+  margin:0 0 12px!important;padding:11px 14px!important;background:#222233!important;
+  border:1px solid #39394f!important;border-radius:12px!important
+}
+#wolf-current-room>.room-heading h3{margin:0!important;font-size:16px!important}
+#wolf-current-room>.room-heading .button-row{display:flex!important;gap:8px!important;flex-wrap:wrap!important}
+#wolf-current-room>#wolf-room-detail{min-width:0!important}
+@media(max-width:700px){
+  .room-panel.room-open{padding:0!important}
+  #wolf-current-room>.room-heading{position:sticky!important;top:0!important;z-index:30!important;padding:9px!important}
+  #wolf-current-room>.room-heading h3{font-size:13px!important}
+  #wolf-current-room>.room-heading button{font-size:10px!important;padding:8px 10px!important}
+}
