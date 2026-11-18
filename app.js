@@ -105,7 +105,8 @@
   if(adminPanel)adminPage.appendChild(adminPanel);
   const setMainPage=(name)=>{
     lobby.dataset.mainView=name;
-    const visiblePage=['friends','profile','extras'].includes(name)?'extras':name;\n    lobby.querySelectorAll('.wolf-main-page').forEach(p=>p.classList.toggle('active',p.dataset.mainPage===visiblePage));
+    const visiblePage=['friends','profile','extras'].includes(name)?'extras':name;
+    lobby.querySelectorAll('.wolf-main-page').forEach(p=>p.classList.toggle('active',p.dataset.mainPage===visiblePage));
     mainNav.querySelectorAll('[data-main-tab]').forEach(b=>b.classList.toggle('active',b.dataset.mainTab===name));
     lobby.classList.toggle('admin-tab-open',name==='admin');
     if(name==='friends')lobby.querySelector('#wolf-extra-app [data-wx-tab="friends"]')?.click();
