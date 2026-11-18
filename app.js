@@ -436,7 +436,7 @@
     const box=$('wolf-friends-content');$('wolf-friend-chat').hidden=true;box.hidden=false;
     if(tab==='lupix'){
       if(!isAlpha){toast('Les discussions avec les Lupix sont réservées aux membres Loup Alpha.');return;}
-      box.innerHTML='<h4>🤖 Vos compagnons Lupix</h4><p class="muted-note">Choisissez un Lupix pour ouvrir une conversation privée et retrouver vos anciens messages.</p><div class="lupix-friend-list"><button type="button" class="friend-row friend-open" data-lupix-chat="lupix-1"><span class="friend-avatar">🐺</span><strong>Lupix 1</strong><small>Analyste prudent</small><span>💬 Discuter</span></button><button type="button" class="friend-row friend-open" data-lupix-chat="lupix-2"><span class="friend-avatar">🦊</span><strong>Lupix 2</strong><small>Diplomate sociable</small><span>💬 Discuter</span></button><button type="button" class="friend-row friend-open" data-lupix-chat="lupix-3"><span class="friend-avatar">🦉</span><strong>Lupix 3</strong><small>Joueur audacieux</small><span>💬 Discuter</span></button></div>';
+      box.innerHTML='<h4>🤖 Vos compagnons Lupix</h4><p class="muted-note">Choisissez un Lupix pour ouvrir une conversation privée et retrouver vos anciens messages.</p><div class="lupix-friend-list"><button type="button" class="friend-row friend-open" data-lupix-chat="lupix-1"><span class="friend-avatar">🐺</span><strong>Lupix</strong><small>Analyste prudent</small><span>💬 Discuter</span></button><button type="button" class="friend-row friend-open" data-lupix-chat="lupix-2"><span class="friend-avatar">🦊</span><strong>Wolko</strong><small>Diplomate sociable</small><span>💬 Discuter</span></button><button type="button" class="friend-row friend-open" data-lupix-chat="lupix-3"><span class="friend-avatar">🦉</span><strong>Lunox</strong><small>Joueur audacieux</small><span>💬 Discuter</span></button></div>';
       box.querySelectorAll('[data-lupix-chat]').forEach(b=>b.addEventListener('click',()=>openLupixFriendChat(b.dataset.lupixChat)));
       return;
     }
@@ -469,7 +469,7 @@
   }
   async function openLupixFriendChat(key){
     if(!isAlpha){toast('Cette fonction est réservée aux membres Loup Alpha.');return;}
-    const names={'lupix-1':'Lupix 1','lupix-2':'Lupix 2','lupix-3':'Lupix 3'};
+    const names={'lupix-1':'Lupix','lupix-2':'Wolko','lupix-3':'Lunox'};
     const avatars={'lupix-1':'🐺','lupix-2':'🦊','lupix-3':'🦉'};
     const name=names[key];if(!name)return;
     activeFriendRequest='private-'+key;
