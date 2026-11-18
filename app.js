@@ -47,7 +47,15 @@
   // Les onglets sociaux restent gérés par features.js ; ces raccourcis ouvrent leurs vrais onglets.
   const hubNav=document.createElement('nav');hubNav.className='wolfy-hub-nav';hubNav.innerHTML='<button data-wx-tab="shop">🛍 Boutique</button><button data-wx-tab="ranking">🏆 Classement</button><button data-wx-tab="friends">👥 Amis</button><button data-wx-tab="profile">🪪 Mon skin</button>';
   $('lobby').insertBefore(hubNav,wolfyHub);
-  hubNav.addEventListener('click',e=>{const b=e.target.closest('[data-wx-tab]');if(!b)return;const target=document.querySelector('#wolf-extra-app [data-wx-tab="'+b.dataset.wxTab+'"]');if(target){target.click();document.querySelector('#wolf-extra-app')?.scrollIntoView({behavior:'smooth',block:'start'});}else toast('Connectez-vous pour accéder à cette rubrique.');});
+  hubNav.addEventListener('click',e=>{
+    const adminButton=e.target.closest('[data-wolf-admin-tab]');
+    if(adminButton){document.querySelector('#lobby')?.classList.add('admin-tab-open');adminPanel?.scrollIntoView({behavior:'smooth',block:'start'});return;}
+    const b=e.target.closest('[data-wx-tab]');if(!b)return;
+    document.querySelector('#lobby')?.classList.remove('admin-tab-open');
+    const target=document.querySelector('#wolf-extra-app [data-wx-tab="'+b.dataset.wxTab+'"]');
+    if(target){target.click();document.querySelector('#wolf-extra-app')?.scrollIntoView({behavior:'smooth',block:'start');}
+    else toast('Connectez-vous pour accéder à cette rubrique.');
+  });
   function renderCompositionFields(comp={}){
     const box=$('wolf-composition-fields');if(!box)return;
     const classic=['villager','wolf'];
@@ -102,6 +110,9 @@
     if(!isAdmin){if(adminPanel)adminPanel.hidden=true;return;}
     if(!adminPanel){adminPanel=document.createElement('section');adminPanel.className='panel admin-panel';adminPanel.id='wolf-admin-panel';$('lobby').appendChild(adminPanel);}
     adminPanel.hidden=false;
+    adminPanel.setAttribute('aria-label','Onglet Administration Wolfanator');
+    const nav=document.querySelector('.wolfy-hub-nav');
+    if(nav&&!nav.querySelector('[data-wolf-admin-tab]'))nav.insertAdjacentHTML('beforeend','<button type="button" data-wolf-admin-tab>⚙️ Administration</button>');
     adminPanel.innerHTML='<p class="eyebrow">CONSOLE PRIVILÉGIÉE</p><h3>🛠️ Administration Wolfanator</h3><p class="muted-note">Outils réservés au compte administrateur permanent.</p><div class="admin-actions"><button class="secondary" id="admin-refresh">Actualiser les données</button><button class="secondary" id="admin-test-hub">🧪 Tester le hub</button><button class="ghost" id="admin-cleanup">Nettoyer les salons en attente de plus de 24 h</button></div><div id="admin-stats" class="admin-stats">Chargement des indicateurs…</div><h4>Gestion de tous les salons</h4><div id="admin-room-list" class="admin-room-list">Chargement…</div><div id="admin-diagnostics" class="admin-diagnostics"></div><h4>Journal des actions administrateur</h4><div id="admin-audit-list" class="admin-audit-list">Chargement…</div><h4>Signalements des joueurs</h4><div id="admin-report-list" class="admin-audit-list">Chargement…</div>';
     $('admin-refresh').addEventListener('click',loadAdminData);
     $('admin-test-hub').addEventListener('click',async()=>{
