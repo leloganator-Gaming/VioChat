@@ -474,15 +474,26 @@
     const name=names[key];if(!name)return;
     activeFriendRequest='private-'+key;
     const chat=$('wolf-friend-chat');$('wolf-friends-content').hidden=true;chat.hidden=false;
-    chat.innerHTML='<div class="friend-chat-head"><button type="button" class="ghost" id="wolf-friend-chat-back">← Mes Lupix</button><span class="friend-avatar">'+avatars[key]+'</span><strong>Discussion avec '+name+'</strong><small>Alpha</small></div><div class="friend-chat-messages" id="wolf-friend-messages">Chargement…</div><form class="friend-chat-form" id="wolf-friend-form"><input id="wolf-friend-input" maxlength="1000" placeholder="Écrire à '+name+'…" required><button class="primary" type="submit">Envoyer</button></form>';
+    chat.innerHTML='<div class="friend-chat-head"><button type="button" class="ghost" id="wolf-friend-chat-back">← Mes Lupix</button><span class="friend-avatar">'+avatars[key]+'</span><strong>Discussion avec '+name+'</strong><small>Alpha · peut aussi prendre l’initiative</small></div><div class="friend-chat-messages" id="wolf-friend-messages">Chargement…</div><form class="friend-chat-form" id="wolf-friend-form"><input id="wolf-friend-input" maxlength="1000" placeholder="Écrire à '+name+'…" required><button class="primary" type="submit">Envoyer</button></form>';
     $('wolf-friend-chat-back').addEventListener('click',()=>showFriendsTab('lupix'));
     const load=async()=>{
       if(activeFriendRequest!=='private-'+key)return;
       const m=await sb.from('lupix_private_messages').select('id,sender,body,created_at').eq('user_id',currentUserId).eq('lupix_key',key).order('created_at',{ascending:true}).limit(100);
       const el=$('wolf-friend-messages');if(!el)return;
       if(m.error){el.textContent=m.error.message;return;}
-      el.innerHTML=(m.data||[]).map(x=>'<div class="friend-message '+(x.sender==='user'?'mine':'')+'"><p>'+esc(x.body)+'</p><small>'+new Date(x.created_at).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})+'</small></div>').join('')||'<small>Dis bonjour à '+name+' pour commencer.</small>';
+      el.innerHTML=(m.data||[]).map(x=>'<div class="friend-message '+(x.sender==='user'?'mine':'')+'"><p>'+esc(x.body)+'</p><small>'+new Date(x.created_at).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})+'</small></div>').join('')||'<small>'+name+' réfléchit à un sujet pour lancer la discussion…</small>';
       el.scrollTop=el.scrollHeight;
+    };
+    let autoBusy=false;
+    const autonomous=async()=>{
+      if(autoBusy||activeFriendRequest!=='private-'+key||document.hidden)return;
+      const input=$('wolf-friend-input');if(input&&input.value.trim())return;
+      autoBusy=true;
+      try{
+        const result=await sb.functions.invoke('lupix-friend-chat',{body:{lupix_key:key,autonomous:true}});
+        if(result.data?.reply)await load();
+        else if(result.error)console.warn('Lupix autonome:',result.error.message);
+      }finally{autoBusy=false;}
     };
     $('wolf-friend-form').addEventListener('submit',async e=>{
       e.preventDefault();const input=$('wolf-friend-input'),body=input.value.trim();if(!body)return;
@@ -494,7 +505,10 @@
       input.value='';await load();input.focus();
     });
     await load();const old=window.__wolfFriendChatTimer;if(old)clearInterval(old);
+    const oldAuto=window.__wolfFriendChatAutoTimer;if(oldAuto)clearInterval(oldAuto);
     window.__wolfFriendChatTimer=setInterval(load,3000);
+    window.__wolfFriendChatAutoTimer=setInterval(autonomous,20000);
+    setTimeout(autonomous,2500);
   }
   async function openFriendChat(friendshipId,friendId,name){
     activeFriend=friendId;activeFriendRequest=friendshipId;const chat=$('wolf-friend-chat');$('wolf-friends-content').hidden=true;chat.hidden=false;
