@@ -23,7 +23,7 @@ body{background:#171725;color:var(--wolf-ui-text)}
 main{width:100%;max-width:1600px;padding:0 clamp(16px,2.5vw,38px)}
 .hero{
   max-width:1400px;min-height:470px;padding:46px 24px 52px;gap:48px;
-  background-image:linear-gradient(90deg,#171725f5 0%,#171725c9 48%,#17172530 100%),url('https://assets.wolfy.fr/ambiance_wolfy.png');
+  background-image:linear-gradient(90deg,#171725f5 0%,#171725c9 48%,#17172530 100%),url('assets/wolfanator-village-night.svg');
   background-size:cover;background-position:center 43%;border-radius:0 0 22px 22px
 }
 .hero-art{border:0;background:#17172545;box-shadow:none}
@@ -126,7 +126,7 @@ main{width:100%;max-width:1600px;padding:0 clamp(16px,2.5vw,38px)}
 #wolf-current-room .wolf-hub .game-table-head{padding:12px 14px!important}
 #wolf-current-room .wolf-hub .game-player-stage{
   position:relative!important;min-height:490px!important;padding:20px 14px!important;overflow:hidden!important;
-  background-image:url('https://assets.wolfy.fr/scenejour_wolfy.png')!important;background-size:cover!important;background-position:center 52%!important
+  background-image:url('assets/wolfanator-village-day.svg')!important;background-size:cover!important;background-position:center 52%!important
 }
 #wolf-current-room .wolf-hub .game-player-stage:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#12132110,#1113216b 70%,#1113219c);pointer-events:none}
 #wolf-current-room .wolf-hub .game-table-art{position:absolute!important;z-index:1!important;left:50%!important;top:48%!important;transform:translate(-50%,-50%)!important;display:grid!important;place-items:center!important;width:210px!important;height:145px!important;border-radius:50%!important;background:#1b1a29a8!important;border:1px solid #ffffff25!important;backdrop-filter:blur(3px)!important;text-align:center!important}
@@ -153,7 +153,7 @@ main{width:100%;max-width:1600px;padding:0 clamp(16px,2.5vw,38px)}
 #wolf-current-room .wolf-hub .wolf-config-actions button{background:#292940!important;color:#fff!important;border:1px solid #ffffff18!important;border-radius:22px!important}
 #wolf-current-room .wolf-hub .wolf-landscape-scene{
   position:relative!important;height:clamp(460px,55vw,650px)!important;min-height:460px!important;overflow:hidden!important;
-  background-image:url('https://assets.wolfy.fr/scenejour_wolfy.png')!important;background-size:cover!important;background-position:center 54%!important
+  background-image:url('assets/wolfanator-village-day.svg')!important;background-size:cover!important;background-position:center 54%!important
 }
 #wolf-current-room .wolf-hub .scene-mountains,
 #wolf-current-room .wolf-hub .scene-lake,
@@ -257,11 +257,11 @@ main{width:100%;max-width:1600px;padding:0 clamp(16px,2.5vw,38px)}
 /* La scène passe réellement du décor du jour à celui de la nuit selon la phase. */
 #wolf-current-room .wolf-hub:has(.game-status[data-game-phase="night"]) .game-player-stage,
 #wolf-current-room .wolf-hub:has(.game-status[data-game-phase="night"]) .wolf-landscape-scene{
-  background-image:url('https://assets.wolfy.fr/scenenuit_wolfy.png')!important;
+  background-image:url('assets/wolfanator-village-night.svg')!important;
   background-size:cover!important;background-position:center 52%!important
 }
 #wolf-current-room .wolf-hub:has(.game-status[data-game-phase="day"]) .game-player-stage{
-  background-image:url('https://assets.wolfy.fr/scenejour_wolfy.png')!important
+  background-image:url('assets/wolfanator-village-day.svg')!important
 }
 
 
@@ -435,4 +435,96 @@ main{width:min(100%,1600px);padding:0 clamp(12px,2vw,28px)}
   #wolf-current-room>.room-heading{position:sticky!important;top:0!important;z-index:30!important;padding:9px!important}
   #wolf-current-room>.room-heading h3{font-size:13px!important}
   #wolf-current-room>.room-heading button{font-size:10px!important;padding:8px 10px!important}
+}
+
+
+/* ===== Full hub reconstruction: scenic center + functional side panels ===== */
+#lobby{
+  max-width:1560px!important;
+  display:grid!important;
+  grid-template-columns:minmax(245px,285px) minmax(360px,1fr) minmax(290px,340px)!important;
+  grid-template-areas:"head head head" "nav nav nav" "quick stage social" "rooms stage social" "rooms profile premium" "account account account"!important;
+  align-items:start!important;gap:13px!important;padding:16px 8px 38px!important
+}
+#lobby>.section-head{grid-area:head!important;margin:0!important;padding:0 3px 4px!important}
+#lobby>.wolfy-hub-nav{grid-area:nav!important;display:flex!important;align-items:center!important;gap:7px!important;padding:8px 10px!important;background:#1d1d2c!important;border:1px solid #39394f!important;border-radius:12px!important}
+.wolfy-hub-nav button{border:0!important;background:transparent!important;color:#d8d5e9!important;padding:9px 13px!important;border-radius:9px!important;font-size:11px!important;font-weight:700!important;cursor:pointer!important}
+.wolfy-hub-nav button:hover{background:#ffffff12!important;color:#fff!important}
+#lobby>.lobby-grid{grid-area:quick!important;display:flex!important;flex-direction:column!important;gap:8px!important}
+#lobby>.lobby-grid .panel{min-height:0!important;padding:13px!important}
+#lobby>.lobby-grid .panel h3{font-size:15px!important;margin:5px 0!important}
+#lobby>.lobby-grid .panel p{font-size:10px!important;line-height:1.4!important}
+#lobby>.wolfy-hub-visual{grid-area:stage!important;min-width:0!important}
+.wolfy-hub-scene{
+  position:relative!important;isolation:isolate!important;min-height:490px!important;height:clamp(490px,42vw,610px)!important;
+  overflow:hidden!important;border:1px solid #41415a!important;border-radius:15px!important;
+  background-image:linear-gradient(180deg,#11162905 38%,#10121de8 100%),url('assets/wolfanator-village-night.svg')!important;
+  background-size:cover!important;background-position:center 58%!important;box-shadow:0 12px 36px #08081266!important
+}
+.wolfy-hub-sky{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 35%,#9e9fce22,transparent 38%);pointer-events:none}
+.wolfy-hub-moon{position:absolute;right:12%;top:11%;width:82px;height:82px;border-radius:50%;background:#e8e6d6;box-shadow:0 0 60px #d9d7ff55;opacity:.82}
+.wolfy-hub-avatar{position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);font-size:clamp(82px,10vw,142px);filter:drop-shadow(0 15px 13px #000b);z-index:2}
+.wolfy-hub-pedestal{position:absolute;left:50%;top:68%;transform:translateX(-50%);width:min(48%,250px);height:38px;border-radius:50%;background:radial-gradient(ellipse,#d5c6a944,#080b19 72%);border:1px solid #ffffff22}
+.wolfy-hub-name{position:absolute;left:50%;top:76%;transform:translateX(-50%);display:grid;gap:4px;text-align:center;z-index:3}
+.wolfy-hub-name small{font-size:8px;letter-spacing:2px;color:#c5c3d8}
+.wolfy-hub-name strong{font:700 19px 'Space Grotesk';color:white;text-shadow:0 2px 9px #000}
+.wolfy-hub-pet{position:absolute;left:65%;top:68%;font-size:32px;filter:drop-shadow(0 6px 6px #000)}
+.wolfy-hub-quick{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);display:flex;justify-content:center;gap:8px;width:calc(100% - 28px);z-index:4}
+.wolfy-hub-quick button{border:0;border-radius:22px;padding:11px 17px;background:#f3b52f;color:#241b13;font-size:11px;font-weight:800;box-shadow:0 5px 18px #0005;cursor:pointer}
+.wolfy-hub-quick button+button{background:#24243a;color:#fff;border:1px solid #ffffff25}
+#lobby>.room-panel{grid-area:rooms!important;min-width:0!important;padding:14px!important;max-height:calc(100svh - 100px)!important;overflow:auto!important}
+#lobby>.room-panel>h3{font-size:16px!important}
+#lobby>.room-panel .composition-editor{padding:10px!important}
+#lobby>.room-panel .composition-icon-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+#lobby>#wolf-extra-app{grid-area:social!important;align-self:stretch!important;min-width:0!important}
+#lobby>.profile-panel{grid-area:profile!important}
+#lobby>.premium-panel{grid-area:premium!important}
+#lobby>.account-panel{grid-area:account!important}
+#lobby>.admin-panel{grid-area:account!important}
+#lobby .wx-shell{padding:14px!important}
+#lobby .wx-heading h2{font-size:19px!important}
+#lobby .wx-nav{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;overflow:visible!important;white-space:normal!important}
+#lobby .wx-nav button{font-size:10px!important;padding:9px 7px!important}
+#lobby .wx-content{padding-top:10px!important}
+#lobby .wx-tiles{grid-template-columns:1fr!important}
+#lobby .wx-tiles button{min-width:0!important}
+#lobby .wx-friend-list{max-height:420px!important;overflow:auto!important}
+#lobby .room-panel.room-open{grid-area:1/1/-1/-1!important;max-height:none!important}
+body.wolf-game-mode #lobby{display:block!important;max-width:none!important;padding:8px!important}
+body.wolf-game-mode #lobby>.room-panel{display:block!important}
+body.wolf-game-mode #lobby>.wolfy-hub-visual,
+body.wolf-game-mode #lobby>.wolfy-hub-nav,
+body.wolf-game-mode #lobby>.lobby-grid,
+body.wolf-game-mode #lobby>.profile-panel,
+body.wolf-game-mode #lobby>.premium-panel,
+body.wolf-game-mode #lobby>#wolf-extra-app,
+body.wolf-game-mode #lobby>.section-head{display:none!important}
+#wolf-current-room .wolf-landscape-scene{background-image:url('assets/wolfanator-village-day.svg')!important}
+#wolf-current-room .wolf-hub:has(.game-status[data-game-phase="night"]) .wolf-landscape-scene,
+#wolf-current-room .wolf-hub:has(.game-status[data-game-phase="night"]) .game-player-stage{background-image:url('assets/wolfanator-village-night.svg')!important}
+#wolf-current-room .wolf-hub:has(.game-status[data-game-phase="day"]) .game-player-stage{background-image:url('assets/wolfanator-village-day.svg')!important}
+@media(max-width:1050px) and (min-width:701px){
+ #lobby{grid-template-columns:minmax(210px,250px) minmax(0,1fr)!important;grid-template-areas:"head head" "nav nav" "quick stage" "rooms stage" "social social" "profile premium" "account account"!important}
+ #lobby>#wolf-extra-app{grid-area:social!important}
+ .wolfy-hub-scene{min-height:470px!important;height:520px!important}
+}
+@media(max-width:700px){
+ #lobby{grid-template-columns:minmax(0,1fr)!important;grid-template-areas:"head" "nav" "stage" "quick" "rooms" "social" "profile" "premium" "account"!important;gap:9px!important;padding:10px 0 28px!important}
+ #lobby>.wolfy-hub-nav{overflow-x:auto!important;white-space:nowrap!important;gap:3px!important;padding:5px!important}
+ .wolfy-hub-nav button{flex:0 0 auto!important;padding:8px 9px!important;font-size:9px!important}
+ #lobby>.lobby-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:7px!important}
+ #lobby>.lobby-grid .panel{padding:10px!important}
+ #lobby>.lobby-grid .panel:last-child{grid-column:1/-1!important}
+ .wolfy-hub-scene{height:clamp(390px,65svh,510px)!important;min-height:390px!important;border-radius:12px!important}
+ .wolfy-hub-moon{width:58px!important;height:58px!important;right:12%!important;top:9%!important}
+ .wolfy-hub-avatar{font-size:100px!important;top:45%!important}
+ .wolfy-hub-pedestal{top:66%!important}
+ .wolfy-hub-name{top:75%!important}
+ .wolfy-hub-quick{bottom:12px!important;gap:5px!important;width:calc(100% - 18px)!important}
+ .wolfy-hub-quick button{padding:10px 11px!important;font-size:10px!important}
+ #lobby>.room-panel{max-height:none!important}
+ #lobby>.room-panel .composition-icon-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+ #lobby .wx-nav{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ body.wolf-game-mode #lobby{padding:4px!important}
+ #wolf-current-room .wolf-hub .wolf-landscape-scene{background-position:center!important}
 }
