@@ -4,7 +4,7 @@
   const toast = s => { const el=$('toast'); el.textContent=s; el.classList.add('show'); clearTimeout(window.__wolfToast); window.__wolfToast=setTimeout(()=>el.classList.remove('show'),4200); };
   const cfg=window.WOLFANATOR_CONFIG||{}, configured=!!(cfg.supabaseUrl&&cfg.supabasePublishableKey&&window.supabase);
   const sb=configured?window.supabase.createClient(cfg.supabaseUrl,cfg.supabasePublishableKey,{auth:{experimental:{passkey:true}}}):null;
-  let currentRoom=null,channel=null,profileName='',currentUserId='',refreshing=false,isAlpha=false,isAdmin=false,adminPanel=null,autoBotPhaseKey='',isRoomHost=false,ambientLupixAt=0;
+  let currentRoom=null,channel=null,directoryChannel=null,profileName='',currentUserId='',refreshing=false,isAlpha=false,isAdmin=false,adminPanel=null,autoBotPhaseKey='',isRoomHost=false,ambientLupixAt=0;
   let autoPhaseKey='',phaseResolveBusy=false;
   setInterval(()=>{const el=$('wolf-phase-timer');if(!el||!currentRoom||!sb)return;const phase=el.dataset.phase,start=Date.parse(el.dataset.startedAt),duration=phase==='day'?90:45,remaining=Math.max(0,duration-Math.floor((Date.now()-start)/1000));el.textContent='⏱️ '+Math.floor(remaining/60)+':'+String(remaining%60).padStart(2,'0');if(remaining===0&&el.dataset.host==='true'&&!phaseResolveBusy){const key=currentRoom+':'+phase+':'+el.dataset.startedAt;if(autoPhaseKey!==key){autoPhaseKey=key;phaseResolveBusy=true;const roomId=currentRoom;sb.rpc('resolve_game_phase',{p_room_id:roomId}).then(async result=>{if(result.error){console.warn('Fin automatique de phase :',result.error.message);autoPhaseKey='';}else if(currentRoom===roomId){toast('Temps écoulé : passage à la phase suivante.');await refreshRoom();}}).finally(()=>{phaseResolveBusy=false;});}}},1000);
   const ambientLupixTimer=setInterval(()=>{if(!currentRoom||!isRoomHost||!sb||Date.now()-ambientLupixAt<35000)return;ambientLupixAt=Date.now();const roomId=currentRoom;sb.functions.invoke('lupix-turn',{body:{room_id:roomId,mode:'ambient'}}).then(x=>{if(x.error)console.warn('Discussion spontanée Lupix indisponible :',x.error.message);else if(x.data?.spoke)console.info('Prise de parole de',x.data.player);}).catch(e=>console.warn('Discussion spontanée Lupix indisponible :',e));},15000);
@@ -169,8 +169,8 @@
     if(!sb)return;const r=await sb.auth.getSession(),session=r.data.session;
     $('wolf-logout').hidden=!session;$('wolf-logout-lobby').hidden=!session;$('wolf-login').hidden=!!session;$('wolf-signup').hidden=!!session;$('wolf-pseudo').hidden=!!session;
     profile.hidden=!session;panel.hidden=!session;premium.hidden=!session;
-    if(session){currentUserId=session.user.id;$('auth-screen').classList.add('hidden');$('lobby').classList.remove('hidden');status('Connecté : '+(session.user.email||'joueur'));await loadProfile(session.user);await loadPasskeys();await loadFriends();await loadPremium();await loadRooms();await renderAdminPanel();if(location.hash.startsWith('#/game/'))await handleGameRoute();}
-    else{currentUserId='';profileName='';isAdmin=false;if(adminPanel)adminPanel.hidden=true;status('Non connecté.');$('wolf-rooms').innerHTML='<small>Connectez-vous pour afficher les salons.</small>';if(location.hash.startsWith('#/game/'))showAuth();}
+    if(session){currentUserId=session.user.id;$('auth-screen').classList.add('hidden');$('lobby').classList.remove('hidden');status('Connecté : '+(session.user.email||'joueur'));await loadProfile(session.user);await loadPasskeys();await loadFriends();await loadPremium();await loadRooms();subscribeRoomDirectory();await renderAdminPanel();if(location.hash.startsWith('#/game/'))await handleGameRoute();}
+    else{if(directoryChannel&&sb){sb.removeChannel(directoryChannel);directoryChannel=null;}currentUserId='';profileName='';isAdmin=false;if(adminPanel)adminPanel.hidden=true;status('Non connecté.');$('wolf-rooms').innerHTML='<small>Connectez-vous pour afficher les salons.</small>';if(location.hash.startsWith('#/game/'))showAuth();}
   }
   async function loadPremium(){
     isAdmin=false;const box=$('wolf-premium-status');if(!box)return;
@@ -266,6 +266,13 @@
     if(n.length<3||n.length>20)return toast('Le pseudo doit contenir entre 3 et 20 caractères.');
     const emoji=$('wolf-avatar').value;const r=await sb.from('profiles').upsert({id:u.id,username:n,avatar:{emoji}},{onConflict:'id'});
     if(r.error)return toast(r.error.message);profileName=n;$('wolf-pseudo').value=n;$('wolf-profile-preview').innerHTML='<span>'+esc(emoji)+'</span><strong>'+esc(n)+'</strong>'+(isAlpha?'<small class="alpha-badge">🐺 LOUP ALPHA</small>':'');toast('Profil enregistré.');
+  }
+  function subscribeRoomDirectory(){
+    if(!sb||directoryChannel)return;
+    directoryChannel=sb.channel('wolf-public-room-directory')
+      .on('postgres_changes',{event:'*',schema:'public',table:'game_rooms'},()=>loadRooms())
+      .on('postgres_changes',{event:'*',schema:'public',table:'room_players'},()=>loadRooms())
+      .subscribe();
   }
   async function loadRooms(){
     const box=$('wolf-rooms');if(!box||!sb)return;
