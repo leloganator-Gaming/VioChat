@@ -632,3 +632,6 @@ body.wolf-game-mode #lobby>.room-panel.room-storage.room-open{display:block!impo
  #lobby>.wolf-main-page[data-main-page="create"].active{grid-template-columns:minmax(0,1fr)!important}
  #lobby>.wolf-main-page[data-main-page="create"] .wolf-create-box{padding:13px!important}
 }
+
+/* Keep one clear navigation bar; admin is injected into the main bar for admins only. */
+#lobby>.wolfy-hub-nav{display:none!important}
